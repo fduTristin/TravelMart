@@ -29,7 +29,7 @@ watch(
   () => route.fullPath,
   (newPath) => {
     console.log('Route changed:', newPath)
-    if (route.name === 'lab1/users') {
+    if (route.name === 'users') {
       loadData()
     }
   }
@@ -98,7 +98,7 @@ const handleCreate = () => {
         <el-table-column prop="userId" label="ID" width="80" />
         <el-table-column prop="userName" label="Name" min-width="80" />
         <el-table-column prop="userEmail" label="E-mail" min-width="100" />
-        <el-table-column label="Actions" width="200" fixed="right">
+        <!-- <el-table-column label="Actions" width="200" fixed="right">
           <template #default="{ row }">
             <el-button-group>
               <el-button
@@ -107,7 +107,7 @@ const handleCreate = () => {
                 title="View Details"
               >
                 <el-icon><View /></el-icon>
-              </el-button>
+              </el-button> -->
               <!-- <el-button
                 size="small"
                 type="primary"
@@ -124,9 +124,9 @@ const handleCreate = () => {
               >
                 <el-icon><Delete /></el-icon>
               </el-button> -->
-            </el-button-group>
+            <!-- </el-button-group>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
 
       <div v-else-if="!userStore.loading" class="empty-state">
