@@ -3,7 +3,7 @@ import type { AxiosInstance } from 'axios'
 
 // 创建 axios 实例
 export const api: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:8000/api', 
+  baseURL: 'http://localhost:8080', 
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json'
