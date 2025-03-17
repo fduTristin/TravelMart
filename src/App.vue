@@ -23,6 +23,7 @@ const error = ref<string | null>(null)
         >
           <el-menu-item index="/items">Tasks</el-menu-item>
           <el-menu-item index="/items/create">New User</el-menu-item>
+          <el-menu-item index="/lab1/users">Users</el-menu-item>
         </el-menu>
       </div>
     </el-header>

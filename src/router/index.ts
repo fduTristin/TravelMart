@@ -63,6 +63,15 @@ const routes: RouteRecordRaw[] = [
     })
   },
   {
+    path: '/lab1/users',
+    name: 'users',
+    component: () => import('@/views/UserList.vue'),
+    meta: {
+      title: 'User Management',
+      keepAlive: true
+    }
+  },
+  {
     // 404 页面
     path: '/:pathMatch(.*)*',
     name: 'not-found',
