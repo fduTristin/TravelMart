@@ -8,16 +8,9 @@ import axios from 'axios'
 
 const router = useRouter()
 
-// 获取并递增 ID
-function getNextUserId() {
-  let lastId = Number(localStorage.getItem('lastUserId')) || 1
-  const newId = lastId + 1
-  localStorage.setItem('lastUserId', newId.toString()) // 存入本地存储
-  return newId
-}
 
 const formData = ref({
-  user_id: getNextUserId(), // 生成自增 ID
+  user_id: 1, // 生成自增 ID
   userName: '',
   userEmail: ''
 })
@@ -81,10 +74,6 @@ const handleCancel = () => {
         class="form"
         :disabled="loading"
       >
-      <el-form-item label="User ID" prop="user_id">
-        <el-input v-model="formData.user_id" disabled />
-      </el-form-item>
-
 
         <el-form-item label="Username" prop="userName">
           <el-input
