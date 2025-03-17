@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import PageContainer from '@/components/PageContainer.vue'
-import { ArrowLeft } from '@element-plus/icons-vue'
 import axios from 'axios'
 
 const router = useRouter()
@@ -33,7 +32,12 @@ const handleSubmit = async () => {
   try {
     loading.value = true
     // 调用 API
-    await axios.post(`/lab1/users/${formData.value.user_id}`, {
+    
+    const request = axios.create({
+        baseURL: 'http://localhost:8080',
+        timeout: 5000
+    })
+    await request.post(`/lab1/users/${formData.value.user_id}`, {
       userName: formData.value.userName,
       userEmail: formData.value.userEmail
     })
