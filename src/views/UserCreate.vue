@@ -11,6 +11,7 @@ const router = useRouter()
 
 // 表单数据
 const formData = ref({
+  user_id: '',
   username: '',
   email: ''
 })
