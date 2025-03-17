@@ -91,11 +91,12 @@ const handleCancel = () => {
             :loading="loading"
             size="large"
           >
-            Create User
+            Submit
           </el-button>
           <el-button
             @click="handleCancel"
             :disabled="loading"
+            size="large"
           >
             Cancel
           </el-button>
