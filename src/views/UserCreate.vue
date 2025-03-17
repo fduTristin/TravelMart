@@ -8,9 +8,16 @@ import axios from 'axios'
 
 const router = useRouter()
 
-// 表单数据
+// 获取并递增 ID
+function getNextUserId() {
+  let lastId = Number(localStorage.getItem('lastUserId')) || 1
+  const newId = lastId + 1
+  localStorage.setItem('lastUserId', newId.toString()) // 存入本地存储
+  return newId
+}
+
 const formData = ref({
-  user_id: '',
+  user_id: getNextUserId(), // 生成自增 ID
   userName: '',
   userEmail: ''
 })
@@ -25,6 +32,7 @@ const messages = {
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 
+
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
@@ -32,10 +40,9 @@ const handleSubmit = async () => {
   try {
     loading.value = true
     // 调用 API
-    
     const request = axios.create({
-        baseURL: 'http://localhost:8080',
-        timeout: 5000
+      baseURL: 'http://localhost:8080',
+      timeout: 5000
     })
     await request.post(`/lab1/users/${formData.value.user_id}`, {
       userName: formData.value.userName,
@@ -74,6 +81,11 @@ const handleCancel = () => {
         class="form"
         :disabled="loading"
       >
+      <el-form-item label="User ID" prop="user_id">
+        <el-input v-model="formData.user_id" disabled />
+      </el-form-item>
+
+
         <el-form-item label="Username" prop="userName">
           <el-input
             v-model="formData.userName"
