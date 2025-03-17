@@ -12,8 +12,8 @@ const router = useRouter()
 // 表单数据
 const formData = ref({
   user_id: '',
-  username: '',
-  email: ''
+  userName: '',
+  userEmail: ''
 })
 
 // 错误消息
@@ -34,8 +34,8 @@ const handleSubmit = async () => {
     loading.value = true
     // 调用 API
     await axios.post(`/lab1/users/${formData.value.user_id}`, {
-      username: formData.value.username,
-      email: formData.value.email
+      userName: formData.value.userName,
+      userEmail: formData.value.userEmail
     })
     ElMessage.success(messages.success)
     // 使用 replace 而不是 push，这样返回时不会回到创建页面
@@ -70,16 +70,16 @@ const handleCancel = () => {
         class="form"
         :disabled="loading"
       >
-        <el-form-item label="Username" prop="username">
+        <el-form-item label="Username" prop="userName">
           <el-input
-            v-model="formData.username"
+            v-model="formData.userName"
             placeholder="Enter username"
           />
         </el-form-item>
 
-        <el-form-item label="Email" prop="email">
+        <el-form-item label="Email" prop="userEmail">
           <el-input
-            v-model="formData.email"
+            v-model="formData.userEmail"
             placeholder="Enter email"
           />
         </el-form-item>

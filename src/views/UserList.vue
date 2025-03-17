@@ -41,25 +41,98 @@ onMounted(() => {
   loadData()
 })
 
+// 查看详情
+const handleView = (user: User) => {
+  router.push(`/users/${user.userId}`)
+}
+
+// 编辑用户
+const handleEdit = (user: User) => {
+  router.push(`/users/${user.userId}`)
+}
+
+// 删除用户
+const handleDelete = async (user: User) => {
+  try {
+    await ElMessageBox.confirm(
+      'Are you sure you want to delete this user?',
+      'Warning',
+      {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      }
+    )
+    await userStore.deleteUser(user.userId)
+    ElMessage.success('Deleted successfully')
+  } catch (e) {
+    if (e !== 'cancel') {
+      ElMessage.error('Failed to delete')
+    }
+  }
+}
+
+// 创建新用户
+const handleCreate = () => {
+  router.push('/users/create')
+}
+
 </script>
 
 
 <template>
   <PageContainer title="User Management">
+    <template #actions>
+      <el-button type="primary" @click="handleCreate">
+        <el-icon><Plus /></el-icon>
+        Create User
+      </el-button>
+    </template>
 
     <div class="table-wrapper" v-loading="userStore.loading">
-      <el-table 
+      <el-table
         v-if="userStore.users.length > 0"
         :data="userStore.users"
         style="width: 100%"
       >
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="name" label="Name" min-width="80" />
-        <el-table-column prop="email" label="E-mail" min-width="100" />
+        <el-table-column prop="userId" label="ID" width="80" />
+        <el-table-column prop="userName" label="Name" min-width="80" />
+        <el-table-column prop="userEmail" label="E-mail" min-width="100" />
+        <el-table-column label="Actions" width="200" fixed="right">
+          <template #default="{ row }">
+            <el-button-group>
+              <el-button
+                size="small"
+                @click="handleView(row)"
+                title="View Details"
+              >
+                <el-icon><View /></el-icon>
+              </el-button>
+              <el-button
+                size="small"
+                type="primary"
+                @click="handleEdit(row)"
+                title="Edit User"
+              >
+                <el-icon><Edit /></el-icon>
+              </el-button>
+              <el-button
+                size="small"
+                type="danger"
+                @click="handleDelete(row)"
+                title="Delete User"
+              >
+                <el-icon><Delete /></el-icon>
+              </el-button>
+            </el-button-group>
+          </template>
+        </el-table-column>
       </el-table>
 
       <div v-else-if="!userStore.loading" class="empty-state">
-        <el-empty description="No users found"> </el-empty>
+        <el-empty description="No users found">
+          <el-button type="primary" @click="handleCreate">Create First User</el-button>
+        </el-empty>
       </div>
     </div>
   </PageContainer>
@@ -87,4 +160,4 @@ onMounted(() => {
   display: flex;
   gap: 4px;
 }
-</style> 
+</style>

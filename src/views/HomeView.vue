@@ -9,7 +9,7 @@ import PageContainer from '@/components/PageContainer.vue'
       <div class="hero-section">
         <h1>Home</h1>
         <!-- <p class="subtitle">Manage tasks efficiently with our intuitive platform</p> -->
-        <el-button type="primary" size="large" @click="$router.push('/items')">
+        <el-button type="primary" size="large" @click="$router.push('/users')">
           User List
         </el-button>
       </div>
