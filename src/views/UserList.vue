@@ -46,31 +46,31 @@ const handleView = (user: User) => {
   router.push(`/users/${user.userId}`)
 }
 
-// 编辑用户
-const handleEdit = (user: User) => {
-  router.push(`/users/${user.userId}`)
-}
+// // 编辑用户
+// const handleEdit = (user: User) => {
+//   router.push(`/users/${user.userId}`)
+// }
 
-// 删除用户
-const handleDelete = async (user: User) => {
-  try {
-    await ElMessageBox.confirm(
-      'Are you sure you want to delete this user?',
-      'Warning',
-      {
-        confirmButtonText: 'Confirm',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
-      }
-    )
-    await userStore.deleteUser(user.userId)
-    ElMessage.success('Deleted successfully')
-  } catch (e) {
-    if (e !== 'cancel') {
-      ElMessage.error('Failed to delete')
-    }
-  }
-}
+// // 删除用户
+// const handleDelete = async (user: User) => {
+//   try {
+//     await ElMessageBox.confirm(
+//       'Are you sure you want to delete this user?',
+//       'Warning',
+//       {
+//         confirmButtonText: 'Confirm',
+//         cancelButtonText: 'Cancel',
+//         type: 'warning',
+//       }
+//     )
+//     await userStore.deleteUser(user.userId)
+//     ElMessage.success('Deleted successfully')
+//   } catch (e) {
+//     if (e !== 'cancel') {
+//       ElMessage.error('Failed to delete')
+//     }
+//   }
+// }
 
 // 创建新用户
 const handleCreate = () => {
@@ -108,7 +108,7 @@ const handleCreate = () => {
               >
                 <el-icon><View /></el-icon>
               </el-button>
-              <el-button
+              <!-- <el-button
                 size="small"
                 type="primary"
                 @click="handleEdit(row)"
@@ -123,7 +123,7 @@ const handleCreate = () => {
                 title="Delete User"
               >
                 <el-icon><Delete /></el-icon>
-              </el-button>
+              </el-button> -->
             </el-button-group>
           </template>
         </el-table-column>
