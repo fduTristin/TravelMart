@@ -4,15 +4,22 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import PageContainer from '@/components/PageContainer.vue'
-import { ArrowLeft } from '@element-plus/icons-vue'
 import axios from 'axios'
 
 const router = useRouter()
 
-// 表单数据
+// 获取并递增 ID
+function getNextUserId() {
+  let lastId = Number(localStorage.getItem('lastUserId')) || 1
+  const newId = lastId + 1
+  localStorage.setItem('lastUserId', newId.toString()) // 存入本地存储
+  return newId
+}
+
 const formData = ref({
-  username: '',
-  email: ''
+  user_id: getNextUserId(), // 生成自增 ID
+  userName: '',
+  userEmail: ''
 })
 
 // 错误消息
@@ -25,6 +32,7 @@ const messages = {
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 
+
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
@@ -32,9 +40,13 @@ const handleSubmit = async () => {
   try {
     loading.value = true
     // 调用 API
-    await axios.post(`/lab1/users/${formData.value.user_id}`, {
-      username: formData.value.username,
-      email: formData.value.email
+    const request = axios.create({
+      baseURL: 'http://localhost:8080',
+      timeout: 5000
+    })
+    await request.post(`/lab1/users/${formData.value.user_id}`, {
+      userName: formData.value.userName,
+      userEmail: formData.value.userEmail
     })
     ElMessage.success(messages.success)
     // 使用 replace 而不是 push，这样返回时不会回到创建页面
@@ -69,16 +81,21 @@ const handleCancel = () => {
         class="form"
         :disabled="loading"
       >
-        <el-form-item label="Username" prop="username">
+      <el-form-item label="User ID" prop="user_id">
+        <el-input v-model="formData.user_id" disabled />
+      </el-form-item>
+
+
+        <el-form-item label="Username" prop="userName">
           <el-input
-            v-model="formData.username"
+            v-model="formData.userName"
             placeholder="Enter username"
           />
         </el-form-item>
 
-        <el-form-item label="Email" prop="email">
+        <el-form-item label="Email" prop="userEmail">
           <el-input
-            v-model="formData.email"
+            v-model="formData.userEmail"
             placeholder="Enter email"
           />
         </el-form-item>
@@ -90,11 +107,12 @@ const handleCancel = () => {
             :loading="loading"
             size="large"
           >
-            Create User
+            Submit
           </el-button>
           <el-button
             @click="handleCancel"
             :disabled="loading"
+            size="large"
           >
             Cancel
           </el-button>

@@ -7,26 +7,11 @@ import PageContainer from '@/components/PageContainer.vue'
   <PageContainer>
     <div class="home-content">
       <div class="hero-section">
-        <h1>Streamline Your Workflow</h1>
-        <p class="subtitle">Manage tasks efficiently with our intuitive platform</p>
-        <el-button type="primary" size="large" @click="$router.push('/items')">
-          Get Started
+        <h1>Home</h1>
+        <!-- <p class="subtitle">Manage tasks efficiently with our intuitive platform</p> -->
+        <el-button type="primary" size="large" @click="$router.push('/users')">
+          User List
         </el-button>
-      </div>
-
-      <div class="features">
-        <div class="feature-card">
-          <h3>Simple & Intuitive</h3>
-          <p>Easy-to-use interface for managing your tasks</p>
-        </div>
-        <div class="feature-card">
-          <h3>Real-time Updates</h3>
-          <p>Stay synchronized with instant task updates</p>
-        </div>
-        <div class="feature-card">
-          <h3>Organized Workflow</h3>
-          <p>Keep your projects structured and on track</p>
-        </div>
       </div>
     </div>
   </PageContainer>

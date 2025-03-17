@@ -32,11 +32,11 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/items/create',
-    name: 'item-create',
+    path: '/users/create',
+    name: 'user-create',
     component: () => import('@/views/UserCreate.vue'),
     meta: {
-      title: 'Create Task'
+      title: 'Create User'
     }
   },
   {
@@ -61,6 +61,15 @@ const routes: RouteRecordRaw[] = [
     props: route => ({
       id: parseInt(route.params.id as string)
     })
+  },
+  {
+    path: '/users',
+    name: 'users',
+    component: () => import('@/views/UserList.vue'),
+    meta: {
+      title: 'User Management',
+      keepAlive: true
+    }
   },
   {
     // 404 页面

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useItemStore } from '@/stores/items'
+import { useUserStore } from '@/stores/users'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { Item } from '@/types/item'
+import type { User } from '@/types/user'
 import PageContainer from '@/components/PageContainer.vue'
-import { Plus, View, Edit, Delete } from '@element-plus/icons-vue'
+// import { Plus, View, Edit, Delete, Refresh } from '@element-plus/icons-vue'
+import { Plus, Refresh } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
-const itemStore = useItemStore()
+const userStore = useUserStore()
 
 const error = ref<string | null>(null)
 
@@ -17,10 +18,12 @@ const error = ref<string | null>(null)
 const loadData = async () => {
   error.value = null
   try {
-    await itemStore.fetchItems()
+    await userStore.fetchUsers()
+    ElMessage.success('User list refreshed successfully')
   } catch (err) {
     error.value = 'Failed to load data. Please refresh the page.'
-    console.error('Failed to load items:', err)
+    ElMessage.error('Failed to load data. Please refresh the page.')
+    console.error('Failed to load users:', err)
   }
 }
 
@@ -29,7 +32,7 @@ watch(
   () => route.fullPath,
   (newPath) => {
     console.log('Route changed:', newPath)
-    if (route.name === 'items') {
+    if (route.name === 'users') {
       loadData()
     }
   }
@@ -42,67 +45,67 @@ onMounted(() => {
 })
 
 // 查看详情
-const handleView = (item: Item) => {
-  router.push(`/items/${item.id}`)
+const handleView = (user: User) => {
+  router.push(`/users/${user.userId}`)
 }
 
-// 编辑项目
-const handleEdit = (item: Item) => {
-  router.push(`/items/${item.id}/edit`)
-}
+// // 编辑用户
+// const handleEdit = (user: User) => {
+//   router.push(`/users/${user.userId}`)
+// }
 
-// 删除项目
-const handleDelete = async (item: Item) => {
-  try {
-    await ElMessageBox.confirm(
-      'Are you sure you want to delete this item?',
-      'Warning',
-      {
-        confirmButtonText: 'Confirm',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
-      }
-    )
-    await itemStore.deleteItem(item.id)
-    ElMessage.success('Deleted successfully')
-  } catch (e) {
-    if (e !== 'cancel') {
-      ElMessage.error('Failed to delete')
-    }
-  }
-}
+// // 删除用户
+// const handleDelete = async (user: User) => {
+//   try {
+//     await ElMessageBox.confirm(
+//       'Are you sure you want to delete this user?',
+//       'Warning',
+//       {
+//         confirmButtonText: 'Confirm',
+//         cancelButtonText: 'Cancel',
+//         type: 'warning',
+//       }
+//     )
+//     await userStore.deleteUser(user.userId)
+//     ElMessage.success('Deleted successfully')
+//   } catch (e) {
+//     if (e !== 'cancel') {
+//       ElMessage.error('Failed to delete')
+//     }
+//   }
+// }
 
-// 创建新项目
+// 创建新用户
 const handleCreate = () => {
-  router.push('/items/create')
+  router.push('/users/create')
 }
+
 </script>
+
 
 <template>
   <PageContainer title="User Management">
     <template #actions>
+      <el-button @click="loadData" :loading="userStore.loading">
+        <el-icon><Refresh /></el-icon>
+        Refresh
+      </el-button>
       <el-button type="primary" @click="handleCreate">
         <el-icon><Plus /></el-icon>
-        New User
+        Create User
       </el-button>
     </template>
 
-    <div class="table-wrapper" v-loading="itemStore.loading">
+    <div class="table-wrapper" v-loading="userStore.loading">
       <el-table
-        v-if="itemStore.items.length > 0"
-        :data="itemStore.items"
+        v-if="userStore.users.length > 0"
+        :data="userStore.users"
         style="width: 100%"
       >
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="title" label="Title" min-width="200" />
-        <el-table-column prop="description" label="Description" min-width="300" />
-        <el-table-column
-          prop="created_at"
-          label="Created"
-          width="180"
-          :formatter="(row: Item) => new Date(row.created_at).toLocaleString()"
-        />
-        <el-table-column label="Actions" width="200" fixed="right">
+        <el-table-column prop="userId" label="ID" width="80" />
+        <el-table-column prop="userName" label="Name" min-width="80" />
+        <el-table-column prop="userEmail" label="E-mail" min-width="100" />
+        <!-- <el-table-column label="Actions" width="200" fixed="right">
           <template #default="{ row }">
             <el-button-group>
               <el-button
@@ -130,10 +133,10 @@ const handleCreate = () => {
               </el-button>
             </el-button-group>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
 
-      <div v-else-if="!itemStore.loading" class="empty-state">
+      <div v-else-if="!userStore.loading" class="empty-state">
         <el-empty description="No users found">
           <el-button type="primary" @click="handleCreate">Create First User</el-button>
         </el-empty>
