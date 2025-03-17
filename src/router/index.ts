@@ -32,11 +32,11 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/items/create',
-    name: 'item-create',
+    path: '/users/create',
+    name: 'user-create',
     component: () => import('@/views/UserCreate.vue'),
     meta: {
-      title: 'Create Task'
+      title: 'Create User'
     }
   },
   {
@@ -63,7 +63,7 @@ const routes: RouteRecordRaw[] = [
     })
   },
   {
-    path: '/lab1/users',
+    path: '/users',
     name: 'users',
     component: () => import('@/views/UserList.vue'),
     meta: {

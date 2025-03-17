@@ -21,8 +21,8 @@ const error = ref<string | null>(null)
           class="nav-menu"
           :default-active="$route.path"
         >
-          <el-menu-item index="/items">Users</el-menu-item>
-          <el-menu-item index="/items/create">New User</el-menu-item>
+          <el-menu-item index="/users">Users</el-menu-item>
+          <el-menu-item index="/users/create">New User</el-menu-item>
           <!-- <el-menu-item index="/lab1/users">Users</el-menu-item> -->
         </el-menu>
       </div>
