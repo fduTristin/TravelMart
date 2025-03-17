@@ -20,7 +20,6 @@ const loadData = async () => {
   try {
     await userStore.fetchUsers()
     ElMessage.success('User list refreshed successfully')
-    ElMessage.success('User list refreshed successfully')
   } catch (err) {
     error.value = 'Failed to load data. Please refresh the page.'
     ElMessage.error('Failed to load data. Please refresh the page.')
@@ -87,10 +86,6 @@ const handleCreate = () => {
 <template>
   <PageContainer title="User Management">
     <template #actions>
-      <el-button @click="loadData" :loading="userStore.loading">
-        <el-icon><Refresh /></el-icon>
-        Refresh
-      </el-button>
       <el-button @click="loadData" :loading="userStore.loading">
         <el-icon><Refresh /></el-icon>
         Refresh
