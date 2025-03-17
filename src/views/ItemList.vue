@@ -79,16 +79,16 @@ const handleCreate = () => {
 </script>
 
 <template>
-  <PageContainer title="Task Management">
+  <PageContainer title="User Management">
     <template #actions>
       <el-button type="primary" @click="handleCreate">
         <el-icon><Plus /></el-icon>
-        Create Task
+        New User
       </el-button>
     </template>
 
     <div class="table-wrapper" v-loading="itemStore.loading">
-      <el-table 
+      <el-table
         v-if="itemStore.items.length > 0"
         :data="itemStore.items"
         style="width: 100%"
@@ -96,35 +96,35 @@ const handleCreate = () => {
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="title" label="Title" min-width="200" />
         <el-table-column prop="description" label="Description" min-width="300" />
-        <el-table-column 
-          prop="created_at" 
-          label="Created" 
+        <el-table-column
+          prop="created_at"
+          label="Created"
           width="180"
           :formatter="(row: Item) => new Date(row.created_at).toLocaleString()"
         />
         <el-table-column label="Actions" width="200" fixed="right">
           <template #default="{ row }">
             <el-button-group>
-              <el-button 
-                size="small" 
+              <el-button
+                size="small"
                 @click="handleView(row)"
                 title="View Details"
               >
                 <el-icon><View /></el-icon>
               </el-button>
-              <el-button 
-                size="small" 
-                type="primary" 
+              <el-button
+                size="small"
+                type="primary"
                 @click="handleEdit(row)"
-                title="Edit Task"
+                title="Edit User"
               >
                 <el-icon><Edit /></el-icon>
               </el-button>
-              <el-button 
-                size="small" 
-                type="danger" 
+              <el-button
+                size="small"
+                type="danger"
                 @click="handleDelete(row)"
-                title="Delete Task"
+                title="Delete User"
               >
                 <el-icon><Delete /></el-icon>
               </el-button>
@@ -134,8 +134,8 @@ const handleCreate = () => {
       </el-table>
 
       <div v-else-if="!itemStore.loading" class="empty-state">
-        <el-empty description="No tasks found">
-          <el-button type="primary" @click="handleCreate">Create First Task</el-button>
+        <el-empty description="No users found">
+          <el-button type="primary" @click="handleCreate">Create First User</el-button>
         </el-empty>
       </div>
     </div>
@@ -164,4 +164,4 @@ const handleCreate = () => {
   display: flex;
   gap: 4px;
 }
-</style> 
+</style>
