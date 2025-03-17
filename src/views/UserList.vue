@@ -6,7 +6,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { User } from '@/types/user'
 import PageContainer from '@/components/PageContainer.vue'
 // import { Plus, View, Edit, Delete, Refresh } from '@element-plus/icons-vue'
-import { Plus, View, Refresh } from '@element-plus/icons-vue'
+import { Plus, Refresh } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -19,6 +19,7 @@ const loadData = async () => {
   error.value = null
   try {
     await userStore.fetchUsers()
+    ElMessage.success('User list refreshed successfully')
     ElMessage.success('User list refreshed successfully')
   } catch (err) {
     error.value = 'Failed to load data. Please refresh the page.'
@@ -86,6 +87,10 @@ const handleCreate = () => {
 <template>
   <PageContainer title="User Management">
     <template #actions>
+      <el-button @click="loadData" :loading="userStore.loading">
+        <el-icon><Refresh /></el-icon>
+        Refresh
+      </el-button>
       <el-button @click="loadData" :loading="userStore.loading">
         <el-icon><Refresh /></el-icon>
         Refresh
