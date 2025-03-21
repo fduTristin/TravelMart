@@ -10,9 +10,12 @@ const router = useRouter()
 
 
 const formData = ref({
-  user_id: 1, // 生成自增 ID
+  userId: 1, // 生成自增 ID
   userName: '',
-  userEmail: ''
+  userEmail: '',
+  userRole: '普通用户',
+  userPhoneNumber: '',
+  userPassword: ''
 })
 
 // 错误消息
@@ -31,13 +34,14 @@ const handleSubmit = async () => {
   if (!formRef.value) return
 
   try {
+    await formRef.value.validate()
     loading.value = true
     // 调用 API
     const request = axios.create({
       baseURL: 'http://localhost:8080',
       timeout: 5000
     })
-    await request.post(`/lab1/users/${formData.value.user_id}`, {
+    await request.post(`/lab1/users/${formData.value.userId}`, {
       userName: formData.value.userName,
       userEmail: formData.value.userEmail
     })
@@ -55,14 +59,71 @@ const handleSubmit = async () => {
 const handleCancel = () => {
   router.back()
 }
+
+// 密码规则验证
+const validatePassword = (_: any, value: string, callback: any) => {
+  if (!value) {
+    return callback(new Error('请输入密码'))
+  }
+  if (value.length < 6 || value.length > 32) {
+    return callback(new Error('密码长度应为6到32个字符'))
+  }
+  if (!/^[a-zA-Z0-9-_]+$/.test(value)) {
+    return callback(new Error('密码只能包含字母、数字、-、_'))
+  }
+
+  let types = 0
+  if (/[a-zA-Z]/.test(value)) types++
+  if (/\d/.test(value)) types++
+  if (/[-_]/.test(value)) types++
+
+  if (types < 2) {
+    return callback(new Error('密码至少包含字母、数字、特殊字符（-_）中的两种'))
+  }
+
+  callback()
+}
+
+
+// 表单验证规则
+const rules: FormRules = {
+  userName: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    {
+      pattern: /^[a-zA-Z0-9_]{3,10}$/,
+      message: '用户名仅可包含字母、数字、下划线，长度为3-10个字符',
+      trigger: 'blur'
+    }
+  ],
+  userEmail: [
+    { required: false, message: '请输入邮箱', trigger: 'blur' },
+    {
+      pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      message: '请输入有效的邮箱地址',
+      trigger: 'blur'
+    }
+  ],
+  userPhone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    {
+      pattern: /^1\d{10}$/,
+      message: '请输入有效的11位手机号',
+      trigger: 'blur'
+    }
+  ],
+  userPassword: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { validator: validatePassword, trigger: 'blur' }
+  ]
+}
+
 </script>
 
 <template>
-  <PageContainer title="Create New User">
+  <PageContainer title="">
     <template #actions>
       <el-button @click="handleCancel">
-        <el-icon><ArrowLeft /></el-icon>
-        Back
+        <div class="button-text">返回</div>
       </el-button>
     </template>
 
@@ -70,22 +131,37 @@ const handleCancel = () => {
       <el-form
         ref="formRef"
         :model="formData"
+        :rules="rules"
         label-width="120px"
         class="form"
         :disabled="loading"
       >
 
-        <el-form-item label="Username" prop="userName">
+        <el-form-item label="角色" prop="userRole">
+          <el-radio-group v-model="formData.userRole">
+            <el-radio label="普通用户" />
+            <el-radio label="商户" />
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="用户名" prop="userName">
           <el-input
             v-model="formData.userName"
-            placeholder="Enter username"
           />
         </el-form-item>
 
-        <el-form-item label="Email" prop="userEmail">
+        <el-form-item label="密码" prop="userPassword">
+          <el-input v-model="formData.userPassword" type="password" show-password />
+        </el-form-item>
+
+
+        <el-form-item label="手机号" prop="userPhoneNumber">
+          <el-input v-model="formData.userPhoneNumber" />
+        </el-form-item>
+
+        <el-form-item label="邮箱" prop="userEmail">
           <el-input
             v-model="formData.userEmail"
-            placeholder="Enter email"
           />
         </el-form-item>
 
@@ -96,14 +172,14 @@ const handleCancel = () => {
             :loading="loading"
             size="large"
           >
-            Submit
+          <div class="button-text">提交</div>
           </el-button>
           <el-button
             @click="handleCancel"
             :disabled="loading"
             size="large"
           >
-            Cancel
+          <div class="button-text">取消</div>
           </el-button>
         </el-form-item>
       </el-form>
@@ -112,8 +188,15 @@ const handleCancel = () => {
 </template>
 
 <style scoped>
+.button-text {
+  font-size: 15px;
+  font-weight: 700;
+  margin-left: 4px;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;;
+}
+
 .form-container {
-  max-width: 800px;
+  max-width: 60vw;
   margin: 0 auto;
   padding: 40px;
   background: white;
