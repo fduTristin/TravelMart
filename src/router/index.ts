@@ -18,7 +18,7 @@ const routes: RouteRecordRaw[] = [
     name: 'home',
     component: HomeView,
     meta: {
-      title: 'TaskFlow',
+      title: 'Travel',
       keepAlive: true
     }
   },
@@ -98,7 +98,7 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach((to, from, next) => {
   // 设置页面标题
-  document.title = `${to.meta.title} - TaskFlow`
+  document.title = `${to.meta.title} - Travel`
 
   // 这里可以添加其他导航守卫逻辑
   // 例如：身份验证、权限检查等

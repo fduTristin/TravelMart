@@ -84,15 +84,15 @@ const handleCreate = () => {
 
 
 <template>
-  <PageContainer title="User Management">
+  <PageContainer title="">
     <template #actions>
       <el-button @click="loadData" :loading="userStore.loading">
         <el-icon><Refresh /></el-icon>
-        Refresh
+        <div class="button-text">刷新</div>
       </el-button>
       <el-button type="primary" @click="handleCreate">
         <el-icon><Plus /></el-icon>
-        Create User
+        <div class="button-text">新建用户</div>
       </el-button>
     </template>
 
@@ -137,8 +137,7 @@ const handleCreate = () => {
       </el-table>
 
       <div v-else-if="!userStore.loading" class="empty-state">
-        <el-empty description="No users found">
-          <el-button type="primary" @click="handleCreate">Create First User</el-button>
+        <el-empty description="用户列表为空">
         </el-empty>
       </div>
     </div>
@@ -156,6 +155,13 @@ const handleCreate = () => {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.button-text {
+  font-size: 15px;
+  font-weight: 700;
+  margin-left: 4px;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;;
 }
 
 :deep(.el-table) {

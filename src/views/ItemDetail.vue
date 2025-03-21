@@ -204,4 +204,9 @@ const messages = {
   color: #666;
   font-size: 14px;
 }
+
+.el-button {
+  display: inline-flex;
+  align-items: center;
+}
 </style> 

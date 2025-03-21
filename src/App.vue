@@ -2,6 +2,7 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { ElContainer, ElHeader, ElMain, ElMenu, ElMenuItem } from 'element-plus'
 import { ref } from 'vue'
+import { Guide } from '@element-plus/icons-vue'; // 导入图标
 
 const error = ref<string | null>(null)
 </script>
@@ -11,8 +12,11 @@ const error = ref<string | null>(null)
     <el-header>
       <div class="header-content">
         <router-link to="/" class="logo">
-          <img src="@/assets/logo.svg" alt="TaskFlow Logo" class="logo-image">
-          TaskFlow
+        <!-- 使用 Element Plus 图标 -->
+        <el-icon :size="60" color="#000">
+          <Guide />
+        </el-icon>
+        <span class="logo-text">旅游商城</span>
         </router-link>
         <el-menu
           mode="horizontal"
@@ -21,8 +25,8 @@ const error = ref<string | null>(null)
           class="nav-menu"
           :default-active="$route.path"
         >
-          <el-menu-item index="/users">Users</el-menu-item>
-          <el-menu-item index="/users/create">New User</el-menu-item>
+          <el-menu-item index="/users">用户管理</el-menu-item>
+          <el-menu-item index="/users/create">注册</el-menu-item>
           <!-- <el-menu-item index="/lab1/users">Users</el-menu-item> -->
         </el-menu>
       </div>
@@ -47,7 +51,10 @@ const error = ref<string | null>(null)
 
 <style scoped>
 .app-container {
-  min-height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .header-content {
@@ -55,49 +62,72 @@ const error = ref<string | null>(null)
   margin: 0 auto;
   height: 100%;
   display: flex;
+  /* justify-content: space-between; */
   align-items: center;
   padding: 0 40px;
+  background-color: #fff;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #2B3A67;
+  color: #0f5526;
   text-decoration: none;
-  margin-right: 40px;
   white-space: nowrap;
-  letter-spacing: -1px;
+  letter-spacing: 1px;
 }
 
 .logo-image {
-  height: 32px;
-  margin-right: 10px;
+  height: 52px;
+  margin-right: 40px;
+}
+
+.logo-text {
+  font-size: 40px;
+  font-weight: 900;
+  color: #000;
+  margin-left: 10px;
+  letter-spacing: 3px;
+  white-space: nowrap;
+  font-family: 'Microsoft YaHei', sans-serif;
 }
 
 .nav-menu {
   border-bottom: none;
-  font-size: 15px;
+  background-color: transparent;
+  border-radius: 0;
+  margin-left: 40px;
+  white-space: nowrap;
+}
+
+.el-menu-item {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 20px; /* 设置字体大小 */
+  font-weight: bold; /* 设置字体粗细 */
+  color: #000; /* 设置字体颜色 */
+  padding: 0 20px; /* 设置内边距 */
+  line-height: 80px; /* 设置行高 */
+  border-bottom: 0px solid transparent; /* 设置底部边框 */
+  transition: border-bottom-color 1.3s; /* 设置过渡效果 */ 
 }
 
 .el-header {
-  background-color: white;
-  border-bottom: 1px solid var(--el-border-color-light);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.el-main {
-  background-color: var(--el-bg-color-page);
+  background-color: #fff;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
   padding: 0;
-  min-height: calc(100vh - 60px);
+  height: 80px;
+  line-height: 80px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1); /* 设置阴影 */
 }
 
 .main-content {
   max-width: 100%;
   margin: 0 auto;
   padding: 20px 40px;
-  min-height: calc(100vh - 60px);
+  height: 80vh;
+  width: 100vw;
   position: relative;
 }
 
@@ -116,12 +146,9 @@ const error = ref<string | null>(null)
 <style>
 /* 全局样式 */
 body {
-  margin: 0;
-  font-family: var(--el-font-family);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: var(--el-text-color-primary);
-  background-color: var(--el-bg-color-page);
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 #app {

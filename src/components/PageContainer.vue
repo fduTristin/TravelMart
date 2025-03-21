@@ -23,7 +23,7 @@ defineProps<{
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  min-height: calc(100vh - 100px);
+  min-height: calc(90vh - 100px);
   position: absolute;
   top: 0;
   left: 0;

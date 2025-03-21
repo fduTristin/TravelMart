@@ -1,35 +1,57 @@
 @import './base.css';
 
+/* 全局样式优化 */
+body {
+  font-family: 'Inter', sans-serif;
+  color: #333;
+  background-color: #f8f9fa;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100vw;   /* 宽度占视口的 80% */
+  height: 100vh;  /* 高度占视口的 80% */
   padding: 2rem;
   font-weight: normal;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  display: flex;   /* 让内容更有弹性布局 */
+  flex-direction: column;
+  justify-content: center; /* 垂直居中内容 */
+  align-items: center; /* 水平居中内容 */
 }
 
-a,
-.green {
+
+/* 链接样式优化 */
+a, .green {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+  color: #2a9d8f;
+  transition: all 0.3s ease-in-out;
+  padding: 4px 6px;
+  border-radius: 4px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+a:hover {
+  background-color: rgba(42, 157, 143, 0.2);
+  box-shadow: 0 2px 4px rgba(42, 157, 143, 0.2);
 }
 
+/* 响应式布局优化 */
 @media (min-width: 1024px) {
   body {
     display: flex;
-    place-items: center;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
   }
 
   #app {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 2rem;
   }
 }
