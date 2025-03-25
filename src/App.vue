@@ -1,48 +1,69 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { ElContainer, ElHeader, ElMain, ElMenu, ElMenuItem } from 'element-plus'
+import { ElContainer, ElAside, ElHeader, ElMain, ElMenu, ElMenuItem, ElIcon, ElDivider } from 'element-plus'
 import { ref } from 'vue'
-import { Guide } from '@element-plus/icons-vue'; // 导入图标
+import { Guide, User, Edit, House, Setting, Tickets } from '@element-plus/icons-vue'
 
 const error = ref<string | null>(null)
 </script>
 
 <template>
   <el-container class="app-container">
-    <el-header>
-      <div class="header-content">
+    <el-aside width="240px" class="sidebar">
+      <div class="logo-container">
         <router-link to="/" class="logo">
-        <!-- 使用 Element Plus 图标 -->
-        <el-icon :size="60" color="#000">
-          <Guide />
-        </el-icon>
-        <span class="logo-text">旅游商城</span>
+          <img src="https://www.logosc.cn/oss/icons/2021/12/10/i_1qm0jc_8MlgUS.png" alt="logo" class="logo-img" />
+          <span class="logo-text">TravelMart</span>
         </router-link>
-        <el-menu
-          mode="horizontal"
-          router
-          :ellipsis="false"
-          class="nav-menu"
-          :default-active="$route.path"
-        >
-          <el-menu-item index="/users">用户管理</el-menu-item>
-          <el-menu-item index="/users/create">注册</el-menu-item>
-          <!-- <el-menu-item index="/lab1/users">Users</el-menu-item> -->
-        </el-menu>
+        <el-divider class="logo-divider" />
       </div>
-    </el-header>
 
-    <el-main>
-      <div class="main-content">
+      <el-menu router :default-active="$route.path" class="nav-menu" background-color="#001529" text-color="#b7c0cd"
+        active-text-color="#fff">
+        <el-menu-item index="/">
+          <el-icon>
+            <House />
+          </el-icon>
+          <span>Dashboard</span>
+        </el-menu-item>
+        <el-menu-item index="/users">
+          <el-icon>
+            <User />
+          </el-icon>
+          <span>User Management</span>
+        </el-menu-item>
+        <!-- <el-menu-item index="/users/create">
+          <el-icon>
+            <Edit />
+          </el-icon>
+          <span>用户注册</span>
+        </el-menu-item>
+        <el-menu-item index="/products">
+          <el-icon>
+            <Tickets />
+          </el-icon>
+          <span>旅游产品</span>
+        </el-menu-item>
+        <el-menu-item index="/settings">
+          <el-icon>
+            <Setting />
+          </el-icon>
+          <span>系统设置</span>
+        </el-menu-item> -->
+      </el-menu>
+    </el-aside>
+
+    <!-- 主内容区 -->
+    <el-container>
+      <el-main class="main-content">
         <router-view v-slot="{ Component }">
           <keep-alive>
             <component :is="Component" />
           </keep-alive>
         </router-view>
-      </div>
-    </el-main>
+      </el-main>
+    </el-container>
 
-    <!-- 错误提示 -->
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
@@ -51,127 +72,134 @@ const error = ref<string | null>(null)
 
 <style scoped>
 .app-container {
-  max-height: 100vh;
+  height: 95vh;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
-.header-content {
-  max-width: 100%;
-  margin: 0 auto;
-  height: 100%;
+/* 侧边栏样式 */
+.sidebar {
+  background-color: #a9c9e9;
+  height: 95vh;
+  min-width: 16vw;
+  border-radius: 8px 8px 8px 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   display: flex;
-  /* justify-content: space-between; */
-  align-items: center;
-  padding: 0 40px;
-  background-color: #fff;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.logo-container {
+  padding: 20px 20px 20px 20px;
+  position: relative;
+  margin-bottom: 20px;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  color: #0f5526;
   text-decoration: none;
-  white-space: nowrap;
-  letter-spacing: 1px;
+  height: 100%;
 }
 
-.logo-image {
-  height: 52px;
-  margin-right: 40px;
+.logo-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
 }
 
 .logo-text {
-  font-size: 40px;
-  font-weight: 900;
-  color: #000;
-  margin-left: 10px;
-  letter-spacing: 3px;
+  font-size: 25px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  margin-left: 15px;
   white-space: nowrap;
-  font-family: 'Microsoft YaHei', sans-serif;
+}
+
+.logo-divider {
+  margin: 16px 0 8px 0;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-menu {
-  border-bottom: none;
-  background-color: transparent;
-  border-radius: 0;
-  margin-left: 40px;
-  white-space: nowrap;
+  border-right: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: inherit;
+  padding: 0 12px;
 }
 
 .el-menu-item {
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  font-size: 20px; /* 设置字体大小 */
-  font-weight: bold; /* 设置字体粗细 */
-  color: #000; /* 设置字体颜色 */
-  padding: 0 20px; /* 设置内边距 */
-  line-height: 80px; /* 设置行高 */
-  border-bottom: 0px solid transparent; /* 设置底部边框 */
-  transition: border-bottom-color 1.3s; /* 设置过渡效果 */ 
-}
-
-.el-header {
-  background-color: #fff;
-  color: #fff;
-  font-size: 18px;
+  height: 56px;
+  line-height: 56px;
+  font-size: 15px;
   font-weight: 500;
-  padding: 0;
-  height: 80px;
-  line-height: 80px;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1); /* 设置阴影 */
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 4px 0;
+  border-radius: 6px;
+  color: #0a4a82;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
 }
 
-.main-content {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 20px 40px;
-  height: 80vh;
-  width: 100vw;
-  position: relative;
+.el-menu-item .el-icon {
+  color: inherit;
+  font-size: 20px;
+  width: 24px;
+  margin-left: 10px;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.el-menu-item span {
+  flex-grow: 1;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+/* 交互状态 */
+.el-menu-item:not(.is-active):hover {
+  background-color: rgba(7, 27, 45, 0.2);
+  color: #fff;
+}
+
+.el-menu-item.is-active {
+  background-color: #1890ff;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+}
+
+.header {
+  height: 60px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 0 24px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.welcome {
+  font-size: 20px;
+  color: #666;
 }
 
 .error-message {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: var(--el-color-danger);
+  padding: 12px 24px;
+  background-color: #f56c6c;
   color: white;
-  padding: 10px 20px;
   border-radius: 4px;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
-}
-</style>
-
-<style>
-/* 全局样式 */
-body {
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-#app {
-  height: 100vh;
-}
-
-/* 响应式布局 */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  .logo {
-    margin-bottom: 10px;
-  }
-
-  .nav-menu {
-    width: 100%;
-  }
-
-  .el-main {
-    padding: 100px 10px 20px;
-  }
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 </style>
