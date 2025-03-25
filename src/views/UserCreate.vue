@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import PageContainer from '@/components/PageContainer.vue'
+import BaseButton from '@/components/BaseButton.vue'
 import axios from 'axios'
 
 const router = useRouter()
@@ -18,7 +19,6 @@ const formData = ref({
   userPassword: ''
 })
 
-// 错误消息
 const messages = {
   success: 'Operation successful',
   error: 'Failed to create user'
@@ -122,9 +122,13 @@ const rules: FormRules = {
 <template>
   <PageContainer title="">
     <template #actions>
-      <el-button @click="handleCancel">
-        <div class="button-text">返回</div>
-      </el-button>
+      <BaseButton 
+        type="default" 
+        @click="handleCancel"
+        :disabled="loading"
+      >
+        返回
+      </BaseButton>
     </template>
 
     <div class="form-container">
@@ -166,21 +170,19 @@ const rules: FormRules = {
         </el-form-item>
 
         <el-form-item>
-          <el-button
-            type="primary"
+          <BaseButton 
+            type="primary" 
             @click="handleSubmit"
             :loading="loading"
-            size="large"
           >
-          <div class="button-text">提交</div>
-          </el-button>
-          <el-button
+            提交
+          </BaseButton>
+          <BaseButton 
             @click="handleCancel"
             :disabled="loading"
-            size="large"
           >
-          <div class="button-text">取消</div>
-          </el-button>
+            取消
+          </BaseButton>
         </el-form-item>
       </el-form>
     </div>
@@ -189,10 +191,10 @@ const rules: FormRules = {
 
 <style scoped>
 .button-text {
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 700;
   margin-left: 4px;
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 .form-container {
@@ -223,17 +225,5 @@ const rules: FormRules = {
 :deep(.el-form-item:last-child) {
   margin-bottom: 0;
   text-align: right;
-}
-
-:deep(.el-button) {
-  margin-left: 12px;
-}
-
-:deep(.el-button:first-child) {
-  margin-left: 0;
-}
-
-:deep(.el-input__count) {
-  background: transparent;
 }
 </style>

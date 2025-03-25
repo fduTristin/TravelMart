@@ -7,6 +7,8 @@ import type { User } from '@/types/user'
 import PageContainer from '@/components/PageContainer.vue'
 // import { Plus, View, Edit, Delete, Refresh } from '@element-plus/icons-vue'
 import { Plus, Refresh } from '@element-plus/icons-vue'
+import BaseButton from '@/components/BaseButton.vue'
+import UserTable from '@/components/UserTable.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -82,95 +84,42 @@ const handleCreate = () => {
 
 </script>
 
-
 <template>
   <PageContainer title="">
     <template #actions>
-      <el-button @click="loadData" :loading="userStore.loading">
-        <el-icon><Refresh /></el-icon>
-        <div class="button-text">刷新</div>
-      </el-button>
-      <el-button type="primary" @click="handleCreate">
-        <el-icon><Plus /></el-icon>
-        <div class="button-text">新建用户</div>
-      </el-button>
+      <BaseButton 
+        type="default" 
+        @click="loadData" 
+        :loading="userStore.loading"
+        :icon="Refresh"
+      >
+        Refresh
+      </BaseButton>
+      <BaseButton 
+        type="primary" 
+        @click="handleCreate"
+        :icon="Plus"
+      >
+        New User
+      </BaseButton>
     </template>
 
-    <div class="table-wrapper" v-loading="userStore.loading">
-      <el-table
-        v-if="userStore.users.length > 0"
-        :data="userStore.users"
-        style="width: 100%"
-      >
-        <el-table-column prop="userId" label="ID" width="80" />
-        <el-table-column prop="userName" label="Name" min-width="80" />
-        <el-table-column prop="userEmail" label="E-mail" min-width="100" />
-        <!-- <el-table-column label="Actions" width="200" fixed="right">
+    <UserTable
+      :users="userStore.users"
+      :loading="userStore.loading"
+      empty-text="No Users"
+      @row-click="handleView"
+    >
+      <!-- 如需添加操作列 -->
+      <!-- <template #actions>
+        <el-table-column label="Actions" width="180" fixed="right">
           <template #default="{ row }">
-            <el-button-group>
-              <el-button
-                size="small"
-                @click="handleView(row)"
-                title="View Details"
-              >
-                <el-icon><View /></el-icon>
-              </el-button>
-              <el-button
-                size="small"
-                type="primary"
-                @click="handleEdit(row)"
-                title="Edit User"
-              >
-                <el-icon><Edit /></el-icon>
-              </el-button>
-              <el-button
-                size="small"
-                type="danger"
-                @click="handleDelete(row)"
-                title="Delete User"
-              >
-                <el-icon><Delete /></el-icon>
-              </el-button>
-            </el-button-group>
+            <el-button size="small" @click.stop="handleView(row)">
+              查看
+            </el-button>
           </template>
-        </el-table-column> -->
-      </el-table>
-
-      <div v-else-if="!userStore.loading" class="empty-state">
-        <el-empty description="用户列表为空">
-        </el-empty>
-      </div>
-    </div>
+        </el-table-column>
+      </template> -->
+    </UserTable>
   </PageContainer>
 </template>
-
-<style scoped>
-.empty-state {
-  padding: 60px 0;
-  text-align: center;
-}
-
-.table-wrapper {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-}
-
-.button-text {
-  font-size: 15px;
-  font-weight: 700;
-  margin-left: 4px;
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;;
-}
-
-:deep(.el-table) {
-  --el-table-border-color: var(--el-border-color-lighter);
-  --el-table-header-bg-color: #f8f9fc;
-}
-
-:deep(.el-button-group) {
-  display: flex;
-  gap: 4px;
-}
-</style>
