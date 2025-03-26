@@ -34,22 +34,22 @@ defineEmits(['click'])
 
 <style scoped>
 .base-button {
-    min-width: 80px;
+    min-width: 5vw;
     height: 48px;
     border-radius: 15px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: 'Poppins', sans-serif;
+    font-family: "Noto Sans SC";
 }
 
 .button-content {
-    font-size: 17px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
     letter-spacing: 0.8px;
 }
 
 /* 主按钮样式 */
 .button-primary {
-    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    background: linear-gradient(135deg, #1890ff 0%, #74a5c3 100%);
     border: none;
     box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
 }

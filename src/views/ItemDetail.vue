@@ -185,7 +185,7 @@ const messages = {
   background: #f0f2f5;
   padding: 2px 8px;
   border-radius: 4px;
-  font-family: monospace;
+  font-family: "Noto Sans SC";
 }
 
 .title {

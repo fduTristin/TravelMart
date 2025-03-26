@@ -10,8 +10,8 @@
       @row-click="handleRowClick"
     >
       <el-table-column prop="userId" label="ID" width="80" sortable />
-      <el-table-column prop="userName" label="User Name" min-width="120" :show-overflow-tooltip="true" />
-      <el-table-column prop="userEmail" label="Email" min-width="180" :show-overflow-tooltip="true" />
+      <el-table-column prop="userName" label="用户名" min-width="120" :show-overflow-tooltip="true" />
+      <el-table-column prop="userEmail" label="邮箱" min-width="180" :show-overflow-tooltip="true" />
     </el-table>
 
     <!-- 无数据且不在加载状态时显示空状态 -->
@@ -30,7 +30,7 @@
       <el-icon class="is-loading">
         <Loading />
       </el-icon>
-      <span>loading...</span>
+      <span>加载中</span>
     </div>
   </div>
 </template>
@@ -47,7 +47,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  emptyText: "No user",
+  emptyText: " ",
   showEmpty: true,
   loading: false
 })
@@ -79,7 +79,7 @@ const handleRowClick = (row: User) => {
 }
 
 :deep(.el-table) {
-  font-family: 'Poppins';
+  font-family: "Noto Sans SC";
 
   /* 表头样式 */
   .el-table__header-wrapper th {

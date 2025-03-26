@@ -93,21 +93,21 @@ const handleCreate = () => {
         :loading="userStore.loading"
         :icon="Refresh"
       >
-        Refresh
+        刷新
       </BaseButton>
       <BaseButton 
         type="primary" 
         @click="handleCreate"
         :icon="Plus"
       >
-        New User
+        新建用户
       </BaseButton>
     </template>
 
     <UserTable
       :users="userStore.users"
       :loading="userStore.loading"
-      empty-text="No Users"
+      empty-text="用户列表为空"
       @row-click="handleView"
     >
       <!-- 如需添加操作列 -->

@@ -36,7 +36,8 @@ const routes: RouteRecordRaw[] = [
     name: 'user-create',
     component: () => import('@/views/UserCreate.vue'),
     meta: {
-      title: 'Create User'
+      title: 'Create User',
+      hideSidebar: true
     }
   },
   {
