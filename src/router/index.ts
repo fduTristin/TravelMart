@@ -73,6 +73,36 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/UserProfile.vue'),
+    meta: {
+      title: 'User Profile'
+    },
+    props: true
+  },
+  {
+    path: '/stores',
+    name: 'stores',
+    component: () => import('@/views/StoreList.vue'),
+    meta: {
+      title: 'Store Management',
+      keepAlive: true
+    }
+  },
+  {
+    path: '/store/:id',
+    name: 'store-detail',
+    component: () => import('@/views/StoreDetail.vue'),
+    meta: {
+      title: 'Store Detail',
+      keepAlive: true
+    },
+    props: route => ({
+      id: parseInt(route.params.id as string)
+    })
+  },
+  {
     // 404 页面
     path: '/:pathMatch(.*)*',
     name: 'not-found',
