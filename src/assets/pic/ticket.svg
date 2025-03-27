@@ -1,0 +1,10 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  <path d="M200,150 L600,150 L600,450 L200,450 Z" fill="#27ae60" stroke="#fff" stroke-width="10"/>
+  <path d="M200,250 L600,250" stroke="#fff" stroke-width="5" stroke-dasharray="10,5"/>
+  <circle cx="250" cy="200" r="20" fill="#fff"/>
+  <circle cx="550" cy="400" r="20" fill="#fff"/>
+  <text x="400" y="350" font-family="Arial" font-size="48" text-anchor="middle" fill="#fff">景区门票</text>
+  <path d="M300,180 L500,180" stroke="#fff" stroke-width="5"/>
+  <path d="M300,220 L500,220" stroke="#fff" stroke-width="5"/>
+</svg>

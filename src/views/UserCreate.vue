@@ -3,19 +3,21 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import PageContainer from '@/components/PageContainer.vue'
+import BaseButton from '@/components/BaseButton.vue'
 import axios from 'axios'
 
 const router = useRouter()
 
 
 const formData = ref({
-  user_id: 1, // 生成自增 ID
+  userId: 1, // 生成自增 ID
   userName: '',
-  userEmail: ''
+  userEmail: '',
+  userRole: '普通用户',
+  userPhoneNumber: '',
+  userPassword: ''
 })
 
-// 错误消息
 const messages = {
   success: 'Operation successful',
   error: 'Failed to create user'
@@ -31,13 +33,14 @@ const handleSubmit = async () => {
   if (!formRef.value) return
 
   try {
+    await formRef.value.validate()
     loading.value = true
     // 调用 API
     const request = axios.create({
       baseURL: 'http://localhost:8080',
       timeout: 5000
     })
-    await request.post(`/lab1/users/${formData.value.user_id}`, {
+    await request.post(`/lab1/users/${formData.value.userId}`, {
       userName: formData.value.userName,
       userEmail: formData.value.userEmail
     })
@@ -55,74 +58,175 @@ const handleSubmit = async () => {
 const handleCancel = () => {
   router.back()
 }
+
+// 密码规则验证
+const validatePassword = (_: any, value: string, callback: any) => {
+  if (!value) {
+    return callback(new Error('请输入密码'))
+  }
+  if (value.length < 6 || value.length > 32) {
+    return callback(new Error('密码长度应为6到32个字符'))
+  }
+  if (!/^[a-zA-Z0-9-_]+$/.test(value)) {
+    return callback(new Error('密码只能包含字母、数字、-、_'))
+  }
+
+  let types = 0
+  if (/[a-zA-Z]/.test(value)) types++
+  if (/\d/.test(value)) types++
+  if (/[-_]/.test(value)) types++
+
+  if (types < 2) {
+    return callback(new Error('密码至少包含字母、数字、特殊字符（-_）中的两种'))
+  }
+
+  callback()
+}
+
+
+// 表单验证规则
+const rules: FormRules = {
+  userName: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    {
+      pattern: /^[a-zA-Z0-9_]{3,10}$/,
+      message: '用户名仅可包含字母、数字、下划线，长度为3-10个字符',
+      trigger: 'blur'
+    }
+  ],
+  userEmail: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    {
+      pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      message: '请输入有效的邮箱地址',
+      trigger: 'blur'
+    }
+  ],
+  userPhoneNumber: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    {
+      pattern: /^1\d{10}$/,
+      message: '请输入有效的11位手机号',
+      trigger: 'blur'
+    }
+  ],
+  userPassword: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { validator: validatePassword, trigger: 'blur' }
+  ]
+}
+
 </script>
 
 <template>
-  <PageContainer title="Create New User">
-    <template #actions>
-      <el-button @click="handleCancel">
-        <el-icon><ArrowLeft /></el-icon>
-        Back
-      </el-button>
-    </template>
+  <!-- 全屏背景层 -->
+  <div class="fullscreen-background">
+    <!-- 背景图片层 -->
+    <div class="background-image"></div>
 
-    <div class="form-container">
-      <el-form
-        ref="formRef"
-        :model="formData"
-        label-width="120px"
-        class="form"
-        :disabled="loading"
-      >
+    <!-- 居中表单容器 -->
+    <div class="centered-form-container">
+      <div class="form-container">
+        <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form" :disabled="loading">
+          <!-- 表单内容保持不变 -->
+          <el-form-item label="角色" prop="userRole">
+            <el-radio-group v-model="formData.userRole">
+              <el-radio label="普通用户" />
+              <el-radio label="商户" />
+            </el-radio-group>
+          </el-form-item>
 
-        <el-form-item label="Username" prop="userName">
-          <el-input
-            v-model="formData.userName"
-            placeholder="Enter username"
-          />
-        </el-form-item>
+          <el-form-item label="用户名" prop="userName">
+            <el-input v-model="formData.userName" />
+          </el-form-item>
 
-        <el-form-item label="Email" prop="userEmail">
-          <el-input
-            v-model="formData.userEmail"
-            placeholder="Enter email"
-          />
-        </el-form-item>
+          <el-form-item label="密码" prop="userPassword">
+            <el-input v-model="formData.userPassword" type="password" show-password />
+          </el-form-item>
 
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSubmit"
-            :loading="loading"
-            size="large"
-          >
-            Submit
-          </el-button>
-          <el-button
-            @click="handleCancel"
-            :disabled="loading"
-            size="large"
-          >
-            Cancel
-          </el-button>
-        </el-form-item>
-      </el-form>
+          <el-form-item label="手机号" prop="userPhoneNumber">
+            <el-input v-model="formData.userPhoneNumber" />
+          </el-form-item>
+
+          <el-form-item label="邮箱" prop="userEmail">
+            <el-input v-model="formData.userEmail" />
+          </el-form-item>
+
+          <el-form-item>
+            <BaseButton type="primary" @click="handleSubmit" :loading="loading">
+              提交
+            </BaseButton>
+            <BaseButton @click="handleCancel" :disabled="loading">
+              取消
+            </BaseButton>
+          </el-form-item>
+        </el-form>
+      </div>
     </div>
-  </PageContainer>
+  </div>
 </template>
 
 <style scoped>
-.form-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+/* 全屏背景样式 */
+.fullscreen-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* 背景图片样式 */
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../../public/background.jpg'); /* 替换为你的图片路径 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(5px) brightness(0.7); /* 模糊和变暗效果 */
+}
+
+/* 居中表单容器 */
+.centered-form-container {
+  width: 40vw;
+  padding: 20px;
+  z-index: 1;
+  animation: fadeIn 0.3s ease-out; /* 淡入动画 */
+}
+
+/* 表单容器样式 */
+.form-container {
+  background: rgb(247, 249, 249);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  width: 36vw;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 调整表单元素样式 */
 :deep(.el-form-item__label) {
+  font-size: 18px;
   font-weight: 500;
+  margin-right: 1vw;
 }
 
 :deep(.el-input__wrapper),
@@ -137,20 +241,28 @@ const handleCancel = () => {
   border-color: var(--el-color-primary);
 }
 
+:deep(.el-radio__label),
+:deep(.el-input__inner),
+:deep(.el-textarea__inner) {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 18px;
+}
+
+:deep(.el-form-item:first-child) {
+  margin-top: 20px;
+}
+
 :deep(.el-form-item:last-child) {
-  margin-bottom: 0;
-  text-align: right;
+  margin-bottom: 20px;
+  margin-left: 2.6vw;
 }
 
-:deep(.el-button) {
-  margin-left: 12px;
+:deep(.el-form-item:last-child .el-form-item__content) {
+  gap: 2vw; /* 按钮间距 */
 }
 
-:deep(.el-button:first-child) {
-  margin-left: 0;
-}
-
-:deep(.el-input__count) {
-  background: transparent;
+:deep(.el-input) {
+  display: flex;
+  max-width: 20vw;
 }
 </style>

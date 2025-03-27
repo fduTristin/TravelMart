@@ -20,11 +20,8 @@ defineProps<{
 
 <style scoped>
 .page-container {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  min-height: calc(100vh - 100px);
-  position: absolute;
+  background-color:inherit;
+  height: inherit;
   top: 0;
   left: 0;
   right: 0;
@@ -32,8 +29,7 @@ defineProps<{
 }
 
 .page-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--el-border-color-light);
+  padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -49,4 +45,4 @@ defineProps<{
 .page-content {
   padding: 24px;
 }
-</style> 
+</style>

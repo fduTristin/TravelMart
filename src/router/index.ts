@@ -18,7 +18,7 @@ const routes: RouteRecordRaw[] = [
     name: 'home',
     component: HomeView,
     meta: {
-      title: 'TaskFlow',
+      title: 'Travel',
       keepAlive: true
     }
   },
@@ -36,7 +36,8 @@ const routes: RouteRecordRaw[] = [
     name: 'user-create',
     component: () => import('@/views/UserCreate.vue'),
     meta: {
-      title: 'Create User'
+      title: 'Create User',
+      hideSidebar: true
     }
   },
   {
@@ -72,6 +73,36 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/UserProfile.vue'),
+    meta: {
+      title: 'User Profile'
+    },
+    props: true
+  },
+  {
+    path: '/stores',
+    name: 'stores',
+    component: () => import('@/views/StoreList.vue'),
+    meta: {
+      title: 'Store Management',
+      keepAlive: true
+    }
+  },
+  {
+    path: '/store/:id',
+    name: 'store-detail',
+    component: () => import('@/views/StoreDetail.vue'),
+    meta: {
+      title: 'Store Detail',
+      keepAlive: true
+    },
+    props: route => ({
+      id: parseInt(route.params.id as string)
+    })
+  },
+  {
     // 404 页面
     path: '/:pathMatch(.*)*',
     name: 'not-found',
@@ -98,7 +129,7 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach((to, from, next) => {
   // 设置页面标题
-  document.title = `${to.meta.title} - TaskFlow`
+  document.title = `${to.meta.title} - Travel`
 
   // 这里可以添加其他导航守卫逻辑
   // 例如：身份验证、权限检查等
