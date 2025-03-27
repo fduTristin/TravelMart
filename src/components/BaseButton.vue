@@ -36,7 +36,7 @@ defineEmits(['click'])
 .base-button {
     min-width: 5vw;
     height: 48px;
-    border-radius: 15px;
+    border-radius: 12px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: "Noto Sans SC";
 }

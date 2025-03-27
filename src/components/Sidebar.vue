@@ -31,17 +31,28 @@ const route = useRoute()
         </el-icon>
         <span>用户管理</span>
       </el-menu-item>
+      <el-menu-item index="/profile" class="menu-item">
+        <el-icon>
+          <Tickets />
+        </el-icon>
+        <span>个人信息</span>
+      </el-menu-item>
+      <el-menu-item index="/Stores" class="menu-item">
+        <el-icon>
+          <Setting />
+        </el-icon>
+        <span>店铺管理</span>
+      </el-menu-item>
     </el-menu>
   </el-aside>
 </template>
 
 <style scoped>
 .sidebar {
-  background: linear-gradient(135deg, #dde4ec 0%, #0a3aa3 100%);
-  height: 95vh;
-  width: 15vw;
-  border-radius: 8px 8px 8px 8px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  background: inherit;
+  height: inherit;
+  width: 18vw;
+  /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -56,29 +67,29 @@ const route = useRoute()
 .logo {
   display: flex;
   align-items: center;
-  justify-content: center; /* 添加居中 */
+  justify-content: center;
+  /* 添加居中 */
   text-decoration: none;
   height: 100%;
 }
 
 .logo-img {
-  width: 50px;
-  height: 50px;
+  width: 4vw;
+  height: 4vw;
   object-fit: contain;
 }
 
 .logo-text {
-  font-size: 25px;
+  font-size: 28px;
   font-weight: 600;
   font-family: "Noto Sans SC";
-  color: #fff;
-  margin-left: 15px;
-  white-space: nowrap;
+  color: #073c62;
+  margin-left: 1vw;
 }
 
 .logo-divider {
   margin: 16px 0 8px 0;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(199, 20, 20, 0.1);
 }
 
 .nav-menu {
@@ -88,34 +99,49 @@ const route = useRoute()
   flex-direction: column;
   background-color: inherit;
   padding: 0;
-  align-items: center; /* 使菜单项居中 */
+  align-items: center;
+  /* 使菜单项居中 */
 }
 
 .menu-item {
-  height: 56px;
-  line-height: 56px;
-  font-size: 19px;
+  height: 6vh;
+  font-size: 15px;
   font-weight: 500;
   font-family: "Noto Sans SC";
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-left: 1vw;
-  margin-right: 1vw;
-  margin-bottom: 1vh;
-  border-radius: 6px;
-  color: #0a4a82;
+  margin-left: 2vw;
+  margin-right: 2vw;
+  margin-bottom: 1.5vh;
+  border-radius: 12px;
+  color: #062a4a;
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* 内容从左侧开始 */
-  width: 90%; /* 设置固定宽度 */
+  justify-content: flex-start;
+  /* 内容从左侧开始 */
+  width: 90%;
+  /* 设置固定宽度 */
   padding: 0 16px;
 }
 
 .menu-item .el-icon {
   color: inherit;
   font-size: 20px;
-  width: 24px;
-  margin-right: 12px;
+  width: 2.5vw;
+  height: 2.5vw;
+  margin-right: 1.6vw;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(162, 163, 164, 0.25);
+  transition: background-color 0.3s;
+}
+
+.menu-item.is-active .el-icon {
+  background-color: #275f94;
+  color: #fff;
 }
 
 .menu-item span {
@@ -126,13 +152,13 @@ const route = useRoute()
 
 /* Interaction states */
 .menu-item:not(.is-active):hover {
-  background-color: rgba(7, 27, 45, 0.2);
-  color: #fff;
+  background-color: inherit;
+  color: #9dafe4;
 }
 
 .menu-item.is-active {
-  background-color: #1890ff;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+  background-color: #fff;
+  color: inherit;
+  box-shadow: 0 4px 12px rgba(237, 238, 239, 0.25);
 }
 </style>

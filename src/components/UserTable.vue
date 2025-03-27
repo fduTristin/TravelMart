@@ -6,7 +6,7 @@
       :data="users" 
       v-loading="loading" 
       style="width: 100%" 
-      :row-class-name="tableRowClassName"
+      :row-class-name="tableRowClassName" 
       @row-click="handleRowClick"
     >
       <el-table-column prop="userId" label="ID" width="80" sortable />
@@ -68,7 +68,7 @@ const handleRowClick = (row: User) => {
 <style scoped>
 .user-table-container {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }

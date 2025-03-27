@@ -95,14 +95,14 @@ const rules: FormRules = {
     }
   ],
   userEmail: [
-    { required: false, message: '请输入邮箱', trigger: 'blur' },
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
     {
       pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
       message: '请输入有效的邮箱地址',
       trigger: 'blur'
     }
   ],
-  userPhone: [
+  userPhoneNumber: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
     {
       pattern: /^1\d{10}$/,
@@ -203,7 +203,7 @@ const rules: FormRules = {
 
 /* 表单容器样式 */
 .form-container {
-  background: rgb(234, 241, 251);
+  background: rgb(247, 249, 249);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: 20px;

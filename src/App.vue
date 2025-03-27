@@ -33,8 +33,9 @@ const error = ref<string | null>(null)
 
 <style scoped>
 .app-container {
-  height: 95vh;
+  height: inherit;
   overflow: hidden;
+  background: rgb(245, 245, 245);
 }
 
 .header {
@@ -42,7 +43,7 @@ const error = ref<string | null>(null)
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background-color: #fff;
+  background-color: inherit;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   padding: 0 24px;
 }
@@ -66,5 +67,9 @@ const error = ref<string | null>(null)
   color: white;
   border-radius: 4px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+  padding: 20px;
 }
 </style>

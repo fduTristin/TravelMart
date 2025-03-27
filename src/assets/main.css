@@ -13,7 +13,6 @@ body {
 #app {
   width: 100vw;   /* 宽度占视口的 80% */
   height: 100vh;  /* 高度占视口的 80% */
-  padding: 2rem;
   font-weight: normal;
   background: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -52,6 +51,5 @@ a:hover {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
-    padding: 2rem;
   }
 }
