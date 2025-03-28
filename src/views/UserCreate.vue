@@ -3,30 +3,38 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
+import type { AxiosError } from 'axios'
 import BaseButton from '@/components/BaseButton.vue'
-import axios from 'axios'
+import { api } from '@/services/api'
+
+interface ErrorResponse {
+  message: string
+  error: string
+  errors: null | Array<{
+    field: string
+    rejectedValue: string
+    reason: string
+  }>
+}
 
 const router = useRouter()
 
-
 const formData = ref({
-  userId: 1, // 生成自增 ID
   userName: '',
   userEmail: '',
-  userRole: '普通用户',
-  userPhoneNumber: '',
-  userPassword: ''
+  userRole: 'CUSTOMER', // 修改默认值为CUSTOMER
+  userTel: '',
+  userPwd: ''
 })
 
 const messages = {
-  success: 'Operation successful',
-  error: 'Failed to create user'
+  success: '注册成功',
+  error: '注册失败'
 }
 
 // 表单引用
 const formRef = ref<FormInstance>()
 const loading = ref(false)
-
 
 // 提交表单
 const handleSubmit = async () => {
@@ -35,20 +43,29 @@ const handleSubmit = async () => {
   try {
     await formRef.value.validate()
     loading.value = true
-    // 调用 API
-    const request = axios.create({
-      baseURL: 'http://localhost:8080',
-      timeout: 5000
-    })
-    await request.post(`/lab1/users/${formData.value.userId}`, {
+
+    // 调用注册API
+    const response = await api.post('/auth/register', {
       userName: formData.value.userName,
-      userEmail: formData.value.userEmail
+      userPwd: formData.value.userPwd,
+      userRole: formData.value.userRole,
+      userEmail: formData.value.userEmail,
+      userTel: formData.value.userTel
     })
+
     ElMessage.success(messages.success)
-    // 使用 replace 而不是 push，这样返回时不会回到创建页面
-    router.replace('/users')
-  } catch (e) {
-    ElMessage.error(messages.error)
+    // // 使用 replace 而不是 push，这样返回时不会回到创建页面
+    // router.replace('/users')
+    // 注册成功后跳转到登录页面
+    router.push('/login')
+  } catch (error: unknown) {
+    // 处理错误响应
+    const axiosError = error as AxiosError<ErrorResponse>
+    if (axiosError.response?.data?.message) {
+      ElMessage.error(axiosError.response.data.message)
+    } else {
+      ElMessage.error(messages.error)
+    }
   } finally {
     loading.value = false
   }
@@ -60,7 +77,7 @@ const handleCancel = () => {
 }
 
 // 密码规则验证
-const validatePassword = (_: any, value: string, callback: any) => {
+const validatePassword = (_: unknown, value: string, callback: (error?: Error) => void) => {
   if (!value) {
     return callback(new Error('请输入密码'))
   }
@@ -83,7 +100,6 @@ const validatePassword = (_: any, value: string, callback: any) => {
   callback()
 }
 
-
 // 表单验证规则
 const rules: FormRules = {
   userName: [
@@ -102,7 +118,7 @@ const rules: FormRules = {
       trigger: 'blur'
     }
   ],
-  userPhoneNumber: [
+  userTel: [
     { required: true, message: '请输入手机号', trigger: 'blur' },
     {
       pattern: /^1\d{10}$/,
@@ -110,7 +126,7 @@ const rules: FormRules = {
       trigger: 'blur'
     }
   ],
-  userPassword: [
+  userPwd: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { validator: validatePassword, trigger: 'blur' }
   ]
@@ -128,11 +144,10 @@ const rules: FormRules = {
     <div class="centered-form-container">
       <div class="form-container">
         <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form" :disabled="loading">
-          <!-- 表单内容保持不变 -->
           <el-form-item label="角色" prop="userRole">
             <el-radio-group v-model="formData.userRole">
-              <el-radio label="普通用户" />
-              <el-radio label="商户" />
+              <el-radio label="CUSTOMER">普通用户</el-radio>
+              <el-radio label="MERCHANT">商户</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -140,12 +155,12 @@ const rules: FormRules = {
             <el-input v-model="formData.userName" />
           </el-form-item>
 
-          <el-form-item label="密码" prop="userPassword">
-            <el-input v-model="formData.userPassword" type="password" show-password />
+          <el-form-item label="密码" prop="userPwd">
+            <el-input v-model="formData.userPwd" type="password" show-password />
           </el-form-item>
 
-          <el-form-item label="手机号" prop="userPhoneNumber">
-            <el-input v-model="formData.userPhoneNumber" />
+          <el-form-item label="手机号" prop="userTel">
+            <el-input v-model="formData.userTel" />
           </el-form-item>
 
           <el-form-item label="邮箱" prop="userEmail">
@@ -154,7 +169,7 @@ const rules: FormRules = {
 
           <el-form-item>
             <BaseButton type="primary" @click="handleSubmit" :loading="loading">
-              提交
+              注册
             </BaseButton>
             <BaseButton @click="handleCancel" :disabled="loading">
               取消
