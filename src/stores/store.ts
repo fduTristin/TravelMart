@@ -19,6 +19,17 @@ interface Store {
   serviceType: ServiceType
 }
 
+// 创建店铺的DTO接口
+interface CreateStoreDTO {
+  storeName: string
+  serviceTypes: ServiceType[]
+  idNumber: string
+  description: string
+  address: string
+  capital: number
+  registrationDate: string
+}
+
 export const useStoreStore = defineStore('store', () => {
   // 状态
   const stores = ref<Store[]>([
@@ -181,6 +192,23 @@ export const useStoreStore = defineStore('store', () => {
     return currentStore()
   }
 
+  // 创建新店铺
+  const createStore = (data: CreateStoreDTO) => {
+    // 生成新的店铺ID
+    const maxId = Math.max(...stores.value.map(store => store.storeId), 0)
+    const newStore: Store = {
+      storeId: maxId + 1,
+      storeName: data.storeName,
+      rating: 5.0, // 新店铺默认5星
+      isOpen: true,
+      description: data.description,
+      imageUrl: 'https://via.placeholder.com/400x300', // 默认图片
+      serviceType: data.serviceTypes[0] // 暂时只使用第一个服务类型
+    }
+    stores.value.push(newStore)
+    return newStore
+  }
+
   return {
     stores,
     currentStore,
@@ -188,6 +216,7 @@ export const useStoreStore = defineStore('store', () => {
     prevStore,
     getRandomStore,
     getStoresByType,
-    getRandomStoreByType
+    getRandomStoreByType,
+    createStore
   }
 })
