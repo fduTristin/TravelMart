@@ -6,6 +6,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type { AxiosError } from 'axios'
 import BaseButton from '@/components/BaseButton.vue'
 import { api } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
 interface ErrorResponse {
   status: number
@@ -16,6 +17,7 @@ interface ErrorResponse {
 
 const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore()
 
 const formData = ref({
   userName: '',
@@ -46,7 +48,7 @@ const handleSubmit = async () => {
     })
 
     // 保存token
-    localStorage.setItem('token', response.data.token)
+    authStore.setToken(response.data.token)
 
     ElMessage.success(messages.success)
     // 登录成功后跳转到原本要访问的页面或首页

@@ -1,11 +1,21 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { ElContainer, ElAside, ElHeader, ElMain, ElMenu, ElMenuItem, ElIcon, ElDivider } from 'element-plus'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Guide, User, Edit, House, Setting, Tickets } from '@element-plus/icons-vue'
 import Sidebar from './components/Sidebar.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const error = ref<string | null>(null)
+const authStore = useAuthStore()
+
+// 初始化时从 localStorage 恢复 token
+onMounted(() => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    authStore.setToken(token)
+  }
+})
 </script>
 
 <template>

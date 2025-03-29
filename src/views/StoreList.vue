@@ -4,9 +4,12 @@ import StoreCard from '@/components/StoreCard.vue'
 import PageContainer from '@/components/PageContainer.vue'
 import { useRouter } from 'vue-router'
 import { useStoreStore, ServiceType } from '@/stores/store'
+import { useAuthStore } from '@/stores/auth'
+import { Plus } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const storeStore = useStoreStore()
+const authStore = useAuthStore()
 
 // 服务类型筛选
 const selectedType = ref<ServiceType | null>(null)
@@ -23,6 +26,11 @@ const handleStoreClick = (storeId: number) => {
   // 跳转到店铺详情页
   router.push(`/store/${storeId}`)
 }
+
+// 创建新店铺
+const handleCreateStore = () => {
+  router.push('/stores/create')
+}
 </script>
 
 <template>
@@ -30,12 +38,18 @@ const handleStoreClick = (storeId: number) => {
     <template #header>
       <div class="header-container">
         <h1>店铺列表</h1>
-        <select v-model="selectedType" class="type-filter">
-          <option :value="null">全部类型</option>
-          <option v-for="type in Object.values(ServiceType)" :key="type" :value="type">
-            {{ type }}
-          </option>
-        </select>
+        <div class="header-actions">
+          <select v-model="selectedType" class="type-filter">
+            <option :value="null">全部类型</option>
+            <option v-for="type in Object.values(ServiceType)" :key="type" :value="type">
+              {{ type }}
+            </option>
+          </select>
+          <el-button v-if="authStore.isMerchant" type="primary" @click="handleCreateStore">
+            <el-icon><Plus /></el-icon>
+            开设新店铺
+          </el-button>
+        </div>
       </div>
     </template>
 
@@ -107,6 +121,12 @@ const handleStoreClick = (storeId: number) => {
   transform: translateY(-4px);
 }
 
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
   .store-grid {
     grid-template-columns: 1fr;
@@ -118,6 +138,10 @@ const handleStoreClick = (storeId: number) => {
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
+  }
+
+  .header-actions {
+    flex-direction: column;
   }
 }
 </style>

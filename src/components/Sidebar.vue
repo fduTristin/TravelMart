@@ -3,8 +3,10 @@ import { RouterLink } from 'vue-router'
 import { ElAside, ElMenu, ElMenuItem, ElIcon, ElDivider } from 'element-plus'
 import { House, User, Edit, Tickets, Setting } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
 </script>
 
 <template>
@@ -25,7 +27,7 @@ const route = useRoute()
         </el-icon>
         <span>首页</span>
       </el-menu-item>
-      <el-menu-item index="/users" class="menu-item">
+      <el-menu-item v-if="authStore.isAdmin" index="/users" class="menu-item">
         <el-icon>
           <User />
         </el-icon>
@@ -37,7 +39,7 @@ const route = useRoute()
         </el-icon>
         <span>个人信息</span>
       </el-menu-item>
-      <el-menu-item index="/Stores" class="menu-item">
+      <el-menu-item v-if="authStore.isMerchant" index="/stores" class="menu-item">
         <el-icon>
           <Setting />
         </el-icon>
