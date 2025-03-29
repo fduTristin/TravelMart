@@ -73,6 +73,17 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/users/:id',
+    name: 'user-detail',
+    component: () => import('@/views/UserDetail.vue'),
+    meta: {
+      title: 'User Detail',
+    },
+    props: route => ({
+      id: parseInt(route.params.id as string),
+    }),
+  },
+  {
     path: '/profile',
     name: 'profile',
     component: () => import('@/views/UserProfile.vue'),
