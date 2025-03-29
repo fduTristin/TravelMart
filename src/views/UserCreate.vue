@@ -14,8 +14,8 @@ const formData = ref({
   userName: '',
   userEmail: '',
   userRole: '普通用户',
-  userPhoneNumber: '',
-  userPassword: ''
+  userTel: '',
+  userPwd: ''
 })
 
 const messages = {

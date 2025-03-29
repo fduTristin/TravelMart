@@ -10,8 +10,10 @@
       @row-click="handleRowClick"
     >
       <el-table-column prop="userId" label="ID" width="80" sortable />
-      <el-table-column prop="userName" label="用户名" min-width="120" :show-overflow-tooltip="true" />
-      <el-table-column prop="userEmail" label="邮箱" min-width="180" :show-overflow-tooltip="true" />
+      <el-table-column prop="userRole" label="用户类型" min-width="80" :show-overflow-tooltip="true" /> 
+      <el-table-column prop="userName" label="用户名" min-width="80" :show-overflow-tooltip="true" />
+      <el-table-column prop="userEmail" label="邮箱" min-width="120" :show-overflow-tooltip="true" />
+      <el-table-column prop="userTel" label="手机号" min-width="120" :show-overflow-tooltip="true" />
     </el-table>
 
     <!-- 无数据且不在加载状态时显示空状态 -->
@@ -71,6 +73,7 @@ const handleRowClick = (row: User) => {
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  width: 70vw;
 }
 
 .empty-state {
