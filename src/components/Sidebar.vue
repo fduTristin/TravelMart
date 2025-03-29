@@ -11,6 +11,10 @@ const authStore = useAuthStore()
 
 // 处理登出
 const handleLogout = () => {
+  // 保存用户名到 localStorage
+  if (authStore.user?.sub) {
+    localStorage.setItem('lastUsername', authStore.user.sub)
+  }
   authStore.logout()
   router.push('/login')
 }
@@ -70,7 +74,7 @@ const handleCommand = (command: string) => {
     <div class="user-info">
       <el-dropdown trigger="click" @command="handleCommand">
         <div class="user-info-content">
-          <el-avatar :size="40" :src="'https://avatars.githubusercontent.com/u/129137808?v=4'" />
+          <el-avatar :size="40" :src="'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" />
           <span class="username">{{ authStore.user?.sub }}</span>
         </div>
         <template #dropdown>

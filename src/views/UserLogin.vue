@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -20,8 +20,25 @@ const route = useRoute()
 const authStore = useAuthStore()
 
 const formData = ref({
-  userName: '',
+  userName: localStorage.getItem('lastUsername') || '',
   userPwd: ''
+})
+
+// 清空密码字段的函数
+const clearPassword = () => {
+  formData.value.userPwd = ''
+}
+
+// 监听路由变化，当进入登录页时清空密码字段
+watch(() => route.path, (newPath) => {
+  if (newPath === '/login') {
+    clearPassword()
+  }
+})
+
+// 组件挂载时清空密码字段
+onMounted(() => {
+  clearPassword()
 })
 
 const messages = {
@@ -69,7 +86,7 @@ const handleSubmit = async () => {
 
 // 跳转到注册页面
 const handleRegister = () => {
-  router.push('/users/create')
+  router.push('/register')
 }
 
 // 表单验证规则
