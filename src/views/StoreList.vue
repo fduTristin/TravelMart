@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { useStoreStore, ServiceType } from '@/stores/store'
 import { useAuthStore } from '@/stores/auth'
 import { Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const storeStore = useStoreStore()
@@ -29,13 +30,17 @@ const handleStoreClick = (storeId: number) => {
 
 // 创建新店铺
 const handleCreateStore = () => {
+  if (!authStore.isMerchant) {
+    ElMessage.warning('只有商户才能开设店铺')
+    return
+  }
   router.push('/stores/create')
 }
 </script>
 
 <template>
   <PageContainer>
-    <template #header>
+    <template #actions>
       <div class="header-container">
         <h1>店铺列表</h1>
         <div class="header-actions">
@@ -45,7 +50,7 @@ const handleCreateStore = () => {
               {{ type }}
             </option>
           </select>
-          <el-button v-if="authStore.isMerchant" type="primary" @click="handleCreateStore">
+          <el-button type="primary" @click="handleCreateStore">
             <el-icon><Plus /></el-icon>
             开设新店铺
           </el-button>
