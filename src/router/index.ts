@@ -8,18 +8,29 @@ declare module 'vue-router' {
     title: string
     requiresAuth?: boolean
     keepAlive?: boolean
+    hideSidebar?: boolean
   }
 }
 
 // 路由配置
 const routes: RouteRecordRaw[] = [
   {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/UserLogin.vue'),
+    meta: {
+      title: '用户登录',
+      hideSidebar: true
+    }
+  },
+  {
     path: '/',
     name: 'home',
     component: HomeView,
     meta: {
       title: 'Travel',
-      keepAlive: true
+      keepAlive: true,
+      requiresAuth: true
     }
   },
   {
@@ -32,11 +43,11 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/users/create',
+    path: '/register',
     name: 'user-create',
     component: () => import('@/views/UserCreate.vue'),
     meta: {
-      title: 'Create User',
+      title: 'Register',
       hideSidebar: true
     }
   },
@@ -91,6 +102,15 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/stores/create',
+    name: 'store-create',
+    component: () => import('@/views/CreateStore.vue'),
+    meta: {
+      title: '开设新店铺',
+      keepAlive: false
+    }
+  },
+  {
     path: '/store/:id',
     name: 'store-detail',
     component: () => import('@/views/StoreDetail.vue'),
@@ -126,15 +146,23 @@ const router = createRouter({
   }
 })
 
-// 全局前置守卫
+// 路由导航守卫
 router.beforeEach((to, from, next) => {
-  // 设置页面标题
-  document.title = `${to.meta.title} - Travel`
+  // 获取token
+  const token = localStorage.getItem('token')
 
-  // 这里可以添加其他导航守卫逻辑
-  // 例如：身份验证、权限检查等
-
-  next()
+  // 如果需要登录且没有token
+  if (to.meta.requiresAuth && !token) {
+    // 保存原本要去的页面
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    })
+  } else {
+    // 设置页面标题
+    document.title = `${to.meta.title} - Travel`
+    next()
+  }
 })
 
 // 全局后置钩子

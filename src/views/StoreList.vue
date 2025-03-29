@@ -4,9 +4,13 @@ import StoreCard from '@/components/StoreCard.vue'
 import PageContainer from '@/components/PageContainer.vue'
 import { useRouter } from 'vue-router'
 import { useStoreStore, ServiceType } from '@/stores/store'
+import { useAuthStore } from '@/stores/auth'
+import { Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const storeStore = useStoreStore()
+const authStore = useAuthStore()
 
 // 服务类型筛选
 const selectedType = ref<ServiceType | null>(null)
@@ -23,19 +27,41 @@ const handleStoreClick = (storeId: number) => {
   // 跳转到店铺详情页
   router.push(`/store/${storeId}`)
 }
+
+// 创建新店铺
+const handleCreateStore = () => {
+  if (!authStore.isMerchant) {
+    ElMessage.warning('只有商户才能开设店铺')
+    return
+  }
+  router.push('/stores/create')
+}
 </script>
 
 <template>
   <PageContainer>
-    <template #header>
+    <template #actions>
       <div class="header-container">
-        <h1>店铺列表</h1>
-        <select v-model="selectedType" class="type-filter">
-          <option :value="null">全部类型</option>
-          <option v-for="type in Object.values(ServiceType)" :key="type" :value="type">
-            {{ type }}
-          </option>
-        </select>
+        <!-- <h1>店铺列表</h1> -->
+        <div class="header-actions">
+          <el-select
+            v-model="selectedType"
+            placeholder="选择服务类型"
+            clearable
+            class="type-filter"
+          >
+            <el-option
+              v-for="type in Object.values(ServiceType)"
+              :key="type"
+              :label="type"
+              :value="type"
+            />
+          </el-select>
+          <el-button type="primary" @click="handleCreateStore">
+            <el-icon><Plus /></el-icon>
+            开设新店铺
+          </el-button>
+        </div>
       </div>
     </template>
 
@@ -61,23 +87,7 @@ const handleStoreClick = (storeId: number) => {
 }
 
 .type-filter {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-  background-color: white;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-}
-
-.type-filter:hover {
-  border-color: #409eff;
-}
-
-.type-filter:focus {
-  outline: none;
-  border-color: #409eff;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+  width: 200px;
 }
 
 .store-grid {
@@ -97,18 +107,6 @@ const handleStoreClick = (storeId: number) => {
 
 @media (max-width: 768px) {
   .store-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-    padding: 12px;
-  }
-}
-
-.store-grid-item:hover {
-  transform: translateY(-4px);
-}
-
-@media (max-width: 768px) {
-  .store-grid {
     grid-template-columns: 1fr;
     padding: 16px;
     gap: 16px;
@@ -119,5 +117,23 @@ const handleStoreClick = (storeId: number) => {
     gap: 16px;
     align-items: stretch;
   }
+
+  .header-actions {
+    flex-direction: column;
+  }
+
+  .type-filter {
+    width: 100%;
+  }
+}
+
+.store-grid-item:hover {
+  transform: translateY(-4px);
+}
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 </style>
