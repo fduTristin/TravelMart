@@ -42,14 +42,21 @@ const handleCreateStore = () => {
   <PageContainer>
     <template #actions>
       <div class="header-container">
-        <h1>店铺列表</h1>
+        <!-- <h1>店铺列表</h1> -->
         <div class="header-actions">
-          <select v-model="selectedType" class="type-filter">
-            <option :value="null">全部类型</option>
-            <option v-for="type in Object.values(ServiceType)" :key="type" :value="type">
-              {{ type }}
-            </option>
-          </select>
+          <el-select
+            v-model="selectedType"
+            placeholder="选择服务类型"
+            clearable
+            class="type-filter"
+          >
+            <el-option
+              v-for="type in Object.values(ServiceType)"
+              :key="type"
+              :label="type"
+              :value="type"
+            />
+          </el-select>
           <el-button type="primary" @click="handleCreateStore">
             <el-icon><Plus /></el-icon>
             开设新店铺
@@ -80,23 +87,7 @@ const handleCreateStore = () => {
 }
 
 .type-filter {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-  background-color: white;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-}
-
-.type-filter:hover {
-  border-color: #409eff;
-}
-
-.type-filter:focus {
-  outline: none;
-  border-color: #409eff;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+  width: 200px;
 }
 
 .store-grid {
@@ -116,24 +107,6 @@ const handleCreateStore = () => {
 
 @media (max-width: 768px) {
   .store-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-    padding: 12px;
-  }
-}
-
-.store-grid-item:hover {
-  transform: translateY(-4px);
-}
-
-.header-actions {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
-@media (max-width: 768px) {
-  .store-grid {
     grid-template-columns: 1fr;
     padding: 16px;
     gap: 16px;
@@ -148,5 +121,19 @@ const handleCreateStore = () => {
   .header-actions {
     flex-direction: column;
   }
+
+  .type-filter {
+    width: 100%;
+  }
+}
+
+.store-grid-item:hover {
+  transform: translateY(-4px);
+}
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 </style>
