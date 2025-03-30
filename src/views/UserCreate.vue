@@ -201,7 +201,7 @@ const rules: FormRules = {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../../public/background.jpg'); /* 替换为你的图片路径 */
+  background-image: url('/background.jpg'); /* 替换为你的图片路径 */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

@@ -151,7 +151,7 @@ const rules: FormRules = {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../../public/background.jpg');
+  background-image: url('/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
