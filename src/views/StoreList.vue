@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import StoreCard from '@/components/StoreCard.vue'
 import PageContainer from '@/components/PageContainer.vue'
 import { useRouter } from 'vue-router'
 import { useStoreStore, ServiceType } from '@/stores/store'
 import { useAuthStore } from '@/stores/auth'
 import { Plus } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElLoading } from 'element-plus'
 
 const router = useRouter()
 const storeStore = useStoreStore()
@@ -36,6 +36,22 @@ const handleCreateStore = () => {
   }
   router.push('/stores/create')
 }
+
+// 加载店铺列表
+onMounted(async () => {
+  const loadingInstance = ElLoading.service({
+    target: '.store-grid',
+    text: '加载店铺数据中...'
+  })
+
+  try {
+    await storeStore.fetchStores()
+  } catch (error) {
+    ElMessage.error('加载店铺列表失败')
+  } finally {
+    loadingInstance.close()
+  }
+})
 </script>
 
 <template>

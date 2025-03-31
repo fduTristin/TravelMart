@@ -126,6 +126,9 @@ const rules = ref<FormRules>({
 // 表单引用
 const formRef = ref<FormInstance>()
 
+// 加载状态
+const loading = ref(false)
+
 // 返回列表
 const handleBack = () => {
   router.push('/stores')
@@ -138,12 +141,16 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid, fields) => {
     if (valid) {
       try {
+        loading.value = true
         // 调用创建店铺的API
-        const newStore = storeStore.createStore(formData.value)
+        const newStore = await storeStore.createStore(formData.value)
         ElMessage.success('店铺创建成功')
         router.push(`/store/${newStore.storeId}`)
-      } catch (error) {
-        ElMessage.error('创建店铺失败')
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : '未知错误'
+        ElMessage.error(`创建店铺失败: ${errorMessage}`)
+      } finally {
+        loading.value = false
       }
     } else {
       console.error('表单验证失败:', fields)
@@ -222,8 +229,14 @@ const handleSubmit = async () => {
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleSubmit">创建店铺</el-button>
-          <el-button @click="handleBack">取消</el-button>
+          <el-button
+            type="primary"
+            @click="handleSubmit"
+            :loading="loading"
+          >
+            创建店铺
+          </el-button>
+          <el-button @click="handleBack" :disabled="loading">取消</el-button>
         </el-form-item>
       </el-form>
     </div>
