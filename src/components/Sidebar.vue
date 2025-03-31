@@ -153,7 +153,7 @@ const handleCommand = (command: string) => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 1.5vh;
   border-radius: 12px;
-  color: #062a4a;
+  color: #275f94;
   display: flex;
   align-items: center;
   justify-content: center; /* 横向居中 */
@@ -162,7 +162,7 @@ const handleCommand = (command: string) => {
 }
 
 .menu-item .el-icon {
-  color: inherit;
+  color: #275f94;
   font-size: 22px;
   width: 2.5vw;
   height: 2.5vw;
@@ -176,8 +176,6 @@ const handleCommand = (command: string) => {
   box-shadow: 0 4px 12px rgba(162, 163, 164, 0.25);
   transition: background-color 0.3s;
 }
-
-
 
 .menu-item span {
   flex-grow: 1;
@@ -201,7 +199,7 @@ const handleCommand = (command: string) => {
 
 .menu-item.is-active {
   background-color: #fff;
-  color: inherit;
+  color: #275f94;
   box-shadow: 0 4px 12px rgba(237, 238, 239, 0.25);
 }
 

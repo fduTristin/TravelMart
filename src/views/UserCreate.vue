@@ -280,4 +280,14 @@ const rules: FormRules = {
   display: flex;
   max-width: 20vw;
 }
+
+:deep(.el-radio.is-checked .el-radio__label) {
+  color: #275f94;
+  font-weight: bold;
+}
+
+:deep(.el-radio.is-checked .el-radio__input .el-radio__inner) {
+  border-color: #275f94;
+  background-color: #275f94;
+}
 </style>
