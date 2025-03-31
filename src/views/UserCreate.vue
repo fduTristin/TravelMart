@@ -201,7 +201,7 @@ const rules: FormRules = {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../../public/background.jpg'); /* 替换为你的图片路径 */
+  background-image: url('/background.jpg'); /* 替换为你的图片路径 */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -279,5 +279,15 @@ const rules: FormRules = {
 :deep(.el-input) {
   display: flex;
   max-width: 20vw;
+}
+
+:deep(.el-radio.is-checked .el-radio__label) {
+  color: #275f94;
+  font-weight: bold;
+}
+
+:deep(.el-radio.is-checked .el-radio__input .el-radio__inner) {
+  border-color: #275f94;
+  background-color: #275f94;
 }
 </style>

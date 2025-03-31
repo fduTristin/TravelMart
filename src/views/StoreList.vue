@@ -96,7 +96,6 @@ const handleCreateStore = () => {
   gap: 20px;
   padding: 16px;
   margin: 0 auto;
-  max-width: 1440px;
 }
 
 .store-grid-item {

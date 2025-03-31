@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router'
-import { ElAside, ElMenu, ElMenuItem, ElIcon, ElDivider, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
-import { House, User, Edit, Tickets, Setting, SwitchButton } from '@element-plus/icons-vue'
+import { ElAside, ElMenu, ElMenuItem, ElIcon, ElDivider, ElAvatar } from 'element-plus'
+import { House, User, Setting, SwitchButton } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import CustomDropdown from '@/components/CustomDropdown.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -56,12 +57,6 @@ const handleCommand = (command: string) => {
         </el-icon>
         <span>用户管理</span>
       </el-menu-item>
-      <!-- <el-menu-item index="/profile" class="menu-item">
-        <el-icon>
-          <Tickets />
-        </el-icon>
-        <span>个人信息</span>
-      </el-menu-item> -->
       <el-menu-item v-if="authStore.isMerchant" index="/stores" class="menu-item">
         <el-icon>
           <Setting />
@@ -72,24 +67,24 @@ const handleCommand = (command: string) => {
 
     <!-- 用户信息区域 -->
     <div class="user-info">
-      <el-dropdown trigger="click" @command="handleCommand">
-        <div class="user-info-content">
-          <el-avatar :size="40" :src="'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" />
-          <span class="username">{{ authStore.user?.sub }}</span>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="profile">
-              <el-icon><User /></el-icon>
-              个人信息
-            </el-dropdown-item>
-            <el-dropdown-item command="logout" divided>
-              <el-icon><SwitchButton /></el-icon>
-              退出登录
-            </el-dropdown-item>
-          </el-dropdown-menu>
+      <custom-dropdown>
+        <template #trigger>
+          <div class="user-info-content">
+            <el-avatar :src="'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" class="custom-avatar" />
+            <span class="username">{{ authStore.user?.sub }}</span>
+          </div>
         </template>
-      </el-dropdown>
+        <template #menu>
+          <div @click="handleCommand('profile')">
+            <el-icon><User /></el-icon>
+            个人信息
+          </div>
+          <div @click="handleCommand('logout')">
+            <el-icon><SwitchButton /></el-icon>
+            退出登录
+          </div>
+        </template>
+      </custom-dropdown>
     </div>
   </el-aside>
 </template>
@@ -98,15 +93,15 @@ const handleCommand = (command: string) => {
 .sidebar {
   background: inherit;
   height: inherit;
-  width: 18vw;
-  /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); */
+  width: 16vw;
   display: flex;
   flex-direction: column;
+  align-items: center; /* 横向居中 */
   overflow: hidden;
 }
 
 .logo-container {
-  padding: 20px;
+  padding: 15px;
   position: relative;
   margin-bottom: 20px;
 }
@@ -121,17 +116,17 @@ const handleCommand = (command: string) => {
 }
 
 .logo-img {
-  width: 4vw;
-  height: 4vw;
+  width: 4.5vw;
+  height: 4.5vw;
   object-fit: contain;
 }
 
 .logo-text {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 600;
   font-family: "Noto Sans SC";
   color: #073c62;
-  margin-left: 1vw;
+  margin-left: 1vw;   
 }
 
 .logo-divider {
@@ -143,11 +138,11 @@ const handleCommand = (command: string) => {
   border-right: none;
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* 竖向排列 */
   background-color: inherit;
   padding: 0;
-  align-items: center;
-  /* 使菜单项居中 */
+  align-items: center; /* 横向居中 */
+  justify-content: flex-start; /* 自上而下排列 */
 }
 
 .menu-item {
@@ -156,26 +151,22 @@ const handleCommand = (command: string) => {
   font-weight: 500;
   font-family: "Noto Sans SC";
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-left: 2vw;
-  margin-right: 2vw;
   margin-bottom: 1.5vh;
   border-radius: 12px;
-  color: #062a4a;
+  color: #275f94;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  /* 内容从左侧开始 */
-  width: 90%;
-  /* 设置固定宽度 */
+  justify-content: center; /* 横向居中 */
+  width: 14vw;
   padding: 0 16px;
 }
 
 .menu-item .el-icon {
-  color: inherit;
-  font-size: 20px;
+  color: #275f94;
+  font-size: 22px;
   width: 2.5vw;
   height: 2.5vw;
-  margin-right: 1.6vw;
+  margin-right: 1.2vw;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -186,47 +177,57 @@ const handleCommand = (command: string) => {
   transition: background-color 0.3s;
 }
 
-.menu-item.is-active .el-icon {
-  background-color: #275f94;
-  color: #fff;
-}
-
 .menu-item span {
   flex-grow: 1;
   white-space: nowrap;
   letter-spacing: 0.3px;
 }
 
-/* Interaction states */
+.menu-item.is-active .el-icon {
+  background-color: #275f94;
+  color: #fff;
+}
+
 .menu-item:not(.is-active):hover {
-  background-color: inherit;
-  color: #9dafe4;
+  background-color: #275f94;
+  color: #fff;
+}
+
+.menu-item:not(.is-active):hover .el-icon {
+  color: #275f94;
 }
 
 .menu-item.is-active {
   background-color: #fff;
-  color: inherit;
+  color: #275f94;
   box-shadow: 0 4px 12px rgba(237, 238, 239, 0.25);
 }
 
 .user-info {
-  padding: 16px;
+  position: relative; /* 确保子元素的绝对定位基于 user-info */
+  padding: 1vh;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: auto;
+  display: flex;
+  justify-content: center; /* 横向居中 */
+  width: 100%;
 }
 
 .user-info-content {
   display: flex;
   align-items: center;
+  justify-content: center; /* 居中显示 */
+  min-width: 10vw;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 0.8vw;
+  border-radius: 1vh;
   transition: all 0.3s ease;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: inherit;
+  gap: 1.2vw; /* 自定义间隔 */
 }
 
 .user-info-content:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #275f94;
   /* transform: translateY(-2px); */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -236,24 +237,24 @@ const handleCommand = (command: string) => {
 }
 
 .username {
-  margin-left: 12px;
-  color: #000000;
-  font-size: 14px;
+  color: #275f94;
+  font-size: 20px;
+  font-weight: 700;
   transition: color 0.3s ease;
+  text-align: center;
 }
 
-:deep(.el-dropdown-menu__item) {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
+.custom-avatar {
+  width: 3.5vw;
+  height: 3.5vw;
+  border: 2px solid #275f94;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 1vh; /* 设置为方形 */
 }
 
-:deep(.el-dropdown-menu__item:hover) {
-  background-color: #f5f7fa;
-}
-
-:deep(.el-dropdown-menu__item .el-icon) {
-  margin-right: 0;
+.custom-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 </style>

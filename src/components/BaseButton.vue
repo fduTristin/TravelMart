@@ -42,6 +42,7 @@ defineEmits(['click'])
 }
 
 .button-content {
+    display: inline-flex;
     font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.8px;
@@ -49,7 +50,7 @@ defineEmits(['click'])
 
 /* 主按钮样式 */
 .button-primary {
-    background: linear-gradient(135deg, #1890ff 0%, #74a5c3 100%);
+    background-color: #275f94;
     border: none;
     box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
 }
@@ -66,8 +67,8 @@ defineEmits(['click'])
 }
 
 .button-default:hover:not(.is-disabled) {
-    color: #1890ff;
-    border-color: #1890ff;
+    color: #275f94;
+    border-color: #275f94;
     background: rgba(24, 144, 255, 0.04);
 }
 
@@ -83,7 +84,11 @@ defineEmits(['click'])
 }
 
 :deep(.el-button .el-icon) {
-  font-size: 18px;
-  margin-right: 6px;
+    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    /* 垂直居中 */
+    justify-content: center;
+    /* 水平居中 */
 }
 </style>

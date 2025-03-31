@@ -151,7 +151,7 @@ const rules: FormRules = {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('../../public/background.jpg');
+  background-image: url('/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -159,8 +159,11 @@ const rules: FormRules = {
 }
 
 .centered-form-container {
-  width: 40vw;
-  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
   z-index: 1;
   animation: fadeIn 0.3s ease-out;
 }
@@ -170,14 +173,19 @@ const rules: FormRules = {
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: 20px;
-  width: 36vw;
+  width: 32vw;
+  /* 确保内容居中 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .login-title {
   text-align: center;
   margin-bottom: 30px;
-  color: #333;
-  font-size: 24px;
+  color: #275f94;
+  font-size: 28px;
+  font-weight: 600;
 }
 
 @keyframes fadeIn {
@@ -206,7 +214,7 @@ const rules: FormRules = {
 
 :deep(.el-input__wrapper:hover),
 :deep(.el-textarea__wrapper:hover) {
-  border-color: var(--el-color-primary);
+  border-color: #275f94;
 }
 
 :deep(.el-radio__label),
@@ -229,6 +237,6 @@ const rules: FormRules = {
 
 :deep(.el-input) {
   display: flex;
-  max-width: 20vw;
+  max-width: 17vw;
 }
 </style>
