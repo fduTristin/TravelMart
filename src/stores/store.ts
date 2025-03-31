@@ -19,6 +19,7 @@ interface Store {
   description?: string
   imageUrl?: string
   serviceType: ServiceType
+  // ownerId?: number 这个字段在数据模型中还没有，需要后端支持
 }
 
 // 创建店铺的DTO接口
@@ -186,6 +187,37 @@ export const useStoreStore = defineStore('store', () => {
     }
   }
 
+  // 获取商户自己的店铺列表
+  const fetchMerchantStores = async () => {
+    try {
+      loading.value = true
+      error.value = null
+      const authStore = useAuthStore()
+
+      // 确保用户已登录
+      if (!authStore.token) {
+        throw new Error('用户未登录')
+      }
+
+      // 设置请求头中的 token
+      const response = await api.get('/api/stores/merchant', {
+        headers: {
+          Authorization: `Bearer ${authStore.token}`
+        }
+      })
+
+      stores.value = response.data
+      return stores.value
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '获取店铺列表失败'
+      error.value = errorMsg
+      console.error('获取商户店铺列表失败:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   // 获取当前店铺
   const currentStore = () => stores.value[currentStoreIndex.value]
 
@@ -273,6 +305,7 @@ export const useStoreStore = defineStore('store', () => {
     getStoresByType,
     getRandomStoreByType,
     createStore,
-    fetchStores
+    fetchStores,
+    fetchMerchantStores
   }
 })

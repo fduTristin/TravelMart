@@ -62,7 +62,7 @@ const handleCommand = (command: string) => {
         </el-icon>
         <span>个人信息</span>
       </el-menu-item> -->
-      <el-menu-item v-if="authStore.isMerchant" index="/stores" class="menu-item">
+      <el-menu-item v-if="authStore.isMerchant || authStore.isAdmin" index="/stores" class="menu-item">
         <el-icon>
           <Setting />
         </el-icon>
