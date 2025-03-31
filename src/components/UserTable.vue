@@ -10,7 +10,13 @@
       @row-click="handleRowClick"
     >
       <el-table-column prop="userId" label="ID" width="80" sortable />
-      <el-table-column prop="userRole" label="用户类型" min-width="80" :show-overflow-tooltip="true" /> 
+      <el-table-column 
+        prop="userRole" 
+        label="用户类型" 
+        min-width="80" 
+        :formatter="(row) => getUserRoleLabel(row.userRole)" 
+        :show-overflow-tooltip="true" 
+      /> 
       <el-table-column prop="userName" label="用户名" min-width="80" :show-overflow-tooltip="true" />
       <el-table-column prop="userEmail" label="邮箱" min-width="120" :show-overflow-tooltip="true" />
       <el-table-column prop="userTel" label="手机号" min-width="120" :show-overflow-tooltip="true" />
@@ -39,6 +45,7 @@
 
 <script setup lang="ts">
 import type { User } from '@/types/user'
+import { getUserRoleLabel } from '@/types/user'
 
 interface Props {
   users: User[]
