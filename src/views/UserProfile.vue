@@ -29,9 +29,6 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
         <!-- 下方个人信息 -->
         <div class="info-section">
             <el-form label-width="120px" class="form">
-                <!-- <el-form-item label="性别">
-          <span>{{ user.gender }}</span>
-        </el-form-item> -->
                 <el-form-item label="商户类型">
                     <span>{{ user.userType }}</span>
                 </el-form-item>
@@ -60,7 +57,7 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
 .header {
     width: 72vw;
     height: 28vh;
-    background: linear-gradient(135deg, #097ee5, #92bae4);
+    background: linear-gradient(135deg, #0b68ba, #92bae4);
     color: white;
     display: flex;
     align-items: center;
@@ -86,16 +83,16 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
 }
 
 .bio h2 {
-    margin: 0 0 8px;
-    font-size: 2rem; /* 增大字体 */
+    margin: 0 0 4px;
+    font-size: 40px;
     font-weight: bold;
-    color: #ffffff; /* 确保标题颜色为白色 */
+    color: #ffffff;
 }
 
 .bio p {
     margin: 0;
-    font-size: 1.2rem; /* 调整字体大小 */
-    color: #d0d0d0; /* 调整颜色为更浅的灰色 */
+    font-size: 20px;
+    color: #d0d0d0;
 }
 
 .info-section {
@@ -103,8 +100,7 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
     min-height: 20vh;
     max-height: 40vh;
     margin-top: 24px;
-    padding: 24px;
-    /* 增加内边距 */
+    padding: 30px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -114,7 +110,6 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
 }
 
 .form {
-    width: 100%;
     display: flex;
     /* 使用 flex 布局 */
     flex-direction: column;
@@ -125,11 +120,9 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
 
 .el-form-item {
     margin-bottom: 0;
-    /* 移除默认的底部间距 */
 }
 
 span {
-    font-size: 15px; /* 调整内容字体大小 */
+    font-size: 15px;  /* 调整内容字体大小 */
 }
-
 </style>

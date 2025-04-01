@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode'
 
 interface JwtPayload {
   sub: string
-  role: 'ADMIN' | 'MERCHANT' | 'CUSTOMER'
+  userRole: 'ADMIN' | 'MERCHANT' | 'CUSTOMER'
   iat: number
   exp: number
 }
@@ -23,7 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   // 用户角色
-  const role = computed(() => user.value?.role || null)
+  const role = computed(() => user.value?.userRole || null)
 
   // 是否是商户
   const isMerchant = computed(() => role.value === 'MERCHANT')

@@ -134,16 +134,6 @@ onMounted(async () => {
   gap: 20px;
   padding: 16px;
   margin: 0 auto;
-  max-width: 1440px;
-  min-height: 200px;
-}
-
-.empty-state {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 40px 0;
-  color: #909399;
-  font-size: 16px;
 }
 
 .store-grid-item {
