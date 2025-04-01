@@ -19,17 +19,16 @@ interface Store {
   description?: string
   imageUrl?: string
   serviceType: ServiceType
-  // ownerId?: number 这个字段在数据模型中还没有，需要后端支持
 }
 
 // 创建店铺的DTO接口
 interface CreateStoreDTO {
-  storeName: string
-  serviceTypes: ServiceType[]
-  idNumber: string
+  shopName: string
+  categories: string
+  ownerIdNumber: string
   description: string
-  address: string
-  capital: number
+  registrationAddress: string
+  registeredCapital: number
   registrationDate: string
 }
 
@@ -264,7 +263,7 @@ export const useStoreStore = defineStore('store', () => {
       }
 
       // 设置请求头中的 token
-      const response = await api.post('/api/stores', data, {
+      const response = await api.post('/stores/create', data, {
         headers: {
           Authorization: `Bearer ${authStore.token}`
         }
@@ -273,13 +272,13 @@ export const useStoreStore = defineStore('store', () => {
       // 如果后端返回创建的店铺信息,使用后端返回的数据
       if (response.data) {
         const newStore: Store = {
-          storeId: response.data.storeId,
-          storeName: response.data.storeName,
+          storeId: response.data.id,
+          storeName: response.data.shopName,
           rating: response.data.rating || 5.0, // 如果后端未返回评分,使用默认评分
           isOpen: response.data.isOpen || true,
           description: response.data.description,
           imageUrl: response.data.imageUrl || 'https://via.placeholder.com/400x300',
-          serviceType: response.data.serviceTypes[0] // 暂时只使用第一个服务类型
+          serviceType: response.data.categories.split(',')[0] // 使用第一个类别作为服务类型
         }
 
         // 添加到本地状态中
