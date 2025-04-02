@@ -88,19 +88,12 @@ const handleCreate = () => {
   <PageContainer title="">
     <template #actions>
       <BaseButton 
-        type="default" 
+        type="primary" 
         @click="loadData" 
         :loading="userStore.loading"
         :icon="Refresh"
       >
         刷新
-      </BaseButton>
-      <BaseButton 
-        type="primary" 
-        @click="handleCreate"
-        :icon="Plus"
-      >
-        新建用户
       </BaseButton>
     </template>
 
