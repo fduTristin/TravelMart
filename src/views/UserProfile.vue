@@ -1,16 +1,27 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import type { User } from '@/types/user'
+import { getUserRoleLabel } from '@/types/user'
+import { useUserStore } from '@/stores/users'
+import { useAuthStore } from '@/stores/auth'
 
-const user = ref<User & { bio?: string; phone?: string; userType?: string; gender?: string }>({
-    userId: 1,
-    userName: 'Tristin',
-    userEmail: 'zhangsan@example.com',
-    bio: '',
-    phone: '13800138000',
-    userType: '普通用户',
-    gender: '男'
+const userStore = useUserStore()
+const authStore = useAuthStore()
+const user = ref<User | null>(null)
+
+onMounted(async () => {
+  await userStore.fetchSelf()
+  user.value = userStore.userSelf
 })
+
+watch(() => userStore.userSelf, (newUser) => {
+  user.value = newUser
+})
+
+watch(() => authStore.token, async () => {
+  await userStore.fetchSelf()
+})
+
 </script>
 
 <template>
@@ -18,28 +29,26 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
         <!-- 顶部背景 -->
         <div class="header">
             <div class="avatar">
-                <img src="https://avatars.githubusercontent.com/u/129137808?v=4" alt="User Avatar" />
+                <img src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" alt="User Avatar" />
             </div>
             <div class="bio">
-                <h2>{{ user.userName }}</h2>
-                <p>{{ user.bio || '暂无个人简介' }}</p>
+                <h2>{{ user?.userName || '未知用户' }}</h2>
+                <p>{{ user?.bio || '暂无个人简介' }}</p>
             </div>
         </div>
 
         <!-- 下方个人信息 -->
         <div class="info-section">
             <el-form label-width="120px" class="form">
-                <el-form-item label="商户类型">
-                    <span>{{ user.userType }}</span>
+                <el-form-item label="角色">
+                    <span>{{ getUserRoleLabel(user?.userRole || 'CUSTOMER') }}</span>
                 </el-form-item>
                 <el-form-item label="手机号">
-                    <span>{{ user.phone }}</span>
+                    <span>{{ user?.userTel || '未提供' }}</span>
                 </el-form-item>
                 <el-form-item label="邮箱">
-                    <span>{{ user.userEmail }}</span>
+                    <span>{{ user?.userEmail || '未提供' }}</span>
                 </el-form-item>
-
-
             </el-form>
         </div>
     </div>
@@ -57,7 +66,8 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
 .header {
     width: 72vw;
     height: 28vh;
-    background: linear-gradient(135deg, #0b68ba, #92bae4);
+    /* background: linear-gradient(135deg, #205684, #92bae4); */
+    background-color: #275f94;
     color: white;
     display: flex;
     align-items: center;
@@ -122,7 +132,14 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
     margin-bottom: 0;
 }
 
+:deep(.el-form-item__label) {
+    font-size: 20px;
+    font-weight: 600;
+    margin-right: 0.6vw;
+    color: #275f94;
+}
+
 span {
-    font-size: 15px;  /* 调整内容字体大小 */
+    font-size: 20px;  /* 调整内容字体大小 */
 }
 </style>

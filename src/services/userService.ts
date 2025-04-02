@@ -24,4 +24,15 @@ export const userService = {
       },
     })
   },
+
+  getSelf: async () => {
+    console.log('Fetching self user info...')
+    const token = useAuthStore().token;
+    console.log(`Token: ${token}`) 
+    return await api.get<User>('/profile', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+  }
 }
