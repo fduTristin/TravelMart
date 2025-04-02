@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import type { User } from '@/types/user'
 import { userService } from '@/services/userService'
+import { getUserRoleLabel } from '@/types/user'
 
 const route = useRoute()
 const user = ref<User & { bio?: string; phone?: string; userType?: string; gender?: string } | null>(null)
@@ -43,7 +44,7 @@ onMounted(() => {
           <span>{{ user.gender || '未知' }}</span>
         </el-form-item>
         <el-form-item label="商户类型">
-          <span>{{ user.userType || '普通用户' }}</span>
+          <span>{{ getUserRoleLabel(user.userType || 'CUSTOMER') }}</span>
         </el-form-item>
         <el-form-item label="手机号">
           <span>{{ user.phone || '未提供' }}</span>
