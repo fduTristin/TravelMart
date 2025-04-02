@@ -29,7 +29,7 @@ watch(() => authStore.token, async () => {
         <!-- 顶部背景 -->
         <div class="header">
             <div class="avatar">
-                <img src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" alt="User Avatar" />
+                <img src="/avatar.png" alt="User Avatar" />
             </div>
             <div class="bio">
                 <h2>{{ user?.userName || '未知用户' }}</h2>

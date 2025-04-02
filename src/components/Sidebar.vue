@@ -70,7 +70,7 @@ const handleCommand = (command: string) => {
       <custom-dropdown>
         <template #trigger>
           <div class="user-info-content">
-            <el-avatar :src="'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" class="custom-avatar" />
+            <el-avatar :src="'/avatar.png'" class="custom-avatar" />
             <span class="username">{{ authStore.user?.sub }}</span>
           </div>
         </template>
