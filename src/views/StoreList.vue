@@ -7,6 +7,7 @@ import { useStoreStore, ServiceType } from '@/stores/store'
 import { useAuthStore } from '@/stores/auth'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import BaseButton from '@/components/BaseButton.vue'
 
 const router = useRouter()
 const storeStore = useStoreStore()
@@ -44,34 +45,22 @@ const handleCreateStore = () => {
       <div class="header-container">
         <!-- <h1>店铺列表</h1> -->
         <div class="header-actions">
-          <el-select
-            v-model="selectedType"
-            placeholder="选择服务类型"
-            clearable
-            class="type-filter"
-          >
-            <el-option
-              v-for="type in Object.values(ServiceType)"
-              :key="type"
-              :label="type"
-              :value="type"
-            />
+          <el-select v-model="selectedType" placeholder="选择服务类型" clearable class="type-filter">
+            <el-option v-for="type in Object.values(ServiceType)" :key="type" :label="type" :value="type" />
           </el-select>
-          <el-button type="primary" @click="handleCreateStore">
-            <el-icon><Plus /></el-icon>
+          <BaseButton type="primary" @click="handleCreateStore">
+            <el-icon>
+              <Plus />
+            </el-icon>
             开设新店铺
-          </el-button>
+          </BaseButton>
         </div>
       </div>
     </template>
 
     <div class="store-grid">
-      <div
-        v-for="store in filteredStores"
-        :key="store.storeId"
-        class="store-grid-item"
-        @click="handleStoreClick(store.storeId)"
-      >
+      <div v-for="store in filteredStores" :key="store.storeId" class="store-grid-item"
+        @click="handleStoreClick(store.storeId)">
         <StoreCard :store="store" />
       </div>
     </div>
