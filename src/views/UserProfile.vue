@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import type { User } from '@/types/user'
 import { userService } from '@/services/userService'
 import { ElMessage } from 'element-plus'
 
+const loading = ref(true)
 const user = ref<User & { bio?: string; phone?: string; userType?: string; gender?: string }>({
     userId: 1,
     userName: 'Tristin',
@@ -16,6 +18,7 @@ const user = ref<User & { bio?: string; phone?: string; userType?: string; gende
 
 // 获取用户信息
 const fetchUserProfile = async () => {
+    loading.value = true
     try {
         const response = await userService.getCurrentUser()
         user.value = {
@@ -26,8 +29,30 @@ const fetchUserProfile = async () => {
     } catch (error) {
         console.error('Failed to fetch user profile:', error)
         ElMessage.error('获取用户信息失败')
+    } finally {
+        loading.value = false
     }
 }
+
+const route = useRoute()
+
+// 监听路由变化，当路由有needRefresh标记时重新加载数据
+watch(
+  () => route.meta.needRefresh,
+  (needRefresh) => {
+    if (needRefresh) {
+      fetchUserProfile()
+      // 重置刷新标记，避免重复刷新
+      route.meta.needRefresh = false
+    }
+  },
+  { immediate: true }
+)
+
+// 路由更新时重新获取数据
+onBeforeRouteUpdate(() => {
+    fetchUserProfile()
+})
 
 // 组件挂载时获取用户信息
 onMounted(() => {
@@ -36,7 +61,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="user-profile">
+    <div v-loading.fullscreen.lock="loading" class="user-profile">
         <!-- 顶部背景 -->
         <div class="header">
             <div class="avatar">
@@ -52,7 +77,8 @@ onMounted(() => {
         <div class="info-section">
             <el-form label-width="120px" class="form">
                 <el-form-item label="用户类型">
-                    <span>{{ user.userRole === 'MERCHANT' ? '商户' : '普通用户' }}</span>
+                    <span>{{ user.userRole === 'MERCHANT' ? '商户' :
+                           user.userRole === 'ADMIN' ? '管理员' : '普通用户' }}</span>
                 </el-form-item>
                 <el-form-item label="手机号">
                     <span>{{ user.userTel }}</span>
