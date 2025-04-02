@@ -12,22 +12,22 @@ const storeStore = useStoreStore()
 
 // 表单数据
 interface StoreForm {
-  storeName: string
-  serviceTypes: ServiceType[]
-  idNumber: string
+  shopName: string
+  categories: string[]
+  ownerIdNumber: string
   description: string
-  address: string
-  capital: number
+  registrationAddress: string
+  registeredCapital: number
   registrationDate: string
 }
 
 const formData = ref<StoreForm>({
-  storeName: '',
-  serviceTypes: [],
-  idNumber: '',
+  shopName: '',
+  categories: [],
+  ownerIdNumber: '',
   description: '',
-  address: '',
-  capital: 1000,
+  registrationAddress: '',
+  registeredCapital: 1000,
   registrationDate: new Date().toISOString().split('T')[0]
 })
 
@@ -80,24 +80,14 @@ const validateIdNumber = (rule: unknown, value: string, callback: (error?: Error
 
 // 表单规则
 const rules = ref<FormRules>({
-  storeName: [
+  shopName: [
     { required: true, message: '请输入店铺名称', trigger: 'blur' },
     { max: 20, message: '店铺名称不能超过20个字符', trigger: 'blur' }
   ],
-  serviceTypes: [
-    { required: true, message: '请选择至少一个服务类型', trigger: 'change' },
-    {
-      validator: (rule, value, callback) => {
-        if (value.length > 4) {
-          callback(new Error('最多只能选择4个服务类型'))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'change'
-    }
+  categories: [
+    { required: true, message: '请选择至少一个服务类型', trigger: 'change' }
   ],
-  idNumber: [
+  ownerIdNumber: [
     { required: true, message: '请输入身份证号', trigger: 'blur' },
     { validator: validateIdNumber, trigger: 'blur' }
   ],
@@ -105,11 +95,11 @@ const rules = ref<FormRules>({
     { required: true, message: '请输入商店简介', trigger: 'blur' },
     { max: 500, message: '商店简介不能超过500个字符', trigger: 'blur' }
   ],
-  address: [
+  registrationAddress: [
     { required: true, message: '请输入备案地址', trigger: 'blur' },
     { max: 100, message: '备案地址不能超过100个字符', trigger: 'blur' }
   ],
-  capital: [
+  registeredCapital: [
     { required: true, message: '请输入注册资金', trigger: 'blur' },
     {
       type: 'number',
@@ -126,6 +116,9 @@ const rules = ref<FormRules>({
 // 表单引用
 const formRef = ref<FormInstance>()
 
+// 加载状态
+const loading = ref(false)
+
 // 返回列表
 const handleBack = () => {
   router.push('/stores')
@@ -138,12 +131,21 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid, fields) => {
     if (valid) {
       try {
+        loading.value = true
+        // 将categories数组转换为逗号分隔的字符串
+        const submitData = {
+          ...formData.value,
+          categories: formData.value.categories.join(',')
+        }
         // 调用创建店铺的API
-        const newStore = storeStore.createStore(formData.value)
+        const newStore = await storeStore.createStore(submitData)
         ElMessage.success('店铺创建成功')
         router.push(`/store/${newStore.storeId}`)
-      } catch (error) {
-        ElMessage.error('创建店铺失败')
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : '未知错误'
+        ElMessage.error(`创建店铺失败: ${errorMessage}`)
+      } finally {
+        loading.value = false
       }
     } else {
       console.error('表单验证失败:', fields)
@@ -169,12 +171,12 @@ const handleSubmit = async () => {
         label-width="120px"
         class="form"
       >
-        <el-form-item label="店铺名称" prop="storeName">
-          <el-input v-model="formData.storeName" placeholder="请输入店铺名称" />
+        <el-form-item label="店铺名称" prop="shopName">
+          <el-input v-model="formData.shopName" placeholder="请输入店铺名称" />
         </el-form-item>
 
-        <el-form-item label="服务类型" prop="serviceTypes">
-          <el-checkbox-group v-model="formData.serviceTypes">
+        <el-form-item label="服务类型" prop="categories">
+          <el-checkbox-group v-model="formData.categories">
             <el-checkbox
               v-for="type in Object.values(ServiceType)"
               :key="type"
@@ -185,8 +187,8 @@ const handleSubmit = async () => {
           </el-checkbox-group>
         </el-form-item>
 
-        <el-form-item label="身份证号" prop="idNumber">
-          <el-input v-model="formData.idNumber" placeholder="请输入身份证号" />
+        <el-form-item label="身份证号" prop="ownerIdNumber">
+          <el-input v-model="formData.ownerIdNumber" placeholder="请输入身份证号" />
         </el-form-item>
 
         <el-form-item label="商店简介" prop="description">
@@ -198,13 +200,13 @@ const handleSubmit = async () => {
           />
         </el-form-item>
 
-        <el-form-item label="备案地址" prop="address">
-          <el-input v-model="formData.address" placeholder="请输入备案地址" />
+        <el-form-item label="备案地址" prop="registrationAddress">
+          <el-input v-model="formData.registrationAddress" placeholder="请输入备案地址" />
         </el-form-item>
 
-        <el-form-item label="注册资金" prop="capital">
+        <el-form-item label="注册资金" prop="registeredCapital">
           <el-input-number
-            v-model="formData.capital"
+            v-model="formData.registeredCapital"
             :min="1000"
             :step="1000"
             :precision="2"
@@ -222,8 +224,14 @@ const handleSubmit = async () => {
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleSubmit">创建店铺</el-button>
-          <el-button @click="handleBack">取消</el-button>
+          <el-button
+            type="primary"
+            @click="handleSubmit"
+            :loading="loading"
+          >
+            创建店铺
+          </el-button>
+          <el-button @click="handleBack" :disabled="loading">取消</el-button>
         </el-form-item>
       </el-form>
     </div>

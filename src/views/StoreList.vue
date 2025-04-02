@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import StoreCard from '@/components/StoreCard.vue'
 import PageContainer from '@/components/PageContainer.vue'
 import { useRouter } from 'vue-router'
 import { useStoreStore, ServiceType } from '@/stores/store'
 import { useAuthStore } from '@/stores/auth'
 import { Plus } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElLoading } from 'element-plus'
 
 const router = useRouter()
 const storeStore = useStoreStore()
@@ -17,10 +17,14 @@ const selectedType = ref<ServiceType | null>(null)
 
 // 根据筛选条件获取店铺列表
 const filteredStores = computed(() => {
-  if (selectedType.value === null) {
-    return storeStore.stores
+  let stores = storeStore.stores;
+
+  // 应用服务类型筛选
+  if (selectedType.value !== null) {
+    stores = stores.filter(store => store.serviceType === selectedType.value);
   }
-  return storeStore.getStoresByType(selectedType.value)
+
+  return stores;
 })
 
 const handleStoreClick = (storeId: number) => {
@@ -36,13 +40,44 @@ const handleCreateStore = () => {
   }
   router.push('/stores/create')
 }
+
+// 页面标题
+const pageTitle = computed(() => {
+  return authStore.isAdmin ? '所有店铺' : '我的店铺';
+})
+
+// 加载店铺列表
+onMounted(async () => {
+  const loadingInstance = ElLoading.service({
+    target: '.store-grid',
+    text: '加载店铺数据中...'
+  })
+
+  try {
+    // 根据用户角色获取不同的店铺列表
+    if (authStore.isAdmin) {
+      // 管理员获取所有店铺
+      await storeStore.fetchStores()
+    } else if (authStore.isMerchant) {
+      // 商户获取自己的店铺
+      await storeStore.fetchMerchantStores()
+    } else {
+      // 普通用户获取所有店铺
+      await storeStore.fetchStores()
+    }
+  } catch (error) {
+    ElMessage.error('加载店铺列表失败')
+  } finally {
+    loadingInstance.close()
+  }
+})
 </script>
 
 <template>
   <PageContainer>
     <template #actions>
       <div class="header-container">
-        <!-- <h1>店铺列表</h1> -->
+        <h1>{{ pageTitle }}</h1>
         <div class="header-actions">
           <el-select
             v-model="selectedType"
@@ -73,6 +108,9 @@ const handleCreateStore = () => {
         @click="handleStoreClick(store.storeId)"
       >
         <StoreCard :store="store" />
+      </div>
+      <div v-if="filteredStores.length === 0" class="empty-state">
+        <p>{{ authStore.isMerchant && !authStore.isAdmin ? '您还没有开设店铺' : '没有找到符合条件的店铺' }}</p>
       </div>
     </div>
   </PageContainer>

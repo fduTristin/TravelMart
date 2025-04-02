@@ -57,8 +57,7 @@ const handleCommand = (command: string) => {
         </el-icon>
         <span>用户管理</span>
       </el-menu-item>
-      <el-menu-item v-if="authStore.isMerchant" index="/stores" class="menu-item">
-        <el-icon>
+      <el-menu-item v-if="authStore.isMerchant || authStore.isAdmin" index="/stores" class="menu-item">        <el-icon>
           <Setting />
         </el-icon>
         <span>店铺管理</span>
@@ -126,7 +125,7 @@ const handleCommand = (command: string) => {
   font-weight: 600;
   font-family: "Noto Sans SC";
   color: #073c62;
-  margin-left: 1vw;   
+  margin-left: 1vw;
 }
 
 .logo-divider {

@@ -7,7 +7,7 @@ export const userService = {
   getAll: async () => {
     console.log('Fetching all users...')
     const token = useAuthStore().token;
-    console.log(`Token: ${token}`) 
+    console.log(`Token: ${token}`)
     return await api.get<User[]>('/admin/users', {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -24,4 +24,14 @@ export const userService = {
       },
     })
   },
+
+  // 获取当前用户信息
+  getCurrentUser: async () => {
+    const token = useAuthStore().token;
+    return await api.get<User>('/profile', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+  }
 }

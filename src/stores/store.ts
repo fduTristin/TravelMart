@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { api } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
 // 服务类型枚举
 export enum ServiceType {
@@ -21,12 +23,12 @@ interface Store {
 
 // 创建店铺的DTO接口
 interface CreateStoreDTO {
-  storeName: string
-  serviceTypes: ServiceType[]
-  idNumber: string
+  shopName: string
+  categories: string
+  ownerIdNumber: string
   description: string
-  address: string
-  capital: number
+  registrationAddress: string
+  registeredCapital: number
   registrationDate: string
 }
 
@@ -156,6 +158,64 @@ export const useStoreStore = defineStore('store', () => {
     // }
   ])
   const currentStoreIndex = ref(0)
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  // 从后端获取店铺列表
+  const fetchStores = async () => {
+    try {
+      loading.value = true
+      error.value = null
+      const authStore = useAuthStore()
+
+      const headers: Record<string, string> = {}
+      if (authStore.token) {
+        headers.Authorization = `Bearer ${authStore.token}`
+      }
+
+      const response = await api.get('/api/stores', { headers })
+      stores.value = response.data
+      return stores.value
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '获取店铺列表失败'
+      error.value = errorMsg
+      console.error('获取店铺列表失败:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 获取商户自己的店铺列表
+  const fetchMerchantStores = async () => {
+    try {
+      loading.value = true
+      error.value = null
+      const authStore = useAuthStore()
+
+      // 确保用户已登录
+      if (!authStore.token) {
+        throw new Error('用户未登录')
+      }
+
+      // 设置请求头中的 token
+      const response = await api.get('/api/stores/merchant', {
+        headers: {
+          Authorization: `Bearer ${authStore.token}`
+        }
+      })
+
+      stores.value = response.data
+      return stores.value
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '获取店铺列表失败'
+      error.value = errorMsg
+      console.error('获取商户店铺列表失败:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
 
   // 获取当前店铺
   const currentStore = () => stores.value[currentStoreIndex.value]
@@ -193,30 +253,58 @@ export const useStoreStore = defineStore('store', () => {
   }
 
   // 创建新店铺
-  const createStore = (data: CreateStoreDTO) => {
-    // 生成新的店铺ID
-    const maxId = Math.max(...stores.value.map(store => store.storeId), 0)
-    const newStore: Store = {
-      storeId: maxId + 1,
-      storeName: data.storeName,
-      rating: 5.0, // 新店铺默认5星
-      isOpen: true,
-      description: data.description,
-      imageUrl: 'https://via.placeholder.com/400x300', // 默认图片
-      serviceType: data.serviceTypes[0] // 暂时只使用第一个服务类型
+  const createStore = async (data: CreateStoreDTO) => {
+    try {
+      const authStore = useAuthStore()
+
+      // 确保用户已登录
+      if (!authStore.token) {
+        throw new Error('用户未登录')
+      }
+
+      // 设置请求头中的 token
+      const response = await api.post('/stores/create', data, {
+        headers: {
+          Authorization: `Bearer ${authStore.token}`
+        }
+      })
+
+      // 如果后端返回创建的店铺信息,使用后端返回的数据
+      if (response.data) {
+        const newStore: Store = {
+          storeId: response.data.id,
+          storeName: response.data.shopName,
+          rating: response.data.rating || 5.0, // 如果后端未返回评分,使用默认评分
+          isOpen: response.data.isOpen || true,
+          description: response.data.description,
+          imageUrl: response.data.imageUrl || 'https://via.placeholder.com/400x300',
+          serviceType: response.data.categories.split(',')[0] // 使用第一个类别作为服务类型
+        }
+
+        // 添加到本地状态中
+        stores.value.push(newStore)
+        return newStore
+      } else {
+        throw new Error('创建店铺失败,服务器未返回数据')
+      }
+    } catch (error) {
+      console.error('创建店铺失败:', error)
+      throw error
     }
-    stores.value.push(newStore)
-    return newStore
   }
 
   return {
     stores,
+    loading,
+    error,
     currentStore,
     nextStore,
     prevStore,
     getRandomStore,
     getStoresByType,
     getRandomStoreByType,
-    createStore
+    createStore,
+    fetchStores,
+    fetchMerchantStores
   }
 })
