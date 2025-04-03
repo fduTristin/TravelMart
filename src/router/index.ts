@@ -116,7 +116,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/stores/create',
     name: 'store-create',
-    component: () => import('@/views/CreateStore.vue'),
+    component: () => import('@/views/StoreCreate.vue'),
     meta: {
       title: '开设新店铺',
       keepAlive: false
