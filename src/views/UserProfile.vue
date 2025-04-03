@@ -1,31 +1,27 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useUserStore } from '@/stores/users'
 import type { User } from '@/types/user'
-import { userService } from '@/services/userService'
 import { ElMessage } from 'element-plus'
 
+const userStore = useUserStore()
 const loading = ref(true)
-const user = ref<User & { bio?: string; phone?: string; userType?: string; gender?: string }>({
-    userId: 1,
-    userName: 'Tristin',
-    userEmail: 'zhangsan@example.com',
-    userRole: 'CUSTOMER',
-    userTel: '13800138000',
-    bio: '',
-    gender: '男'
+const user = ref<User>({
+    userId: 0,
+    userName: '',
+    userEmail: '',
+    userRole: '',
+    userTel: '',
+    userBio: '',
 })
 
 // 获取用户信息
 const fetchUserProfile = async () => {
     loading.value = true
     try {
-        const response = await userService.getCurrentUser()
-        user.value = {
-            ...response.data,
-            bio: '',
-            gender: '未知'
-        }
+        const response = await userStore.fetchCurrentUser()
+        user.value = response.data
     } catch (error) {
         console.error('Failed to fetch user profile:', error)
         ElMessage.error('获取用户信息失败')
@@ -69,7 +65,7 @@ onMounted(() => {
             </div>
             <div class="bio">
                 <h2>{{ user.userName }}</h2>
-                <p>{{ user.userId }} | {{ user.bio || '暂无个人简介' }}</p>
+                <p>{{ user.userId }} | {{ user.userBio || '暂无个人简介' }}</p>
             </div>
         </div>
 

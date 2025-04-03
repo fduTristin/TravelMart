@@ -49,12 +49,12 @@ export const useUserStore = defineStore('users', () => {
   }
   
   // 获取当前用户
-  async function fetchSelf() {
+  async function fetchCurrentUser() {
     loading.value = true
     error.value = null
     try {
-      const response = await userService.getSelf()
-      userSelf.value = response.data
+      const response = await userService.getCurrentUser()
+      return response
     } catch (e) {
       error.value = 'Failed to fetch data'
       console.error('Failed to fetch user:', e)
@@ -73,6 +73,6 @@ export const useUserStore = defineStore('users', () => {
     // 操作方法
     fetchUsers,
     fetchUserById,
-    fetchSelf,
+    fetchCurrentUser,
   }
 }) 
