@@ -131,18 +131,19 @@ const router = createRouter({
 
 // 路由导航守卫
 router.beforeEach((to, from, next) => {
-  // 获取token
   const token = localStorage.getItem('token')
+  const authStore = useAuthStore()
 
   // 如果需要登录且没有token
   if (to.meta.requiresAuth && !token) {
-    // 保存原本要去的页面
     next({
       path: '/login',
       query: { redirect: to.fullPath }
     })
+  } else if (to.path === '/users' && !authStore.isAdmin) {
+    // 限制非管理员访问 /users
+    next({ path: '/' })
   } else {
-    // 设置页面标题
     const title = typeof to.meta.title === 'function' ? to.meta.title() : to.meta.title
     document.title = `${title} - 旅游商城`
     next()
