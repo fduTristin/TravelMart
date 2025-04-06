@@ -56,7 +56,7 @@ const prevStore = () => {
 // 跳转到店铺详情
 const goToStore = () => {
   if (currentStore.value) {
-    router.push(`/store/${currentStore.value.id}`)
+    router.push(`/stores/${currentStore.value.id}`)
   }
 }
 
