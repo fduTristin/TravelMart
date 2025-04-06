@@ -49,13 +49,13 @@ onMounted(() => {
 }
 
 .header {
-  height: 60px;
+  height: 10vh;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   background-color: inherit;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  padding: 0 24px;
+  padding: 0 2vw;
 }
 
 .header-right {
@@ -80,6 +80,6 @@ onMounted(() => {
 }
 
 .main-content {
-  padding: 20px;
+  padding: 2vh 2vw;
 }
 </style>

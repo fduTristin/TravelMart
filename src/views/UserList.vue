@@ -21,7 +21,7 @@ const loadData = async () => {
   error.value = null
   try {
     await userStore.fetchUsers()
-    ElMessage.success('User list refreshed successfully')
+    // ElMessage.success('User list refreshed successfully')
   } catch (err) {
     error.value = 'Failed to load data. Please refresh the page.'
     ElMessage.error('Failed to load data. Please refresh the page.')

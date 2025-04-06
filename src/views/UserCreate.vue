@@ -143,6 +143,7 @@ const rules: FormRules = {
     <!-- 居中表单容器 -->
     <div class="centered-form-container">
       <div class="form-container">
+        <h2 class="login-title">用户注册</h2>
         <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form" :disabled="loading">
           <el-form-item label="角色" prop="userRole">
             <el-radio-group v-model="formData.userRole">
@@ -210,7 +211,6 @@ const rules: FormRules = {
 
 /* 居中表单容器 */
 .centered-form-container {
-  width: 40vw;
   padding: 20px;
   z-index: 1;
   animation: fadeIn 0.3s ease-out; /* 淡入动画 */
@@ -220,9 +220,18 @@ const rules: FormRules = {
 .form-container {
   background: rgb(247, 249, 249);
   border-radius: 8px;
+  width : 35vw;
+  height: 50vh;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: 20px;
-  width: 36vw;
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 1vh;
+  color: #275f94;
+  font-size: 3vh;
+  font-weight: 600;
 }
 
 /* 淡入动画 */
@@ -239,7 +248,7 @@ const rules: FormRules = {
 
 /* 调整表单元素样式 */
 :deep(.el-form-item__label) {
-  font-size: 18px;
+  font-size: 2vh;
   font-weight: 500;
   margin-right: 1vw;
 }
@@ -260,7 +269,7 @@ const rules: FormRules = {
 :deep(.el-input__inner),
 :deep(.el-textarea__inner) {
   font-family: "Noto Sans SC", sans-serif;
-  font-size: 18px;
+  font-size: 2vh;
 }
 
 :deep(.el-form-item:first-child) {

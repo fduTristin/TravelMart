@@ -25,24 +25,17 @@ defineProps<{
   top: 0;
   left: 0;
   right: 0;
-  margin: 20px, 0;
+  margin: 2vh, 0;
 }
 
 .page-header {
-  padding: 16px 24px;
+  padding: 1vh 2vw;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.page-header h1 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--el-text-color-primary);
-}
-
 .page-content {
-  padding: 24px;
+  padding: 2vh 2vw;
 }
 </style>

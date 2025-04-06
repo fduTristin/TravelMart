@@ -9,17 +9,17 @@
       :row-class-name="tableRowClassName" 
       @row-click="handleRowClick"
     >
-      <el-table-column prop="userId" label="ID" width="80" sortable />
+      <el-table-column prop="userId" label="ID" min-width="30" sortable />
       <el-table-column 
         prop="userRole" 
         label="用户类型" 
-        min-width="80" 
-        :formatter="(row) => getUserRoleLabel(row.userRole)" 
+        min-width="40" 
+        :formatter="(row) => row.userRole === 'MERCHANT' ? '商户' : row.userRole === 'ADMIN' ? '管理员' : '普通用户'" 
         :show-overflow-tooltip="true" 
       /> 
-      <el-table-column prop="userName" label="用户名" min-width="80" :show-overflow-tooltip="true" />
-      <el-table-column prop="userEmail" label="邮箱" min-width="120" :show-overflow-tooltip="true" />
-      <el-table-column prop="userTel" label="手机号" min-width="120" :show-overflow-tooltip="true" />
+      <el-table-column prop="userName" label="用户名" min-width="60" :show-overflow-tooltip="true" />
+      <el-table-column prop="userEmail" label="邮箱" min-width="100" :show-overflow-tooltip="true" />
+      <el-table-column prop="userTel" label="手机号" min-width="100" :show-overflow-tooltip="true" />
     </el-table>
 
     <!-- 无数据且不在加载状态时显示空状态 -->
@@ -45,7 +45,6 @@
 
 <script setup lang="ts">
 import type { User } from '@/types/user'
-import { getUserRoleLabel } from '@/types/user'
 
 interface Props {
   users: User[]
@@ -77,8 +76,8 @@ const handleRowClick = (row: User) => {
 <style scoped>
 .user-table-container {
   background: white;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 1vh;
+  padding: 2vh 3vw;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   width: 70vw;
 }
@@ -93,21 +92,21 @@ const handleRowClick = (row: User) => {
 
   /* 表头样式 */
   .el-table__header-wrapper th {
-    height: 48px;
+    height: 5vh;
 
     .cell {
       font-weight: 600;
-      font-size: 20px;
+      font-size: 2vh;
     }
   }
 
   /* 数据行样式 */
   .el-table__body-wrapper td {
-    height: 54px;
+    height: 7vh;
 
     .cell {
-      font-weight: 400;
-      font-size: 18px;
+      font-weight: 500;
+      font-size: 2vh;
     }
   }
 
@@ -123,7 +122,7 @@ const handleRowClick = (row: User) => {
 
   /* 单元格内边距 */
   .el-table__cell {
-    padding: 8px 0;
+    padding: 1vh 0;
   }
 }
 </style>

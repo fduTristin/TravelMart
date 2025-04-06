@@ -32,7 +32,7 @@ defineProps<{
   display: flex;
   justify-content: space-between;
   background: linear-gradient(135deg, #f0f4ff, #d9e6ff);
-  border-radius: 12px;
+  border-radius: 1vh;
   padding: 24px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   max-width: 50vw;
@@ -54,7 +54,7 @@ defineProps<{
 .form {
   background: white;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 1vh;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 

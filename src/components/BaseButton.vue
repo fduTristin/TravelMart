@@ -35,15 +35,15 @@ defineEmits(['click'])
 <style scoped>
 .base-button {
     min-width: 5vw;
-    height: 48px;
-    border-radius: 12px;
+    height: 5vh;
+    border-radius: 1vh;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: "Noto Sans SC";
 }
 
 .button-content {
     display: inline-flex;
-    font-size: 16px;
+    font-size: 2vh;
     font-weight: 600;
     letter-spacing: 0.8px;
 }
