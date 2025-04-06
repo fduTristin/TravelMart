@@ -77,7 +77,7 @@ watch(
             <span>{{ user?.userRole === 'MERCHANT' ? '商户' : user?.userRole === 'ADMIN' ? '管理员' : '普通用户' }}</span>
           </el-form-item>
           <el-form-item label="手机号">
-            <span>{{ user?.phone || '未提供' }}</span>
+            <span>{{ user?.userTel || '未提供' }}</span>
           </el-form-item>
           <el-form-item label="邮箱">
             <span>{{ user?.userEmail || '未提供'}}</span>
