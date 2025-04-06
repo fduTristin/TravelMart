@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import PageContainer from '@/components/PageContainer.vue'
-import { useStoreStore } from '@/stores/store'
+import { useStoreStore } from '@/stores/stores'
 import type { Store } from '@/types/store'
 
 const route = useRoute()

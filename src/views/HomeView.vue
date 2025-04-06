@@ -4,7 +4,7 @@ import { ElCard, ElButton, ElSelect, ElOption } from 'element-plus'
 import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import PageContainer from '@/components/PageContainer.vue'
 import StoreCard from '@/components/StoreCard.vue'
-import { useStoreStore } from '@/stores/store'
+import { useStoreStore } from '@/stores/stores'
 import { useRouter } from 'vue-router'
 
 enum ServiceType {

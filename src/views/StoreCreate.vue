@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStoreStore } from '@/stores/store'
+import { useStoreStore } from '@/stores/stores'
 import { ServiceType } from '@/types/store'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
