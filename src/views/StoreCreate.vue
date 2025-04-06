@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStoreStore, ServiceType } from '@/stores/store'
+import { useStoreStore } from '@/stores/store'
+import { ServiceType } from '@/types/store'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import PageContainer from '@/components/PageContainer.vue'
@@ -12,7 +13,7 @@ const storeStore = useStoreStore()
 
 // 表单数据
 interface StoreForm {
-  shopName: string
+  storeName: string
   categories: string[]
   ownerIdNumber: string
   description: string
@@ -22,7 +23,7 @@ interface StoreForm {
 }
 
 const formData = ref<StoreForm>({
-  shopName: '',
+  storeName: '',
   categories: [],
   ownerIdNumber: '',
   description: '',
@@ -80,7 +81,7 @@ const validateIdNumber = (rule: unknown, value: string, callback: (error?: Error
 
 // 表单规则
 const rules = ref<FormRules>({
-  shopName: [
+  storeName: [
     { required: true, message: '请输入店铺名称', trigger: 'blur' },
     { max: 20, message: '店铺名称不能超过20个字符', trigger: 'blur' }
   ],
@@ -158,30 +159,22 @@ const handleSubmit = async () => {
   <PageContainer title="开设新店铺">
     <template #actions>
       <el-button @click="handleBack">
-        <el-icon><ArrowLeft /></el-icon>
+        <el-icon>
+          <ArrowLeft />
+        </el-icon>
         返回
       </el-button>
     </template>
 
     <div class="create-store-form">
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="rules"
-        label-width="120px"
-        class="form"
-      >
-        <el-form-item label="店铺名称" prop="shopName">
-          <el-input v-model="formData.shopName" placeholder="请输入店铺名称" />
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form">
+        <el-form-item label="店铺名称" prop="storeName">
+          <el-input v-model="formData.storeName" placeholder="请输入店铺名称" />
         </el-form-item>
 
         <el-form-item label="服务类型" prop="categories">
           <el-checkbox-group v-model="formData.categories">
-            <el-checkbox
-              v-for="type in Object.values(ServiceType)"
-              :key="type"
-              :label="type"
-            >
+            <el-checkbox v-for="type in Object.values(ServiceType)" :key="type" :label="type">
               {{ type }}
             </el-checkbox>
           </el-checkbox-group>
@@ -192,12 +185,7 @@ const handleSubmit = async () => {
         </el-form-item>
 
         <el-form-item label="商店简介" prop="description">
-          <el-input
-            v-model="formData.description"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入商店简介"
-          />
+          <el-input v-model="formData.description" type="textarea" :rows="4" placeholder="请输入商店简介" />
         </el-form-item>
 
         <el-form-item label="备案地址" prop="registrationAddress">
@@ -205,30 +193,16 @@ const handleSubmit = async () => {
         </el-form-item>
 
         <el-form-item label="注册资金" prop="registeredCapital">
-          <el-input-number
-            v-model="formData.registeredCapital"
-            :min="1000"
-            :step="1000"
-            :precision="2"
-          />
+          <el-input-number v-model="formData.registeredCapital" :min="1000" :step="1000" :precision="2" />
         </el-form-item>
 
         <el-form-item label="注册时间" prop="registrationDate">
-          <el-date-picker
-            v-model="formData.registrationDate"
-            type="date"
-            placeholder="选择注册时间"
-            format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD"
-          />
+          <el-date-picker v-model="formData.registrationDate" type="date" placeholder="选择注册时间" format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD" />
         </el-form-item>
 
         <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSubmit"
-            :loading="loading"
-          >
+          <el-button type="primary" @click="handleSubmit" :loading="loading">
             创建店铺
           </el-button>
           <el-button @click="handleBack" :disabled="loading">取消</el-button>

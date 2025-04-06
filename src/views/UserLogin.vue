@@ -92,10 +92,10 @@ const handleRegister = () => {
 // 表单验证规则
 const rules: FormRules = {
   userName: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
+    { message: '请输入用户名', trigger: 'blur' }
   ],
   userPwd: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
+    { message: '请输入密码', trigger: 'blur' }
   ]
 }
 </script>
@@ -110,7 +110,7 @@ const rules: FormRules = {
     <div class="centered-form-container">
       <div class="form-container">
         <h2 class="login-title">用户登录</h2>
-        <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form" :disabled="loading">
+        <el-form ref="formRef" :model="formData" :rules="rules" label-width="9vw" class="form" :disabled="loading">
           <el-form-item label="用户名" prop="userName">
             <el-input v-model="formData.userName" />
           </el-form-item>
@@ -119,7 +119,7 @@ const rules: FormRules = {
             <el-input v-model="formData.userPwd" type="password" show-password />
           </el-form-item>
 
-          <el-form-item class="form-buttons">
+          <el-form-item>
             <BaseButton type="primary" @click="handleSubmit" :loading="loading">
               登录
             </BaseButton>
@@ -155,25 +155,23 @@ const rules: FormRules = {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: blur(5px) brightness(0.7);
+  filter: blur(6px) brightness(0.7);
 }
 
 .centered-form-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
   z-index: 1;
   animation: fadeIn 0.3s ease-out;
 }
 
 .form-container {
   background: rgb(247, 249, 249);
-  border-radius: 8px;
+  border-radius: 1vh;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  padding: 20px;
   width: 32vw;
+  height: 40vh;
   /* 确保内容居中 */
   display: flex;
   flex-direction: column;
@@ -182,10 +180,14 @@ const rules: FormRules = {
 
 .login-title {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 3vh;
   color: #275f94;
-  font-size: 28px;
+  font-size: 3vh;
   font-weight: 600;
+}
+
+.el-form-item {
+  margin-bottom: 3vh;
 }
 
 @keyframes fadeIn {
@@ -200,9 +202,9 @@ const rules: FormRules = {
 }
 
 :deep(.el-form-item__label) {
-  font-size: 18px;
+  font-size: 2vh;
   font-weight: 500;
-  margin-right: 1vw;
+  margin-right: 0.5vw;
 }
 
 :deep(.el-input__wrapper),
@@ -221,22 +223,16 @@ const rules: FormRules = {
 :deep(.el-input__inner),
 :deep(.el-textarea__inner) {
   font-family: "Noto Sans SC", sans-serif;
-  font-size: 18px;
-}
-
-:deep(.el-form-item:first-child) {
-  margin-top: 20px;
-}
-
-.form-buttons {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+  font-size: 2vh;
 }
 
 :deep(.el-input) {
   display: flex;
   max-width: 17vw;
+}
+
+:deep(.el-form-item:last-child) {
+  margin-top: 4vh;
+  margin-bottom: 0;
 }
 </style>

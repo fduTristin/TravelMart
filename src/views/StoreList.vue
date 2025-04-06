@@ -3,7 +3,8 @@ import { ref, computed, onMounted } from 'vue'
 import StoreCard from '@/components/StoreCard.vue'
 import PageContainer from '@/components/PageContainer.vue'
 import { useRouter } from 'vue-router'
-import { useStoreStore, ServiceType } from '@/stores/store'
+import { useStoreStore } from '@/stores/store'
+import { ServiceType } from '@/types/store'
 import { useAuthStore } from '@/stores/auth'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElLoading } from 'element-plus'
@@ -14,23 +15,24 @@ const storeStore = useStoreStore()
 const authStore = useAuthStore()
 
 // 服务类型筛选
-const selectedType = ref<ServiceType | null>(null)
+const selectedCategory = ref<ServiceType | null>(null)
 
 // 根据筛选条件获取店铺列表
 const filteredStores = computed(() => {
   let stores = storeStore.stores;
 
   // 应用服务类型筛选
-  if (selectedType.value !== null) {
-    stores = stores.filter(store => store.serviceType === selectedType.value);
+  if (selectedCategory.value !== null) {
+    const category = selectedCategory.value
+    stores = stores.filter(store => store.categories.includes(category));
   }
 
   return stores;
 })
 
-const handleStoreClick = (storeId: number) => {
+const handleStoreClick = (id: number) => {
   // 跳转到店铺详情页
-  router.push(`/store/${storeId}`)
+  router.push(`/stores/${id}`)
 }
 
 // 创建新店铺
@@ -42,11 +44,6 @@ const handleCreateStore = () => {
   router.push('/stores/create')
 }
 
-// 页面标题
-const pageTitle = computed(() => {
-  return authStore.isAdmin ? '所有店铺' : '我的店铺';
-})
-
 // 加载店铺列表
 onMounted(async () => {
   const loadingInstance = ElLoading.service({
@@ -55,17 +52,7 @@ onMounted(async () => {
   })
 
   try {
-    // 根据用户角色获取不同的店铺列表
-    if (authStore.isAdmin) {
-      // 管理员获取所有店铺
-      await storeStore.fetchStores()
-    } else if (authStore.isMerchant) {
-      // 商户获取自己的店铺
-      await storeStore.fetchMerchantStores()
-    } else {
-      // 普通用户获取所有店铺
-      await storeStore.fetchStores()
-    }
+    await storeStore.fetchStores()
   } catch (error) {
     ElMessage.error('加载店铺列表失败')
   } finally {
@@ -77,12 +64,11 @@ onMounted(async () => {
 <template>
   <PageContainer>
     <template #actions>
-      <div class="header-container">
-        <h1>{{ pageTitle }}</h1>
-        <div class="header-actions">
-          <el-select v-model="selectedType" placeholder="选择服务类型" clearable class="type-filter">
-            <el-option v-for="type in Object.values(ServiceType)" :key="type" :label="type" :value="type" />
-          </el-select>
+      <div class="header-actions">
+        <el-select v-model="selectedCategory" placeholder="选择服务类型" clearable class="type-filter">
+          <el-option v-for="type in Object.values(ServiceType)" :key="type" :label="type" :value="type" />
+        </el-select>
+        <div v-if="authStore.isMerchant" class="header-actions">
           <BaseButton type="primary" @click="handleCreateStore">
             <el-icon>
               <Plus />
@@ -94,8 +80,7 @@ onMounted(async () => {
     </template>
 
     <div class="store-grid">
-      <div v-for="store in filteredStores" :key="store.storeId" class="store-grid-item"
-        @click="handleStoreClick(store.storeId)">
+      <div v-for="store in filteredStores" :key="store.id" class="store-grid-item" @click="handleStoreClick(store.id)">
         <StoreCard :store="store" />
       </div>
       <div v-if="filteredStores.length === 0" class="empty-state">
@@ -113,14 +98,10 @@ onMounted(async () => {
   margin-bottom: 24px;
 }
 
-.type-filter {
-  width: 200px;
-}
-
 .store-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(19vw, 1fr));
+  /* 确保卡片不会重叠 */
   padding: 16px;
   margin: 0 auto;
 }
@@ -134,6 +115,7 @@ onMounted(async () => {
 @media (max-width: 768px) {
   .store-grid {
     grid-template-columns: 1fr;
+    /* 在小屏幕上每行显示一个卡片 */
     padding: 16px;
     gap: 16px;
   }
@@ -159,7 +141,13 @@ onMounted(async () => {
 
 .header-actions {
   display: flex;
-  gap: 16px;
+  gap: 2vw;
   align-items: center;
+}
+
+:deep(.el-select__wrapper) {
+  width: 11vw;
+  height: 5vh;
+  border-radius: 1vh;
 }
 </style>

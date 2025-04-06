@@ -33,7 +33,7 @@ export const useUserStore = defineStore('users', () => {
     try {
       const response = await userService.getById(id)
       const user = response.data
-      const index = users.value.findIndex((u) => u.id === user.id)
+      const index = users.value.findIndex((u) => u.userId === user.userId)
       if (index !== -1) {
         users.value[index] = user
       } else {
