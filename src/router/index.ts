@@ -31,7 +31,8 @@ const routes: RouteRecordRaw[] = [
     component: HomeView,
     meta: {
       title: '首页',
-      keepAlive: true
+      keepAlive: true,
+      requiresAuth: true // 添加 requiresAuth
     }
   },
   {
@@ -49,7 +50,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/UserList.vue'),
     meta: {
       title: '用户管理',
-      keepAlive: true
+      keepAlive: true,
+      requiresAuth: true // 添加 requiresAuth
     }
   },
   {
@@ -57,7 +59,8 @@ const routes: RouteRecordRaw[] = [
     name: 'user-detail',
     component: () => import('@/views/UserDetail.vue'),
     meta: {
-      title: 'User Detail'
+      title: '用户详情',
+      requiresAuth: true // 添加 requiresAuth
     },
     props: route => ({
       id: parseInt(route.params.id as string),
@@ -68,7 +71,8 @@ const routes: RouteRecordRaw[] = [
     name: 'profile',
     component: () => import('@/views/UserProfile.vue'),
     meta: {
-      title: '用户档案'
+      title: '用户档案',
+      requiresAuth: true // 添加 requiresAuth
     },
     props: true
   },
@@ -79,9 +83,10 @@ const routes: RouteRecordRaw[] = [
     meta: {
       title: () => {
         const authStore = useAuthStore()
-        return authStore.isMerchant ? '我的店铺' : authStore.isAdmin?'店铺管理':'店铺列表'
+        return authStore.isMerchant ? '我的店铺' : authStore.isAdmin ? '店铺管理' : '店铺列表'
       },
-      keepAlive: true
+      keepAlive: true,
+      requiresAuth: true // 添加 requiresAuth
     }
   },
   {
@@ -90,7 +95,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/StoreCreate.vue'),
     meta: {
       title: '开设新店铺',
-      keepAlive: false
+      keepAlive: false,
+      requiresAuth: true // 添加 requiresAuth
     }
   },
   {
@@ -98,8 +104,9 @@ const routes: RouteRecordRaw[] = [
     name: 'store-detail',
     component: () => import('@/views/StoreDetail.vue'),
     meta: {
-      title: 'Store Detail',
-      keepAlive: true
+      title: '店铺详情',
+      keepAlive: true,
+      requiresAuth: true // 添加 requiresAuth
     },
     props: route => ({
       id: parseInt(route.params.id as string)
@@ -111,7 +118,7 @@ const routes: RouteRecordRaw[] = [
     name: 'not-found',
     component: () => import('@/views/NotFound.vue'),
     meta: {
-      title: 'Page Not Found'
+      title: 'Page Not Found',
     }
   }
 ]
