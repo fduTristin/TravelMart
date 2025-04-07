@@ -19,34 +19,30 @@ defineProps<{
 </template>
 
 <style scoped>
+h1 {
+  font-size: 3vh;
+  font-weight: 600;
+  color: #15324d;
+  margin: 2vh 0 0 2vw;
+}
+
 .page-container {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  min-height: calc(100vh - 100px);
-  position: absolute;
+  background-color:inherit;
+  height: inherit;
   top: 0;
   left: 0;
   right: 0;
-  margin: 20px, 0;
+  margin: 2vh, 0;
 }
 
 .page-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--el-border-color-light);
+  padding: 1vh 2vw;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.page-header h1 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--el-text-color-primary);
-}
-
 .page-content {
-  padding: 24px;
+  padding: 2vh 2vw;
 }
-</style> 
+</style>
