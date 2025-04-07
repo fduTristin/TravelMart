@@ -62,7 +62,9 @@ const loadStores = async () => {
 
 // 监听用户信息变化
 watch(() => authStore.user, () => {
-  loadStores()
+  if (authStore.token) {
+    loadStores()
+  }
 }, { deep: true })
 
 // 初始加载
