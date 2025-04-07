@@ -130,7 +130,7 @@ const rules: FormRules = {
     <div class="centered-form-container">
       <div class="form-container">
         <h2 class="login-title">用户注册</h2>
-        <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form" :disabled="loading || authStore.loading">
+        <el-form ref="formRef" :model="formData" :rules="rules" label-width="9vw" class="form" :disabled="loading">
           <el-form-item label="角色" prop="userRole">
             <el-radio-group v-model="formData.userRole">
               <el-radio label="CUSTOMER">普通用户</el-radio>
@@ -155,10 +155,10 @@ const rules: FormRules = {
           </el-form-item>
 
           <el-form-item>
-            <BaseButton type="primary" @click="handleSubmit" :loading="loading || authStore.loading">
+            <BaseButton type="primary" @click="handleSubmit" :loading="loading">
               注册
             </BaseButton>
-            <BaseButton @click="handleCancel" :disabled="loading || authStore.loading">
+            <BaseButton @click="handleCancel" :disabled="loading">
               取消
             </BaseButton>
           </el-form-item>
@@ -197,24 +197,29 @@ const rules: FormRules = {
 
 /* 居中表单容器 */
 .centered-form-container {
-  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1;
-  animation: fadeIn 0.3s ease-out; /* 淡入动画 */
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* 表单容器样式 */
 .form-container {
   background: rgb(247, 249, 249);
-  border-radius: 8px;
-  width : 35vw;
+  border-radius: 1vh;
+  width : 32vw;
   height: 50vh;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .login-title {
   text-align: center;
-  margin-bottom: 1vh;
+  margin-bottom: 0vh;
+  margin-top: 1vh;
   color: #275f94;
   font-size: 3vh;
   font-weight: 600;
@@ -233,6 +238,10 @@ const rules: FormRules = {
 }
 
 /* 调整表单元素样式 */
+.el-form-item {
+  margin-bottom: 2vh;
+}
+
 :deep(.el-form-item__label) {
   font-size: 2vh;
   font-weight: 500;
@@ -256,16 +265,34 @@ const rules: FormRules = {
 :deep(.el-textarea__inner) {
   font-family: "Noto Sans SC", sans-serif;
   font-size: 2vh;
+  height: 3.5vh;
 }
 
-:deep(.el-input) {
-  width: 18vw;
+:deep(.el-form-item:first-child) {
+  margin-top: 3vh;
 }
 
 :deep(.el-form-item:last-child) {
-  margin-top: 1.5vh;
-  margin-bottom: 0;
+  margin-top: 3vh;
+  margin-bottom: 2vh;
+}
+
+:deep(.el-form-item:last-child .el-form-item__content) {
+  gap: 1vw; /* 按钮间距 */
+}
+
+:deep(.el-input) {
   display: flex;
-  justify-content: center;
+  max-width: 17vw;
+}
+
+:deep(.el-radio.is-checked .el-radio__label) {
+  color: #275f94;
+  font-weight: bold;
+}
+
+:deep(.el-radio.is-checked .el-radio__input .el-radio__inner) {
+  border-color: #275f94;
+  background-color: #275f94;
 }
 </style>
