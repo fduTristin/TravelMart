@@ -3,10 +3,12 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import PageContainer from '@/components/PageContainer.vue'
 import { useStoreStore } from '@/stores/stores'
+import { useAuthStore } from '@/stores/auth'
 import type { Store } from '@/types/store'
 
 const route = useRoute()
 const storeStore = useStoreStore()
+const authStore = useAuthStore()
 
 // 店铺数据
 const store = ref<Store | null>(null)
@@ -66,13 +68,18 @@ watch(
         </div>
         <div class="store-info">
           <h1>{{ store?.storeName }}</h1>
+          <div v-if="authStore.isAdmin" class="description">
+            商户ID: {{ store?.ownerId }}
+          </div>
           <!-- <div class="rating">
             <el-rate :model-value="store.rating || 0" disabled show-score text-color="#ff9900" score-template="{value}" />
           </div> -->
-          <p class="description"> 备案地址: {{ store?.registrationAddress }}</p>
-          <p class="description"> 注册人身份证号: {{ store?.ownerIdNumber }}</p>
-          <p class="description"> 注册资金: {{ store?.registeredCapital }}元</p>
-          <p class="description"> 注册时间: {{ store?.registrationDate}}</p>
+          <p class="description">备案地址: {{ store?.registrationAddress }}</p>
+          <p class="description">注册资金: {{ store?.registeredCapital }}元</p>
+          <p class="description">注册时间: {{ store?.registrationDate }}</p>
+          <div v-if="authStore.isAdmin || authStore.isMerchant" class="description">
+            注册人身份证号: {{ store?.ownerIdNumber }}
+          </div>
           <div class="info-grid">
             <div class="info-item">
               <span>简介: </span>
