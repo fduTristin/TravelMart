@@ -4,8 +4,10 @@ import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useUserStore } from '@/stores/users'
 import type { User } from '@/types/user'
 import { ElMessage } from 'element-plus'
+import { useAuthStore } from '@/stores/auth'
 
 const userStore = useUserStore()
+const authStore = useAuthStore()
 const loading = ref(true)
 const user = ref<User>({
     userId: 0,
@@ -34,14 +36,8 @@ const route = useRoute()
 
 // 监听路由变化，当路由有needRefresh标记时重新加载数据
 watch(
-    () => route.meta.needRefresh,
-    (needRefresh) => {
-        if (needRefresh) {
-            fetchUserProfile()
-            // 重置刷新标记，避免重复刷新
-            route.meta.needRefresh = false
-        }
-    },
+    () => authStore.token,
+    fetchUserProfile,
     { immediate: true }
 )
 

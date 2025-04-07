@@ -108,7 +108,10 @@ onUnmounted(() => {
           <div v-if="currentStore" class="store-card-container" @click="goToStore">
             <StoreCard :store="currentStore" class="custom-store-card" />
           </div>
-          <div v-else class="loading-placeholder">
+          <div v-else-if="!currentStore && !storeStore.loading" class="error-placeholder">
+            <p>没有找到符合条件的店铺</p>
+          </div>
+          <div v-else-if="storeStore.loading" class="loading-placeholder">
             <p>加载中...</p>
           </div>
           <div class="nav-button prev" @click.stop="prevStore">

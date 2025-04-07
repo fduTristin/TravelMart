@@ -94,7 +94,7 @@ onMounted(() => {
         <StoreCard :store="store" />
       </div>
       <div v-if="filteredStores.length === 0" class="empty-state">
-        <p>{{ authStore.isMerchant && !authStore.isAdmin ? '您还没有开设店铺' : '没有找到符合条件的店铺' }}</p>
+        <p>{{ authStore.isMerchant && !authStore.isAdmin ? '您还没有开设该类店铺' : '没有找到符合条件的店铺' }}</p>
       </div>
     </div>
   </PageContainer>
