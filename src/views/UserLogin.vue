@@ -3,17 +3,8 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { AxiosError } from 'axios'
 import BaseButton from '@/components/BaseButton.vue'
-import { api } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
-
-interface ErrorResponse {
-  status: number
-  message: string
-  error: string
-  errors: null
-}
 
 const router = useRouter()
 const route = useRoute()
@@ -58,24 +49,20 @@ const handleSubmit = async () => {
     await formRef.value.validate()
     loading.value = true
 
-    // 调用登录API
-    const response = await api.post('/auth/login', {
+    // 调用authStore的login方法
+    await authStore.login({
       userName: formData.value.userName,
       userPwd: formData.value.userPwd
     })
-
-    // 保存token
-    authStore.setToken(response.data.token)
 
     ElMessage.success(messages.success)
     // 登录成功后跳转到原本要访问的页面或首页
     const redirectPath = route.query.redirect as string
     router.push(redirectPath || '/')
-  } catch (error: unknown) {
-    // 处理错误响应
-    const axiosError = error as AxiosError<ErrorResponse>
-    if (axiosError.response?.data?.message) {
-      ElMessage.error(axiosError.response.data.message)
+  } catch (error) {
+    // 错误信息已经在store中处理，这里只需显示错误消息即可
+    if (authStore.error) {
+      ElMessage.error(authStore.error)
     } else {
       ElMessage.error(messages.error)
     }
@@ -110,7 +97,7 @@ const rules: FormRules = {
     <div class="centered-form-container">
       <div class="form-container">
         <h2 class="login-title">用户登录</h2>
-        <el-form ref="formRef" :model="formData" :rules="rules" label-width="9vw" class="form" :disabled="loading">
+        <el-form ref="formRef" :model="formData" :rules="rules" label-width="9vw" class="form" :disabled="loading || authStore.loading">
           <el-form-item label="用户名" prop="userName">
             <el-input v-model="formData.userName" />
           </el-form-item>
@@ -120,10 +107,10 @@ const rules: FormRules = {
           </el-form-item>
 
           <el-form-item>
-            <BaseButton type="primary" @click="handleSubmit" :loading="loading">
+            <BaseButton type="primary" @click="handleSubmit" :loading="loading || authStore.loading">
               登录
             </BaseButton>
-            <BaseButton @click="handleRegister" :disabled="loading">
+            <BaseButton @click="handleRegister" :disabled="loading || authStore.loading">
               注册账号
             </BaseButton>
           </el-form-item>
