@@ -71,6 +71,8 @@ watch(
           </div> -->
           <p class="description"> 备案地址: {{ store?.registrationAddress }}</p>
           <p class="description"> 注册人身份证号: {{ store?.ownerIdNumber }}</p>
+          <p class="description"> 注册资金: {{ store?.registeredCapital }}元</p>
+          <p class="description"> 注册时间: {{ store?.registrationDate}}</p>
           <div class="info-grid">
             <div class="info-item">
               <span>简介: </span>
@@ -190,8 +192,8 @@ watch(
 }
 
 .category-tag {
-  font-size: 14px;
-  padding: 6px 16px;
-  border-radius: 20px;
+  font-size: 1.6vh;
+  padding: 1.2vh 0.6vw;
+  border-radius: 1vh;
 }
 </style>

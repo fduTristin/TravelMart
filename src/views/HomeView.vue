@@ -192,11 +192,11 @@ onUnmounted(() => {
 }
 
 .nav-button.prev {
-  left: -2vw;
+  left: -1vw;
 }
 
 .nav-button.next {
-  right: -2vw;
+  right: -1vw;
 }
 
 .nav-button :deep(.el-button) {

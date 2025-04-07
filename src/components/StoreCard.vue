@@ -43,7 +43,7 @@ defineProps<{
       <!-- <div class="status" :class="{ 'is-open': store.isOpen }">
         {{ store.isOpen ? '营业中' : '休息中' }}
       </div> -->
-      <p class="description">简介: {{ store.description }}</p>
+      <!-- <p class="description">简介: {{ store.description }}</p> -->
     </div>
   </el-card>
 </template>
@@ -53,18 +53,19 @@ defineProps<{
   background: white;
   border-radius: 1vh;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  width: 20vw;
-  min-height: 30vh;
+  width: 100%;
+  height: 30vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .store-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .image {
@@ -86,7 +87,7 @@ defineProps<{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 1vh 0;
 }
 
 .store-header h3 {
@@ -99,13 +100,12 @@ defineProps<{
   display: flex;
   gap: 0.5vw;
   flex-wrap: wrap;
-  margin-bottom: 1vh;
 }
 
 .category-tag {
-  padding: 0.2vw 0.5vw;
+  padding: 0.2vh 0.5vw;
   border-radius: 0.2vw;
-  font-size: 0.8vw;
+  font-size: 1.6vh;
   font-weight: 500;
 }
 

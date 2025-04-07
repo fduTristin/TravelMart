@@ -19,6 +19,13 @@ defineProps<{
 </template>
 
 <style scoped>
+h1 {
+  font-size: 3vh;
+  font-weight: 600;
+  color: #15324d;
+  margin: 2vh 0 0 2vw;
+}
+
 .page-container {
   background-color:inherit;
   height: inherit;

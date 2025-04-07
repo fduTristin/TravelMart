@@ -100,24 +100,27 @@ onMounted(async () => {
 
 .store-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(19vw, 1fr));
-  /* 确保卡片不会重叠 */
-  padding: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(22vw, 1fr));
+  gap: 2vw;
+  padding: 2vh 1vw;
   margin: 0 auto;
+  place-items: center;
 }
 
 .store-grid-item {
   min-width: 0;
+  width: 100%;
   height: 100%;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {
   .store-grid {
     grid-template-columns: 1fr;
-    /* 在小屏幕上每行显示一个卡片 */
-    padding: 16px;
-    gap: 16px;
+    padding: 2vh 4vw;
+    gap: 3vh;
   }
 
   .header-container {

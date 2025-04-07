@@ -97,10 +97,10 @@ export const useStoreStore = defineStore('store', () => {
 
       // 如果后端返回创建的店铺信息,使用后端返回的数据
       if (response.data) {
-        const newStore = ref<Store>(response.data)
+        const newStore = response.data
 
         // 添加到本地状态中
-        stores.value.push(newStore.value)
+        stores.value.push(newStore)
         return newStore
       } else {
         throw new Error('创建店铺失败,服务器未返回数据')
