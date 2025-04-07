@@ -273,21 +273,21 @@ const rules: FormRules = {
 }
 
 :deep(.el-form-item:first-child) {
-  margin-top: 20px;
+  margin-top: 3vh;
 }
 
 :deep(.el-form-item:last-child) {
-  margin-bottom: 20px;
+  margin-top: 3vh;
   margin-left: 2.6vw;
 }
 
 :deep(.el-form-item:last-child .el-form-item__content) {
-  gap: 2vw; /* 按钮间距 */
+  gap: 1vw; /* 按钮间距 */
 }
 
 :deep(.el-input) {
   display: flex;
-  max-width: 20vw;
+  width: 19vw;
 }
 
 :deep(.el-radio.is-checked .el-radio__label) {
