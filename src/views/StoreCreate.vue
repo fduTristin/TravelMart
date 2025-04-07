@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStoreStore } from '@/stores/stores'
 import { ServiceType } from '@/types/store'
@@ -120,6 +120,25 @@ const formRef = ref<FormInstance>()
 
 // 加载状态
 const loading = ref(false)
+
+// 重置表单数据
+const resetForm = () => {
+  formData.value = {
+    storeName: '',
+    categories: [],
+    ownerIdNumber: '',
+    description: '',
+    registrationAddress: '',
+    registeredCapital: 1000,
+    registrationDate: new Date().toISOString().split('T')[0]
+  }
+  formRef.value?.resetFields()
+}
+
+// 监听路由变化，重置表单
+watch(() => router.currentRoute.value, () => {
+  resetForm()
+})
 
 // 返回列表
 const handleBack = () => {

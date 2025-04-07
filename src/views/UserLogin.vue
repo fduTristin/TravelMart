@@ -211,6 +211,7 @@ const rules: FormRules = {
 :deep(.el-textarea__inner) {
   font-family: "Noto Sans SC", sans-serif;
   font-size: 2vh;
+  height: 3.5vh;
 }
 
 :deep(.el-input) {
