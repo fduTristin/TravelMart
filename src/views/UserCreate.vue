@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -15,6 +15,37 @@ const formData = ref({
   userRole: 'CUSTOMER' as 'ADMIN' | 'MERCHANT' | 'CUSTOMER',
   userTel: '',
   userPwd: ''
+})
+
+// 重置表单数据
+const resetForm = () => {
+  formData.value = {
+    userName: '',
+    userEmail: '',
+    userRole: 'CUSTOMER',
+    userTel: '',
+    userPwd: ''
+  }
+  formRef.value?.resetFields()
+}
+
+// 组件加载时重置表单
+onMounted(() => {
+  resetForm()
+})
+
+watch(
+  () => authStore.token,
+  (newToken) => {
+    if (newToken) {
+      resetForm()
+    }
+  }
+)
+
+// 监听路由变化，重置表单
+watch(() => router.currentRoute.value, () => {
+  resetForm()
 })
 
 const messages = {
@@ -188,11 +219,13 @@ const rules: FormRules = {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/background.jpg'); /* 替换为你的图片路径 */
+  background-image: url('/background.jpg');
+  /* 替换为你的图片路径 */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: blur(5px) brightness(0.7); /* 模糊和变暗效果 */
+  filter: blur(5px) brightness(0.7);
+  /* 模糊和变暗效果 */
 }
 
 /* 居中表单容器 */
@@ -208,7 +241,7 @@ const rules: FormRules = {
 .form-container {
   background: rgb(247, 249, 249);
   border-radius: 1vh;
-  width : 32vw;
+  width: 32vw;
   height: 50vh;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   display: flex;
@@ -231,6 +264,7 @@ const rules: FormRules = {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -278,7 +312,8 @@ const rules: FormRules = {
 }
 
 :deep(.el-form-item:last-child .el-form-item__content) {
-  gap: 1vw; /* 按钮间距 */
+  gap: 1vw;
+  /* 按钮间距 */
 }
 
 :deep(.el-input) {
