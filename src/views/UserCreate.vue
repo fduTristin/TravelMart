@@ -3,26 +3,16 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { AxiosError } from 'axios'
 import BaseButton from '@/components/BaseButton.vue'
-import { api } from '@/services/api'
-
-interface ErrorResponse {
-  message: string
-  error: string
-  errors: null | Array<{
-    field: string
-    rejectedValue: string
-    reason: string
-  }>
-}
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const formData = ref({
   userName: '',
   userEmail: '',
-  userRole: 'CUSTOMER', // 修改默认值为CUSTOMER
+  userRole: 'CUSTOMER' as 'ADMIN' | 'MERCHANT' | 'CUSTOMER',
   userTel: '',
   userPwd: ''
 })
@@ -44,8 +34,8 @@ const handleSubmit = async () => {
     await formRef.value.validate()
     loading.value = true
 
-    // 调用注册API
-    const response = await api.post('/auth/register', {
+    // 调用authStore的register方法
+    await authStore.register({
       userName: formData.value.userName,
       userPwd: formData.value.userPwd,
       userRole: formData.value.userRole,
@@ -54,15 +44,12 @@ const handleSubmit = async () => {
     })
 
     ElMessage.success(messages.success)
-    // // 使用 replace 而不是 push，这样返回时不会回到创建页面
-    // router.replace('/users')
     // 注册成功后跳转到登录页面
     router.push('/login')
-  } catch (error: unknown) {
-    // 处理错误响应
-    const axiosError = error as AxiosError<ErrorResponse>
-    if (axiosError.response?.data?.message) {
-      ElMessage.error(axiosError.response.data.message)
+  } catch (error) {
+    // 错误信息已经在store中处理，这里只需显示错误消息即可
+    if (authStore.error) {
+      ElMessage.error(authStore.error)
     } else {
       ElMessage.error(messages.error)
     }
@@ -131,7 +118,6 @@ const rules: FormRules = {
     { validator: validatePassword, trigger: 'blur' }
   ]
 }
-
 </script>
 
 <template>
@@ -144,7 +130,7 @@ const rules: FormRules = {
     <div class="centered-form-container">
       <div class="form-container">
         <h2 class="login-title">用户注册</h2>
-        <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form" :disabled="loading">
+        <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form" :disabled="loading || authStore.loading">
           <el-form-item label="角色" prop="userRole">
             <el-radio-group v-model="formData.userRole">
               <el-radio label="CUSTOMER">普通用户</el-radio>
@@ -169,10 +155,10 @@ const rules: FormRules = {
           </el-form-item>
 
           <el-form-item>
-            <BaseButton type="primary" @click="handleSubmit" :loading="loading">
+            <BaseButton type="primary" @click="handleSubmit" :loading="loading || authStore.loading">
               注册
             </BaseButton>
-            <BaseButton @click="handleCancel" :disabled="loading">
+            <BaseButton @click="handleCancel" :disabled="loading || authStore.loading">
               取消
             </BaseButton>
           </el-form-item>
@@ -250,7 +236,7 @@ const rules: FormRules = {
 :deep(.el-form-item__label) {
   font-size: 2vh;
   font-weight: 500;
-  margin-right: 1vw;
+  margin-right: 0.5vw;
 }
 
 :deep(.el-input__wrapper),
@@ -262,7 +248,7 @@ const rules: FormRules = {
 
 :deep(.el-input__wrapper:hover),
 :deep(.el-textarea__wrapper:hover) {
-  border-color: var(--el-color-primary);
+  border-color: #275f94;
 }
 
 :deep(.el-radio__label),
@@ -272,31 +258,14 @@ const rules: FormRules = {
   font-size: 2vh;
 }
 
-:deep(.el-form-item:first-child) {
-  margin-top: 3vh;
+:deep(.el-input) {
+  width: 18vw;
 }
 
 :deep(.el-form-item:last-child) {
-  margin-top: 3vh;
-  margin-left: 2.6vw;
-}
-
-:deep(.el-form-item:last-child .el-form-item__content) {
-  gap: 1vw; /* 按钮间距 */
-}
-
-:deep(.el-input) {
+  margin-top: 1.5vh;
+  margin-bottom: 0;
   display: flex;
-  width: 19vw;
-}
-
-:deep(.el-radio.is-checked .el-radio__label) {
-  color: #275f94;
-  font-weight: bold;
-}
-
-:deep(.el-radio.is-checked .el-radio__input .el-radio__inner) {
-  border-color: #275f94;
-  background-color: #275f94;
+  justify-content: center;
 }
 </style>
