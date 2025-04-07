@@ -92,7 +92,7 @@ defineProps<{
 
 .store-header h3 {
   margin: 0;
-  font-size: 2vh;
+  font-size: 1.9vh;
   font-weight: 600;
 }
 
@@ -105,7 +105,7 @@ defineProps<{
 .category-tag {
   padding: 0.2vh 0.5vw;
   border-radius: 0.2vw;
-  font-size: 1.6vh;
+  font-size: 1.4vh;
   font-weight: 500;
 }
 
