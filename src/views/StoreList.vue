@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import StoreCard from '@/components/StoreCard.vue'
 import PageContainer from '@/components/PageContainer.vue'
 import { useRouter } from 'vue-router'
@@ -45,7 +45,7 @@ const handleCreateStore = () => {
 }
 
 // 加载店铺列表
-onMounted(async () => {
+const loadStores = async () => {
   const loadingInstance = ElLoading.service({
     target: '.store-grid',
     text: '加载店铺数据中...'
@@ -58,6 +58,16 @@ onMounted(async () => {
   } finally {
     loadingInstance.close()
   }
+}
+
+// 监听用户信息变化
+watch(() => authStore.user, () => {
+  loadStores()
+}, { deep: true })
+
+// 初始加载
+onMounted(() => {
+  loadStores()
 })
 </script>
 
