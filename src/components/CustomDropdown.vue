@@ -72,7 +72,7 @@ const positionClass = computed(() => {
   border-radius: 1vh;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 1;
-  min-width: 150px;
+  width: 10vw;
   padding: 0;
   opacity: 0;
   visibility: hidden;
@@ -96,7 +96,7 @@ const positionClass = computed(() => {
   padding: 1vh 0;
   cursor: pointer;
   transition: background-color 0.8s ease, color 0.8s ease, transform 0.3s ease;
-  font-size: 18px;
+  font-size: 2vh;
   color: #275f94;
   font-weight: 600;
   border-radius: 0;

@@ -3,33 +3,36 @@ import { ref, computed, onMounted } from 'vue'
 import StoreCard from '@/components/StoreCard.vue'
 import PageContainer from '@/components/PageContainer.vue'
 import { useRouter } from 'vue-router'
-import { useStoreStore, ServiceType } from '@/stores/store'
+import { useStoreStore } from '@/stores/stores'
+import { ServiceType } from '@/types/store'
 import { useAuthStore } from '@/stores/auth'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElLoading } from 'element-plus'
+import BaseButton from '@/components/BaseButton.vue'
 
 const router = useRouter()
 const storeStore = useStoreStore()
 const authStore = useAuthStore()
 
 // 服务类型筛选
-const selectedType = ref<ServiceType | null>(null)
+const selectedCategory = ref<ServiceType | null>(null)
 
 // 根据筛选条件获取店铺列表
 const filteredStores = computed(() => {
   let stores = storeStore.stores;
 
   // 应用服务类型筛选
-  if (selectedType.value !== null) {
-    stores = stores.filter(store => store.serviceType === selectedType.value);
+  if (selectedCategory.value !== null) {
+    const category = selectedCategory.value
+    stores = stores.filter(store => store.categories.includes(category));
   }
 
   return stores;
 })
 
-const handleStoreClick = (storeId: number) => {
+const handleStoreClick = (id: number) => {
   // 跳转到店铺详情页
-  router.push(`/store/${storeId}`)
+  router.push(`/stores/${id}`)
 }
 
 // 创建新店铺
@@ -41,11 +44,6 @@ const handleCreateStore = () => {
   router.push('/stores/create')
 }
 
-// 页面标题
-const pageTitle = computed(() => {
-  return authStore.isAdmin ? '所有店铺' : '我的店铺';
-})
-
 // 加载店铺列表
 onMounted(async () => {
   const loadingInstance = ElLoading.service({
@@ -54,17 +52,7 @@ onMounted(async () => {
   })
 
   try {
-    // 根据用户角色获取不同的店铺列表
-    if (authStore.isAdmin) {
-      // 管理员获取所有店铺
-      await storeStore.fetchStores()
-    } else if (authStore.isMerchant) {
-      // 商户获取自己的店铺
-      await storeStore.fetchMerchantStores()
-    } else {
-      // 普通用户获取所有店铺
-      await storeStore.fetchStores()
-    }
+    await storeStore.fetchStores()
   } catch (error) {
     ElMessage.error('加载店铺列表失败')
   } finally {
@@ -76,37 +64,23 @@ onMounted(async () => {
 <template>
   <PageContainer>
     <template #actions>
-      <div class="header-container">
-        <h1>{{ pageTitle }}</h1>
-        <div class="header-actions">
-          <el-select
-            v-model="selectedType"
-            placeholder="选择服务类型"
-            clearable
-            class="type-filter"
-          >
-            <el-option
-              v-for="type in Object.values(ServiceType)"
-              :key="type"
-              :label="type"
-              :value="type"
-            />
-          </el-select>
-          <el-button type="primary" @click="handleCreateStore">
-            <el-icon><Plus /></el-icon>
+      <div class="header-actions">
+        <el-select v-model="selectedCategory" placeholder="选择服务类型" clearable class="type-filter">
+          <el-option v-for="type in Object.values(ServiceType)" :key="type" :label="type" :value="type" />
+        </el-select>
+        <div v-if="authStore.isMerchant" class="header-actions">
+          <BaseButton type="primary" @click="handleCreateStore">
+            <el-icon>
+              <Plus />
+            </el-icon>
             开设新店铺
-          </el-button>
+          </BaseButton>
         </div>
       </div>
     </template>
 
     <div class="store-grid">
-      <div
-        v-for="store in filteredStores"
-        :key="store.storeId"
-        class="store-grid-item"
-        @click="handleStoreClick(store.storeId)"
-      >
+      <div v-for="store in filteredStores" :key="store.id" class="store-grid-item" @click="handleStoreClick(store.id)">
         <StoreCard :store="store" />
       </div>
       <div v-if="filteredStores.length === 0" class="empty-state">
@@ -124,29 +98,29 @@ onMounted(async () => {
   margin-bottom: 24px;
 }
 
-.type-filter {
-  width: 200px;
-}
-
 .store-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(22vw, 1fr));
+  gap: 2vw;
+  padding: 2vh 1vw;
   margin: 0 auto;
+  place-items: center;
 }
 
 .store-grid-item {
   min-width: 0;
+  width: 100%;
   height: 100%;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {
   .store-grid {
     grid-template-columns: 1fr;
-    padding: 16px;
-    gap: 16px;
+    padding: 2vh 4vw;
+    gap: 3vh;
   }
 
   .header-container {
@@ -170,7 +144,13 @@ onMounted(async () => {
 
 .header-actions {
   display: flex;
-  gap: 16px;
+  gap: 2vw;
   align-items: center;
+}
+
+:deep(.el-select__wrapper) {
+  width: 11vw;
+  height: 5vh;
+  border-radius: 1vh;
 }
 </style>

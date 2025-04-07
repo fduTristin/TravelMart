@@ -4,4 +4,6 @@ export interface User {
   userRole: string
   userEmail: string
   userTel: string
+  userBio?: string
 }
+

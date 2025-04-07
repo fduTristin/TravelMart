@@ -3,7 +3,7 @@ import type { User } from '@/types/user'
 import { useAuthStore } from '@/stores/auth'
 
 export const userService = {
-  // 获取所有项目
+  // 获取所有用户
   getAll: async () => {
     console.log('Fetching all users...')
     const token = useAuthStore().token;
@@ -15,6 +15,7 @@ export const userService = {
     })
   },
 
+  //获取ID对应用户
   getById: async (id: number) => {
     console.log(`Fetching user with ID: ${id}`)
     const token = '';
@@ -25,7 +26,7 @@ export const userService = {
     })
   },
 
-  // 获取当前用户信息
+  // 获取当前用户
   getCurrentUser: async () => {
     const token = useAuthStore().token;
     return await api.get<User>('/profile', {

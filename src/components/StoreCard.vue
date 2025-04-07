@@ -8,17 +8,15 @@ const getServiceTypeStyle = (type: ServiceType) => {
   }
   return styles[type] || {}
 }
-import { ServiceType } from '@/stores/store'
 
-interface Store {
-  storeId: number
-  storeName: string
-  rating: number
-  isOpen: boolean
-  description?: string
-  imageUrl?: string
-  serviceType: ServiceType
+const getServiceTypeKey = (category: string): ServiceType | null => {
+  const keys = Object.keys(ServiceType) as Array<keyof typeof ServiceType>
+  const foundKey = keys.find(key => ServiceType[key] === category)
+  return foundKey ? ServiceType[foundKey] : null
 }
+
+import type { Store } from '@/types/store'
+import { ServiceType } from '@/types/store'
 
 defineProps<{
   store: Store
@@ -27,21 +25,25 @@ defineProps<{
 
 <template>
   <el-card class="store-card" :body-style="{ padding: '0px' }">
-    <img :src="store.imageUrl" class="image" />
+    <img :src="store.imageUrl || '/default-store.jpg'" class="image" />
     <div class="store-info">
       <div class="store-header">
         <h3>{{ store.storeName }}</h3>
-        <span class="service-type" :style="getServiceTypeStyle(store.serviceType)">
-          {{ store.serviceType }}
+      </div>
+      <div class="categories">
+        <span v-for="category in store.categories.split(',')" :key="category" class="category-tag"
+          :style="getServiceTypeStyle(getServiceTypeKey(category) || ServiceType.HOTEL)">
+          {{ category }}
         </span>
       </div>
-      <div class="rating">
+
+      <!-- <div class="rating">
         <el-rate v-model="store.rating" disabled show-score text-color="#ff9900" />
-      </div>
-      <div class="status" :class="{ 'is-open': store.isOpen }">
+      </div> -->
+      <!-- <div class="status" :class="{ 'is-open': store.isOpen }">
         {{ store.isOpen ? '营业中' : '休息中' }}
-      </div>
-      <p class="description">{{ store.description }}</p>
+      </div> -->
+      <!-- <p class="description">简介: {{ store.description }}</p> -->
     </div>
   </el-card>
 </template>
@@ -49,87 +51,61 @@ defineProps<{
 <style scoped>
 .store-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 1vh;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  height: 100%;
+  width: 100%;
+  height: 30vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .store-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .image {
   width: 100%;
-  height: 180px;
+  height: 20vh;
   object-fit: cover;
   object-position: center;
 }
 
 .store-info {
-  padding: 16px;
+  margin-left: 1vw;
+  margin-right: 1vw;
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.store-card.closed {
-  opacity: 0.8;
-}
-
-.store-image {
-  position: relative;
-  /* height: 200px; */
-}
-
-.store-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.status-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 4px 12px;
-  border-radius: 8px;
-  background-color: #f56c6c;
-  color: white;
-  font-size: 14px;
-}
-
-.status-badge.open {
-  background-color: #67c23a;
-}
-
-.store-info {
-  padding: 16px;
 }
 
 .store-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 1vh 0;
 }
 
 .store-header h3 {
   margin: 0;
-  font-size: 18px;
-  color: #2c3e50;
+  font-size: 1.9vh;
+  font-weight: 600;
 }
 
-.service-type {
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: white;
-  font-size: 12px;
+.categories {
+  display: flex;
+  gap: 0.5vw;
+  flex-wrap: wrap;
+}
+
+.category-tag {
+  padding: 0.2vh 0.5vw;
+  border-radius: 0.2vw;
+  font-size: 1.4vh;
   font-weight: 500;
 }
 
@@ -138,12 +114,10 @@ defineProps<{
 }
 
 .description {
-  margin: 0;
-  font-size: 14px;
+  margin-bottom: 1vh;
+  font-size: 1.5vh;
   color: #5c6b7c;
-  line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

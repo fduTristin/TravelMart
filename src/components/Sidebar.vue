@@ -5,6 +5,7 @@ import { House, User, Setting, SwitchButton } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import CustomDropdown from '@/components/CustomDropdown.vue'
+import { computed } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -31,13 +32,17 @@ const handleCommand = (command: string) => {
       break
   }
 }
+
+const storeMenuLabel = computed(() => {
+  return authStore.isMerchant ? '我的店铺' : authStore.isAdmin?'店铺管理':'店铺列表'
+})
 </script>
 
 <template>
-  <el-aside width="240px" class="sidebar">
+  <el-aside class="sidebar">
     <div class="logo-container">
       <router-link to="/" class="logo">
-        <img src="https://www.logosc.cn/oss/icons/2021/12/10/i_1qm0jc_8MlgUS.png" alt="logo" class="logo-img" />
+        <img src="/logo.png" alt="logo" class="logo-img" />
         <span class="logo-text">旅游商城</span>
       </router-link>
       <el-divider class="logo-divider" />
@@ -57,10 +62,11 @@ const handleCommand = (command: string) => {
         </el-icon>
         <span>用户管理</span>
       </el-menu-item>
-      <el-menu-item v-if="authStore.isMerchant || authStore.isAdmin" index="/stores" class="menu-item">        <el-icon>
+      <el-menu-item index="/stores" class="menu-item">
+        <el-icon>
           <Setting />
         </el-icon>
-        <span>店铺管理</span>
+        <span>{{ storeMenuLabel }}</span>
       </el-menu-item>
     </el-menu>
 
@@ -69,7 +75,7 @@ const handleCommand = (command: string) => {
       <custom-dropdown>
         <template #trigger>
           <div class="user-info-content">
-            <el-avatar :src="'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" class="custom-avatar" />
+            <el-avatar :src="'/avatar.png'" class="custom-avatar" />
             <span class="username">{{ authStore.user?.sub }}</span>
           </div>
         </template>
@@ -92,7 +98,7 @@ const handleCommand = (command: string) => {
 .sidebar {
   background: inherit;
   height: inherit;
-  width: 16vw;
+  width: 18vw;
   display: flex;
   flex-direction: column;
   align-items: center; /* 横向居中 */
@@ -100,9 +106,10 @@ const handleCommand = (command: string) => {
 }
 
 .logo-container {
-  padding: 15px;
+  padding: 0;
   position: relative;
-  margin-bottom: 20px;
+  margin-top: 2vh;
+  margin-bottom: 4vh;
 }
 
 .logo {
@@ -121,7 +128,7 @@ const handleCommand = (command: string) => {
 }
 
 .logo-text {
-  font-size: 30px;
+  font-size: 2.1vw;
   font-weight: 600;
   font-family: "Noto Sans SC";
   color: #073c62;
@@ -129,7 +136,7 @@ const handleCommand = (command: string) => {
 }
 
 .logo-divider {
-  margin: 16px 0 8px 0;
+  margin-top : 1vh;
   background-color: rgba(199, 20, 20, 0.1);
 }
 
@@ -146,23 +153,23 @@ const handleCommand = (command: string) => {
 
 .menu-item {
   height: 6vh;
-  font-size: 15px;
+  font-size: 1vw;
   font-weight: 500;
   font-family: "Noto Sans SC";
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-bottom: 1.5vh;
-  border-radius: 12px;
+  border-radius: 0.5vw;
   color: #275f94;
   display: flex;
   align-items: center;
   justify-content: center; /* 横向居中 */
   width: 14vw;
-  padding: 0 16px;
+  padding: 0 1vh;
 }
 
 .menu-item .el-icon {
   color: #275f94;
-  font-size: 22px;
+  font-size: 1.5vw;
   width: 2.5vw;
   height: 2.5vw;
   margin-right: 1.2vw;
@@ -170,7 +177,7 @@ const handleCommand = (command: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 0.5vw;
   background-color: #fff;
   box-shadow: 0 4px 12px rgba(162, 163, 164, 0.25);
   transition: background-color 0.3s;
@@ -179,7 +186,7 @@ const handleCommand = (command: string) => {
 .menu-item span {
   flex-grow: 1;
   white-space: nowrap;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.05vh;
 }
 
 .menu-item.is-active .el-icon {
@@ -203,12 +210,11 @@ const handleCommand = (command: string) => {
 }
 
 .user-info {
-  position: relative; /* 确保子元素的绝对定位基于 user-info */
+  position: relative;
   padding: 1vh;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: auto;
   display: flex;
-  justify-content: center; /* 横向居中 */
+  justify-content: center;
   width: 100%;
 }
 
@@ -237,7 +243,7 @@ const handleCommand = (command: string) => {
 
 .username {
   color: #275f94;
-  font-size: 20px;
+  font-size: 3vh;
   font-weight: 700;
   transition: color 0.3s ease;
   text-align: center;
@@ -249,7 +255,7 @@ const handleCommand = (command: string) => {
   border: 2px solid #275f94;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 1vh; /* 设置为方形 */
+  border-radius: 1vh;
 }
 
 .custom-avatar:hover {

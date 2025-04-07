@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStoreStore, ServiceType } from '@/stores/store'
+import { useStoreStore } from '@/stores/stores'
+import { ServiceType } from '@/types/store'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import PageContainer from '@/components/PageContainer.vue'
 import { ArrowLeft } from '@element-plus/icons-vue'
+import BaseButton from '@/components/BaseButton.vue'
 
 const router = useRouter()
 const storeStore = useStoreStore()
 
 // 表单数据
 interface StoreForm {
-  shopName: string
+  storeName: string
   categories: string[]
   ownerIdNumber: string
   description: string
@@ -22,7 +24,7 @@ interface StoreForm {
 }
 
 const formData = ref<StoreForm>({
-  shopName: '',
+  storeName: '',
   categories: [],
   ownerIdNumber: '',
   description: '',
@@ -80,7 +82,7 @@ const validateIdNumber = (rule: unknown, value: string, callback: (error?: Error
 
 // 表单规则
 const rules = ref<FormRules>({
-  shopName: [
+  storeName: [
     { required: true, message: '请输入店铺名称', trigger: 'blur' },
     { max: 20, message: '店铺名称不能超过20个字符', trigger: 'blur' }
   ],
@@ -140,7 +142,7 @@ const handleSubmit = async () => {
         // 调用创建店铺的API
         const newStore = await storeStore.createStore(submitData)
         ElMessage.success('店铺创建成功')
-        router.push(`/store/${newStore.storeId}`)
+        router.push(`/stores/${newStore.id}`)
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : '未知错误'
         ElMessage.error(`创建店铺失败: ${errorMessage}`)
@@ -156,109 +158,174 @@ const handleSubmit = async () => {
 
 <template>
   <PageContainer title="开设新店铺">
-    <template #actions>
-      <el-button @click="handleBack">
-        <el-icon><ArrowLeft /></el-icon>
-        返回
-      </el-button>
-    </template>
+    <div class="centered-form-container">
+      <div class="form-container">
+        <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px" class="form">
+          <el-form-item label="店铺名称" prop="storeName">
+            <el-input v-model="formData.storeName" placeholder="请输入店铺名称" />
+          </el-form-item>
 
-    <div class="create-store-form">
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="rules"
-        label-width="120px"
-        class="form"
-      >
-        <el-form-item label="店铺名称" prop="shopName">
-          <el-input v-model="formData.shopName" placeholder="请输入店铺名称" />
-        </el-form-item>
+          <el-form-item label="服务类型" prop="categories">
+            <el-checkbox-group v-model="formData.categories">
+              <el-checkbox v-for="type in Object.values(ServiceType)" :key="type" :label="type">
+                {{ type }}
+              </el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
 
-        <el-form-item label="服务类型" prop="categories">
-          <el-checkbox-group v-model="formData.categories">
-            <el-checkbox
-              v-for="type in Object.values(ServiceType)"
-              :key="type"
-              :label="type"
-            >
-              {{ type }}
-            </el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
+          <el-form-item label="身份证号" prop="ownerIdNumber">
+            <el-input v-model="formData.ownerIdNumber" placeholder="请输入身份证号" />
+          </el-form-item>
 
-        <el-form-item label="身份证号" prop="ownerIdNumber">
-          <el-input v-model="formData.ownerIdNumber" placeholder="请输入身份证号" />
-        </el-form-item>
+          <el-form-item label="商店简介" prop="description">
+            <el-input v-model="formData.description" type="textarea" :rows="4" placeholder="请输入商店简介" />
+          </el-form-item>
 
-        <el-form-item label="商店简介" prop="description">
-          <el-input
-            v-model="formData.description"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入商店简介"
-          />
-        </el-form-item>
+          <el-form-item label="备案地址" prop="registrationAddress">
+            <el-input v-model="formData.registrationAddress" placeholder="请输入备案地址" />
+          </el-form-item>
 
-        <el-form-item label="备案地址" prop="registrationAddress">
-          <el-input v-model="formData.registrationAddress" placeholder="请输入备案地址" />
-        </el-form-item>
+          <el-form-item label="注册资金" prop="registeredCapital">
+            <el-input-number v-model="formData.registeredCapital" :min="1000" :step="1000" :precision="2" />
+          </el-form-item>
 
-        <el-form-item label="注册资金" prop="registeredCapital">
-          <el-input-number
-            v-model="formData.registeredCapital"
-            :min="1000"
-            :step="1000"
-            :precision="2"
-          />
-        </el-form-item>
+          <el-form-item label="注册时间" prop="registrationDate">
+            <el-date-picker v-model="formData.registrationDate" type="date" placeholder="选择注册时间" format="YYYY-MM-DD"
+              value-format="YYYY-MM-DD" />
+          </el-form-item>
 
-        <el-form-item label="注册时间" prop="registrationDate">
-          <el-date-picker
-            v-model="formData.registrationDate"
-            type="date"
-            placeholder="选择注册时间"
-            format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD"
-          />
-        </el-form-item>
-
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleSubmit"
-            :loading="loading"
-          >
-            创建店铺
-          </el-button>
-          <el-button @click="handleBack" :disabled="loading">取消</el-button>
-        </el-form-item>
-      </el-form>
+          <el-form-item>
+            <BaseButton type="primary" @click="handleSubmit" :loading="loading">
+              创建店铺
+            </BaseButton>
+            <BaseButton @click="handleBack" :disabled="loading">
+              取消
+            </BaseButton>
+          </el-form-item>
+        </el-form>
+      </div>
     </div>
   </PageContainer>
 </template>
 
 <style scoped>
-.create-store-form {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+/* 居中表单容器 */
+.centered-form-container {
+  padding: 20px;
+  z-index: 1;
+  animation: fadeIn 0.3s ease-out;
+  /* 淡入动画 */
+}
+
+/* 表单容器样式 */
+.form-container {
+  background: rgb(252, 252, 252);
+  border-radius: 1vw;
+  width: 60vw;
+  height: 70vh;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 2vh 2vw 2vh 2vw;
 }
 
 .form {
   margin-top: 20px;
 }
 
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 调整表单元素样式 */
+:deep(.el-form-item) {
+  margin-bottom: 2.5vh;
+  display: flex;
+  align-items: center;
+}
+:deep(.el-form-item__label) {
+  font-size: 2vh;
+  font-weight: 600;
+  color: #15324d;
+  margin-right: 1vw;
+}
+
+:deep(.el-input__wrapper),
+:deep(.el-textarea__wrapper) {
+  height: 4vh;
+  box-shadow: none;
+  border: 1px solid var(--el-border-color);
+  transition: all 0.2s;
+}
+
+:deep(.el-input__wrapper:hover),
+:deep(.el-textarea__wrapper:hover) {
+  border-color: var(--el-color-primary);
+}
+
+:deep(.el-radio__label),
+:deep(.el-input__inner),
+:deep(.el-textarea__inner) {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 1.9vh;
+}
+
+:deep(.el-form-item:first-child) {
+  margin-top: 4vh;
+}
+
+:deep(.el-form-item:last-child) {
+  margin-top: 4vh;
+  margin-bottom: 4vh;
+  margin-left: 11vw;
+}
+
+:deep(.el-form-item:last-child .el-form-item__content) {
+  gap: 2vw;
+  /* 按钮间距 */
+}
+
+:deep(.el-input) {
+  display: flex;
+  max-width: 20vw;
+}
+
+:deep(.el-radio.is-checked .el-radio__label) {
+  color: #275f94;
+  font-weight: bold;
+}
+
+:deep(.el-radio.is-checked .el-radio__input .el-radio__inner) {
+  border-color: #275f94;
+  background-color: #275f94;
+}
+
 :deep(.el-checkbox-group) {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 1vw;
+}
+
+:deep(.el-checkbox__inner) {
+  width: 2vh;
+  height: 2vh;
+  border-radius: 0.2vw;
+  border-color: #275f94;
+}
+
+:deep(.el-checkbox__label) {
+  font-size: 2vh;
+  color: #15324d;
 }
 
 :deep(.el-input-number) {
-  width: 240px;
+  width: 12vw;
 }
 </style>

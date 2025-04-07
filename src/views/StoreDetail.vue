@@ -1,103 +1,95 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import PageContainer from '@/components/PageContainer.vue'
-import { useStoreStore } from '@/stores/store'
+import { useStoreStore } from '@/stores/stores'
+import { useAuthStore } from '@/stores/auth'
+import type { Store } from '@/types/store'
 
 const route = useRoute()
-const router = useRouter()
 const storeStore = useStoreStore()
+const authStore = useAuthStore()
 
 // 店铺数据
-const store = ref(null)
+const store = ref<Store | null>(null)
 const loading = ref(true)
 const error = ref(false)
 
-// 监听路由参数变化并获取店铺数据
-watchEffect(() => {
+// 获取店铺数据
+const fetchStore = async () => {
   const storeId = Number(route.params.id)
   loading.value = true
   error.value = false
-  
-  const foundStore = storeStore.stores.find(s => s.storeId === storeId)
-  if (foundStore) {
-    store.value = foundStore
-    loading.value = false
-  } else {
+
+  try {
+    // 确保店铺列表已加载
+    if (storeStore.stores.length === 0) {
+      await storeStore.fetchStores()
+    }
+    // 查找店铺
+    store.value = storeStore.stores.find(s => s.id === storeId) || null
+    if (!store.value) {
+      throw new Error('店铺未找到')
+    }
+  } catch (err) {
+    console.error('Failed to fetch store:', err)
     error.value = true
+  } finally {
     loading.value = false
   }
+}
+
+// 加载店铺数据
+onMounted(() => {
+  fetchStore()
 })
+
+// 监听路由参数变化
+watch(
+  () => route.params.id,
+  () => {
+    fetchStore()
+  }
+)
 </script>
 
 <template>
   <PageContainer>
-    <div class="store-detail">
+    <div v-if="loading" class="loading-placeholder">加载中...</div>
+    <div v-else-if="error" class="error-placeholder">加载店铺数据失败</div>
+    <div v-else class="store-detail">
       <!-- 店铺基本信息 -->
       <div class="store-header">
         <div class="store-cover">
           <img :src="store.imageUrl" :alt="store.storeName" />
-          <div class="status-badge" :class="{ 'open': store.isOpen }">
+          <!-- <div class="status-badge" :class="{ 'open': store.isOpen }">
             {{ store.isOpen ? '营业中' : '已打烊' }}
-          </div>
+          </div> -->
         </div>
         <div class="store-info">
-          <h1>{{ store.storeName }}</h1>
-          <div class="rating">
-            <el-rate
-              v-model="store.rating"
-              disabled
-              show-score
-              text-color="#ff9900"
-              score-template="{value}"
-            />
+          <h1>{{ store?.storeName }}</h1>
+          <div v-if="authStore.isAdmin" class="description">
+            商户ID: {{ store?.ownerId }}
           </div>
-          <p class="description">{{ store.description }}</p>
+          <!-- <div class="rating">
+            <el-rate :model-value="store.rating || 0" disabled show-score text-color="#ff9900" score-template="{value}" />
+          </div> -->
+          <p class="description">备案地址: {{ store?.registrationAddress }}</p>
+          <p class="description">注册资金: {{ store?.registeredCapital }}元</p>
+          <p class="description">注册时间: {{ store?.registrationDate }}</p>
+          <div v-if="authStore.isAdmin || authStore.isMerchant" class="description">
+            注册人身份证号: {{ store?.ownerIdNumber }}
+          </div>
           <div class="info-grid">
             <div class="info-item">
-              <el-icon><Location /></el-icon>
-              <span>{{ store.address }}</span>
-            </div>
-            <div class="info-item">
-              <el-icon><Phone /></el-icon>
-              <span>{{ store.phone }}</span>
-            </div>
-            <div class="info-item">
-              <el-icon><Clock /></el-icon>
-              <span>{{ store.businessHours }}</span>
+              <span>简介: </span>
+              <span>{{ store.description }}</span>
             </div>
           </div>
           <div class="categories">
-            <el-tag
-              v-for="category in store.categories"
-              :key="category"
-              class="category-tag"
-              effect="plain"
-            >
+            <el-tag v-for="category in store.categories.split(',')" :key="category" class="category-tag" effect="plain">
               {{ category }}
             </el-tag>
-          </div>
-        </div>
-      </div>
-
-      <!-- 商品列表 -->
-      <div class="items-section">
-        <h2>商品列表</h2>
-        <div class="items-grid">
-          <div
-            v-for="item in store.items"
-            :key="item.id"
-            class="item-card"
-          >
-            <img :src="item.imageUrl" :alt="item.name" class="item-image" />
-            <div class="item-info">
-              <h3>{{ item.name }}</h3>
-              <p class="item-description">{{ item.description }}</p>
-              <div class="item-price">
-                <span class="price">¥{{ item.price }}</span>
-                <el-button type="primary" size="small">加入购物车</el-button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -106,10 +98,17 @@ watchEffect(() => {
 </template>
 
 <style scoped>
+.loading-placeholder,
+.error-placeholder {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+}
+
 .store-detail {
-  max-width: 1200px;
+  max-width: 60vw;
+  height: 80vh;
   margin: 0 auto;
-  padding: 24px;
 }
 
 .store-header {
@@ -124,7 +123,7 @@ watchEffect(() => {
 
 .store-cover {
   position: relative;
-  height: 400px;
+  height: 40vh;
   width: 100%;
 }
 
@@ -170,7 +169,7 @@ watchEffect(() => {
   font-size: 16px;
   color: #5c6b7c;
   line-height: 1.8;
-  margin-bottom: 32px;
+  margin-bottom: 1.2vh;
   max-width: 800px;
 }
 
@@ -178,10 +177,10 @@ watchEffect(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 24px;
-  margin-bottom: 32px;
+  margin-top: 1.6vh;
   background: #f8f9fa;
   padding: 24px;
-  border-radius: 12px;
+  border-radius: 0.8vw;
 }
 
 .info-item {
@@ -192,11 +191,6 @@ watchEffect(() => {
   font-size: 16px;
 }
 
-.info-item .el-icon {
-  font-size: 20px;
-  color: #409eff;
-}
-
 .categories {
   display: flex;
   gap: 12px;
@@ -205,113 +199,8 @@ watchEffect(() => {
 }
 
 .category-tag {
-  font-size: 14px;
-  padding: 6px 16px;
-  border-radius: 20px;
-}
-
-.items-section {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-.items-section h2 {
-  margin: 0 0 32px;
-  font-size: 28px;
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 32px;
-}
-
-.item-card {
-  background: #f8f9fa;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  border: 1px solid #ebeef5;
-}
-
-.item-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-.item-image {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-}
-
-.item-info {
-  padding: 20px;
-}
-
-.item-info h3 {
-  margin: 0 0 12px;
-  font-size: 20px;
-  color: #2c3e50;
-  font-weight: 500;
-}
-
-.item-description {
-  margin: 0 0 20px;
-  font-size: 14px;
-  color: #5c6b7c;
-  line-height: 1.6;
-}
-
-.item-price {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.price {
-  font-size: 24px;
-  font-weight: 600;
-  color: #f56c6c;
-}
-
-@media (max-width: 768px) {
-  .store-detail {
-    padding: 16px;
-  }
-
-  .store-cover {
-    height: 250px;
-  }
-
-  .store-info {
-    padding: 20px;
-  }
-
-  .store-info h1 {
-    font-size: 24px;
-  }
-
-  .info-grid {
-    grid-template-columns: 1fr;
-    padding: 16px;
-  }
-
-  .items-section {
-    padding: 20px;
-  }
-
-  .items-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .item-image {
-    height: 200px;
-  }
+  font-size: 1.6vh;
+  padding: 1.2vh 0.6vw;
+  border-radius: 1vh;
 }
 </style>
