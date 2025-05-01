@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { User } from '@/types/user'
+import type { User, UpdateUserForm } from '@/types/user'
 import { useAuthStore } from '@/stores/auth'
 
 export const userService = {
@@ -34,5 +34,15 @@ export const userService = {
         'Authorization': `Bearer ${token}`,
       },
     })
-  }
+  },
+
+  // 更新用户
+  updateUser: async (id: number, userData: UpdateUserForm) => {
+    const token = useAuthStore().token;
+    return await api.put<User>(`/users/${id}`, userData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+  },
 }

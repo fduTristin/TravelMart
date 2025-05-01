@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { User } from '@/types/user'
+import type { User, UpdateUserForm } from '@/types/user'
 import { userService } from '@/services/userService'
 
 export const useUserStore = defineStore('users', () => {
@@ -64,6 +64,28 @@ export const useUserStore = defineStore('users', () => {
     }
   }
 
+  // 更新用户
+  async function updateUser(id: number, userData: UpdateUserForm) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await userService.updateUser(id, userData)
+      const updatedUser = response.data
+      const index = users.value.findIndex((u) => u.userId === updatedUser.userId)
+      if (index !== -1) {
+        users.value[index] = updatedUser
+      } else {
+        users.value.push(updatedUser)
+      }
+    } catch (e) {
+      error.value = 'Failed to update user'
+      console.error('Failed to update user:', e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     // 状态
     users,
@@ -74,5 +96,6 @@ export const useUserStore = defineStore('users', () => {
     fetchUsers,
     fetchUserById,
     fetchCurrentUser,
+    updateUser,
   }
 }) 

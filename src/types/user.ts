@@ -7,3 +7,9 @@ export interface User {
   userBio?: string
 }
 
+export interface UpdateUserForm {
+  userName: string
+  userEmail: string
+  userTel: string
+}
+
