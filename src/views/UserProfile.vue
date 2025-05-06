@@ -34,7 +34,7 @@ const fetchUserProfile = async () => {
 
 const route = useRoute()
 
-// 监听路由变化，当用户发生变化时，重新获取用户信息
+// 监听token变化，切换用户重新加载数据
 watch(
     () => authStore.token,
     fetchUserProfile,

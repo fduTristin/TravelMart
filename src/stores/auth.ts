@@ -113,7 +113,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (axiosError.response?.data?.message) {
         error.value = axiosError.response.data.message
       } else {
-        error.value = '注册失败'
+        error.value = '用户名已存在！'
       }
       throw err
     } finally {
