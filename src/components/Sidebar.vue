@@ -26,7 +26,7 @@ const fetchCurrentUser = async () => {
 
 // 组件挂载时获取用户信息
 onMounted(() => {
-  if (authStore.isAuthenticated) {
+  if (authStore.isAuthenticated && !authStore.isAdmin) {
     fetchCurrentUser()
   }
 })
@@ -96,11 +96,11 @@ const storeMenuLabel = computed(() => {
         <template #trigger>
           <div class="user-info-content">
             <el-avatar :src="'/avatar.png'" class="custom-avatar" />
-            <span class="username">{{ userName }}</span>
+            <span class="username">{{ userName || 'admin' }}</span>
           </div>
         </template>
         <template #menu>
-          <div @click="handleCommand('profile')">
+          <div v-if="!authStore.isAdmin" @click="handleCommand('profile')">
             <el-icon><User /></el-icon>
             个人信息
           </div>
