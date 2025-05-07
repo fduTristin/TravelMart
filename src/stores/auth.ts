@@ -6,6 +6,7 @@ import type { AxiosError } from 'axios'
 
 interface JwtPayload {
   sub: string
+  userId: number
   userRole: 'ADMIN' | 'MERCHANT' | 'CUSTOMER'
   iat: number
   exp: number
@@ -45,6 +46,9 @@ export const useAuthStore = defineStore('auth', () => {
       return null
     }
   })
+
+  // 获取用户ID
+  const userId = computed(() => user.value?.userId || null)
 
   // 用户角色
   const role = computed(() => user.value?.userRole || null)
@@ -129,6 +133,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     token,
     user,
+    userId,
     role,
     isMerchant,
     isAdmin,

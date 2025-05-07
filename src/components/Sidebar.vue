@@ -4,18 +4,38 @@ import { ElAside, ElMenu, ElMenuItem, ElIcon, ElDivider, ElAvatar } from 'elemen
 import { House, User, Setting, SwitchButton } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/users'
 import CustomDropdown from '@/components/CustomDropdown.vue'
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const userStore = useUserStore()
+const userName = ref('')
+
+// 获取当前用户信息
+const fetchCurrentUser = async () => {
+  try {
+    const response = await userStore.fetchCurrentUser()
+    userName.value = response.data.userName
+  } catch (error) {
+    console.error('Failed to fetch user:', error)
+  }
+}
+
+// 组件挂载时获取用户信息
+onMounted(() => {
+  if (authStore.isAuthenticated) {
+    fetchCurrentUser()
+  }
+})
 
 // 处理登出
 const handleLogout = () => {
   // 保存用户名到 localStorage
-  if (authStore.user?.sub) {
-    localStorage.setItem('lastUsername', authStore.user.sub)
+  if (userName.value) {
+    localStorage.setItem('lastUsername', userName.value)
   }
   authStore.logout()
   router.push('/login')
@@ -76,7 +96,7 @@ const storeMenuLabel = computed(() => {
         <template #trigger>
           <div class="user-info-content">
             <el-avatar :src="'/avatar.png'" class="custom-avatar" />
-            <span class="username">{{ authStore.user?.sub }}</span>
+            <span class="username">{{ userName }}</span>
           </div>
         </template>
         <template #menu>
