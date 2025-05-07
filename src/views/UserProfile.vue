@@ -2,13 +2,16 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useUserStore } from '@/stores/users'
+import { useAccountStore } from '@/stores/accounts'
 import type { User, UpdateUserForm } from '@/types/user'
+import type { Account } from '@/types/account'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/BaseButton.vue'
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
+const accountStore = useAccountStore()
 const loading = ref(true)
 const editing = ref(false) // 是否处于编辑模式
 const user = ref<User>({
@@ -19,6 +22,12 @@ const user = ref<User>({
     userTel: '',
     userBio: '',
 })
+
+const account = ref<Account | null>({
+    accountStatus: '',
+    accountBalance: 0
+})
+
 const formData = ref<UpdateUserForm>({
     userName: '',
     userEmail: '',
@@ -30,7 +39,9 @@ const fetchUserProfile = async () => {
     loading.value = true
     try {
         const response = await userStore.fetchCurrentUser()
+        await accountStore.fetchCurrentAccount()
         user.value = response.data
+        account.value = accountStore.accountSelf
         formData.value = {
             userName: user.value.userName,
             userEmail: user.value.userEmail,
@@ -65,8 +76,6 @@ const saveUserProfile = async () => {
         loading.value = false
     }
 }
-
-const route = useRoute()
 
 // 监听用户变化，切换用户重新加载数据
 
@@ -144,14 +153,11 @@ onMounted(() => {
             <!-- 新增账户信息，仅非ADMIN用户显示 -->
             <div v-if="user.userRole !== 'ADMIN'" class="account-section">
                 <el-form label-width="10vh" class="form">
+                    <el-form-item label="账户余额">
+                        <span>{{ account?.accountBalance || 0 }}</span>
+                    </el-form-item>
                     <el-form-item label="账户状态">
-                        <span>{{ user.userRole === 'MERCHANT' ? '活跃' : '正常' }}</span>
-                    </el-form-item>
-                    <el-form-item label="注册时间">
-                        <span>2023-01-01</span>
-                    </el-form-item>
-                    <el-form-item label="最后登录">
-                        <span>2023-10-01</span>
+                        <span>{{ account?.accountStatus }}</span>
                     </el-form-item>
                 </el-form>
             </div>
