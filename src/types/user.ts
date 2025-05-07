@@ -8,8 +8,8 @@ export interface User {
 }
 
 export interface UpdateUserForm {
-  userName: string
-  userEmail: string
-  userTel: string
+  userName: string |  null
+  userEmail: string | null
+  userTel: string | null
 }
 

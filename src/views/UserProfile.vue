@@ -48,13 +48,19 @@ const fetchUserProfile = async () => {
 const saveUserProfile = async () => {
     try {
         loading.value = true
-        await userStore.updateUser(user.value.userId, formData.value)
+        // 检查哪些字段未修改，未修改的字段设置为 null
+        const payload = {
+            userName: formData.value.userName !== user.value.userName ? formData.value.userName : null,
+            userEmail: formData.value.userEmail !== user.value.userEmail ? formData.value.userEmail : null,
+            userTel: formData.value.userTel !== user.value.userTel ? formData.value.userTel : null,
+        }
+        await userStore.updateUser(payload)
         ElMessage.success('用户信息更新成功')
         editing.value = false
         fetchUserProfile()
-    } catch (error) {
-        console.error('Failed to update user profile:', error)
-        ElMessage.error('更新用户信息失败')
+    } catch (error: any) {
+        console.error('用户信息更新失败:', error)
+        ElMessage.error(error.message || '用户信息更新失败')
     } finally {
         loading.value = false
     }
@@ -65,9 +71,9 @@ const route = useRoute()
 // 监听用户变化，切换用户重新加载数据
 
 watch(() => authStore.user, () => {
-  if (authStore.token) {
-    fetchUserProfile()
-  }
+    if (authStore.token) {
+        fetchUserProfile()
+    }
 }, { deep: true })
 
 
@@ -251,13 +257,13 @@ span {
 :deep(.el-radio__label),
 :deep(.el-input__inner),
 :deep(.el-textarea__inner) {
-  font-family: "Noto Sans SC", sans-serif;
-  font-size: 2vh;
-  height: 3.5vh;
+    font-family: "Noto Sans SC", sans-serif;
+    font-size: 2vh;
+    height: 3.5vh;
 }
 
 :deep(.el-input__wrapper:hover),
 :deep(.el-textarea__wrapper:hover) {
-  border-color: #275f94;
+    border-color: #275f94;
 }
 </style>

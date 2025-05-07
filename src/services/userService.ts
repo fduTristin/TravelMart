@@ -37,12 +37,16 @@ export const userService = {
   },
 
   // 更新用户
-  updateUser: async (id: number, userData: UpdateUserForm) => {
+  updateUser: async (userData: UpdateUserForm) => {
     const token = useAuthStore().token;
-    return await api.put<User>(`/users/${id}`, userData, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
+    try {
+      return await api.patch(`/users/me/profile`, userData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+    } catch (error: any) {
+      throw error
+    }
   },
 }

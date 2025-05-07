@@ -65,21 +65,12 @@ export const useUserStore = defineStore('users', () => {
   }
 
   // 更新用户
-  async function updateUser(id: number, userData: UpdateUserForm) {
+  async function updateUser(userData: UpdateUserForm) {
     loading.value = true
     error.value = null
     try {
-      const response = await userService.updateUser(id, userData)
-      const updatedUser = response.data
-      const index = users.value.findIndex((u) => u.userId === updatedUser.userId)
-      if (index !== -1) {
-        users.value[index] = updatedUser
-      } else {
-        users.value.push(updatedUser)
-      }
+      const response = await userService.updateUser(userData)
     } catch (e) {
-      error.value = 'Failed to update user'
-      console.error('Failed to update user:', e)
       throw e
     } finally {
       loading.value = false

@@ -112,13 +112,6 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.post('/auth/register', userData)
       return response.data
     } catch (err: unknown) {
-      // 处理错误响应
-      const axiosError = err as AxiosError<ErrorResponse>
-      if (axiosError.response?.data?.message) {
-        error.value = axiosError.response.data.message
-      } else {
-        error.value = '用户名已存在！'
-      }
       throw err
     } finally {
       loading.value = false
