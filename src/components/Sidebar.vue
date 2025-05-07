@@ -45,7 +45,7 @@ const handleLogout = () => {
 const handleCommand = (command: string) => {
   switch (command) {
     case 'profile':
-      router.push('/profile')
+      router.push('/users/me/profile')
       break
     case 'logout':
       handleLogout()

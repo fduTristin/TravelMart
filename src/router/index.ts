@@ -66,7 +66,7 @@ const routes: RouteRecordRaw[] = [
     }),
   },
   {
-    path: '/profile',
+    path: '/users/me/profile',
     name: 'profile',
     component: () => import('@/views/UserProfile.vue'),
     meta: {

@@ -29,7 +29,7 @@ export const userService = {
   // 获取当前用户
   getCurrentUser: async () => {
     const token = useAuthStore().token;
-    return await api.get<User>('/profile', {
+    return await api.get<User>('/users/me/profile', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },

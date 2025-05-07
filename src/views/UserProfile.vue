@@ -230,7 +230,7 @@ onMounted(() => {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 2vh;
+    gap: 1.5vh;
 }
 
 .el-form-item {
