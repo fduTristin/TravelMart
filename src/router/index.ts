@@ -10,7 +10,6 @@ declare module 'vue-router' {
     requiresAuth?: boolean
     keepAlive?: boolean
     hideSidebar?: boolean
-    needRefresh?: boolean
   }
 }
 
@@ -155,16 +154,6 @@ router.beforeEach((to, from, next) => {
     document.title = `${title} - 旅游商城`
     next()
   }
-})
-
-// 全局前置守卫
-router.beforeEach((to, from, next) => {
-  // 如果是导航到个人资料页面，添加一个标记表明需要刷新数据
-  if (to.name === 'profile' || to.name === 'stores') {
-    to.meta.needRefresh = true
-  }
-
-  next()
 })
 
 // 全局后置钩子
