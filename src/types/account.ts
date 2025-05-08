@@ -5,3 +5,7 @@ export interface Account {
     accountStatus: string
 }
 
+export interface AccountBalanceUpdateForm {
+    amountIncrement: number
+}
+

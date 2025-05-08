@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { User, UpdateUserForm } from '@/types/user'
-import type { Account } from '@/types/account'
+import type { Account, AccountBalanceUpdateForm } from '@/types/account'
 import { accountService } from '@/services/accountService'
 
 export const useAccountStore = defineStore('accounts', () => {
@@ -30,10 +29,27 @@ export const useAccountStore = defineStore('accounts', () => {
         }
     }
 
+    // 账户充值
+    async function updateAccountBalance(accountdata: AccountBalanceUpdateForm) {
+        loading.value = true
+        error.value = null
+        try {
+            const response = await accountService.updateAccountBalance(accountdata)
+            currentAccount.value = response.data
+        } catch (e) {
+            error.value = 'Failed to update account balance'
+            console.error('Failed to update account balance:', e)
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
+
     return {
         currentAccount,
         loading,
         error,
         fetchCurrentAccount,
+        updateAccountBalance,
     }
 })
