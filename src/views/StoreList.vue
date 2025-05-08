@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/auth'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElLoading } from 'element-plus'
 import BaseButton from '@/components/BaseButton.vue'
+import type { Store } from '@/types/store'
 
 const router = useRouter()
 const storeStore = useStoreStore()
@@ -18,7 +19,9 @@ const authStore = useAuthStore()
 const selectedCategory = ref<ServiceType | null>(null)
 
 // 根据筛选条件获取店铺列表
-const filteredStores = computed(() => {
+const filteredStores = ref<Store[]>([])
+
+const filterStores = () => {
   let stores = storeStore.stores;
 
   // 应用服务类型筛选
@@ -27,8 +30,8 @@ const filteredStores = computed(() => {
     stores = stores.filter(store => store.categories.includes(category));
   }
 
-  return stores;
-})
+  filteredStores.value = stores
+}
 
 const handleStoreClick = (id: number) => {
   // 跳转到店铺详情页
@@ -53,6 +56,7 @@ const loadStores = async () => {
 
   try {
     await storeStore.fetchStores()
+    filterStores()
   } catch (error) {
     ElMessage.error('加载店铺列表失败')
   } finally {

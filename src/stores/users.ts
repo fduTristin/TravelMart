@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { User, UpdateUserForm } from '@/types/user'
+import type { User, UpdateUserDTO } from '@/types/user'
 import { userService } from '@/services/userService'
 
 export const useUserStore = defineStore('users', () => {
@@ -72,7 +72,7 @@ export const useUserStore = defineStore('users', () => {
   }
 
   // 更新用户
-  async function updateUser(userData: UpdateUserForm) {
+  async function updateUser(userData: UpdateUserDTO) {
     loading.value = true
     error.value = null
     try {
