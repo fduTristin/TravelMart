@@ -29,7 +29,7 @@ export const userService = {
   // 获取当前用户
   getCurrentUser: async () => {
     const token = useAuthStore().token;
-    return await api.get<User>('/users/me/profile', {
+    return await api.get<User>('/profile', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -40,7 +40,7 @@ export const userService = {
   updateUser: async (userData: UpdateUserDTO) => {
     const token = useAuthStore().token;
     try {
-      return await api.patch(`/users/me/profile`, userData, {
+      return await api.patch(`/profile`, userData, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
