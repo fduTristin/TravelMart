@@ -11,7 +11,20 @@ const storeStore = useStoreStore()
 const authStore = useAuthStore()
 
 // 店铺数据
-const store = ref<Store | null>(null)
+const store = ref<Store>(
+  {
+    id: 0,
+    storeName: '',
+    categories: [''],
+    ownerIdNumber: '',
+    description: '',
+    registrationAddress: '',
+    registeredCapital: 0,
+    registrationDate: '',
+    ownerId: 0,
+    imageUrl: '',
+  }
+)
 const loading = ref(true)
 const error = ref(false)
 
@@ -27,7 +40,11 @@ const fetchStore = async () => {
       await storeStore.fetchStores()
     }
     // 查找店铺
-    store.value = storeStore.stores.find(s => s.id === storeId) || null
+    const storeFound = storeStore.stores.find(s => s.id === storeId)
+    if (storeFound) {
+      store.value = storeFound
+    }
+
     if (!store.value) {
       throw new Error('店铺未找到')
     }
@@ -87,7 +104,7 @@ watch(
             </div>
           </div>
           <div class="categories">
-            <el-tag v-for="category in store.categories.split(',')" :key="category" class="category-tag" effect="plain">
+            <el-tag v-for="category in store.categories" :key="category" class="category-tag" effect="plain">
               {{ category }}
             </el-tag>
           </div>

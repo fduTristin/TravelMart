@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { Account, AccountBalanceUpdateForm } from '@/types/account'
+import type { Account, AccountBalanceUpdateDTO } from '@/types/account'
 import { useAuthStore } from '@/stores/auth'
 
 export const accountService = {
@@ -7,7 +7,7 @@ export const accountService = {
     // 获取当前用户的账户信息
     getCurrentAccount: async () => {
         const token = useAuthStore().token
-        return await api.get<Account>('/users/me/account', {
+        return await api.get<Account>('/account', {
             headers: {
                 'Authorization': `Bearer ${token}`,
             },
@@ -15,9 +15,9 @@ export const accountService = {
     },
 
     // 账户充值
-    updateAccountBalance: async (accountdata: AccountBalanceUpdateForm) => {
+    updateAccountBalance: async (accountdata: AccountBalanceUpdateDTO) => {
         const token = useAuthStore().token
-        return await api.post<Account>('/users/me/account/balance', accountdata,{
+        return await api.post<Account>('/account/balance', accountdata,{
             headers: {
                 'Authorization': `Bearer ${token}`,
             },

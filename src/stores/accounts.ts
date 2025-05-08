@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Account, AccountBalanceUpdateForm } from '@/types/account'
+import type { Account, AccountBalanceUpdateDTO } from '@/types/account'
 import { accountService } from '@/services/accountService'
 
 export const useAccountStore = defineStore('accounts', () => {
@@ -30,7 +30,7 @@ export const useAccountStore = defineStore('accounts', () => {
     }
 
     // 账户充值
-    async function updateAccountBalance(accountdata: AccountBalanceUpdateForm) {
+    async function updateAccountBalance(accountdata: AccountBalanceUpdateDTO) {
         loading.value = true
         error.value = null
         try {
