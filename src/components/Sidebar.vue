@@ -17,8 +17,8 @@ const userName = ref('')
 // 获取当前用户信息
 const fetchCurrentUser = async () => {
   try {
-    const response = await userStore.fetchCurrentUser()
-    userName.value = response.data.userName
+    await userStore.fetchCurrentUser()
+    userName.value = userStore.currentUser.userName
   } catch (error) {
     console.error('Failed to fetch user:', error)
   }

@@ -7,7 +7,10 @@ import { accountService } from '@/services/accountService'
 export const useAccountStore = defineStore('accounts', () => {
 
     // 状态
-    const accountSelf = ref<Account | null>(null)
+    const currentAccount = ref<Account>({
+        accountStatus: '',
+        accountBalance: 0
+    })
     const loading = ref(false)
     const error = ref<string | null>(null)
 
@@ -17,7 +20,7 @@ export const useAccountStore = defineStore('accounts', () => {
         error.value = null
         try {
             const response = await accountService.getCurrentAccount()
-            accountSelf.value = response.data
+            currentAccount.value = response.data
         } catch (e) {
             error.value = 'Failed to fetch data'
             console.error('Failed to fetch account:', e)
@@ -28,7 +31,7 @@ export const useAccountStore = defineStore('accounts', () => {
     }
 
     return {
-        accountSelf,
+        currentAccount,
         loading,
         error,
         fetchCurrentAccount,

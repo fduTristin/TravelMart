@@ -23,7 +23,7 @@ const user = ref<User>({
     userBio: '',
 })
 
-const account = ref<Account | null>({
+const account = ref<Account>({
     accountStatus: '',
     accountBalance: 0
 })
@@ -40,8 +40,8 @@ const fetchUserProfile = async () => {
     try {
         const response = await userStore.fetchCurrentUser()
         await accountStore.fetchCurrentAccount()
-        user.value = response.data
-        account.value = accountStore.accountSelf
+        user.value = userStore.currentUser
+        account.value = accountStore.currentAccount
         formData.value = {
             userName: user.value.userName,
             userEmail: user.value.userEmail,
