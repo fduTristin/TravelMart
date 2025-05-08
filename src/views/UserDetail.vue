@@ -63,16 +63,13 @@ watch(
         </div>
         <div class="bio">
           <h2>{{ user?.userName }}</h2>
-          <p>{{ user?.bio || '暂无个人简介' }}</p>
+          <p>{{ user?.userBio || '暂无个人简介' }}</p>
         </div>
       </div>
 
       <!-- 用户详细信息 -->
       <div class="info-section">
         <el-form label-width="120px" class="form">
-          <el-form-item label="性别">
-            <span>{{ user?.gender || '未知' }}</span>
-          </el-form-item>
           <el-form-item label="商户类型">
             <span>{{ user?.userRole === 'MERCHANT' ? '商户' : user?.userRole === 'ADMIN' ? '管理员' : '普通用户' }}</span>
           </el-form-item>

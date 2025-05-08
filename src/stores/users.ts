@@ -1,12 +1,19 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { User } from '@/types/user'
+import type { User, UpdateUserForm } from '@/types/user'
 import { userService } from '@/services/userService'
 
 export const useUserStore = defineStore('users', () => {
   // 状态
   const users = ref<User[]>([])
-  const userSelf = ref<User | null>(null)
+  const currentUser = ref<User>({
+    userId: 0,
+    userName: '',
+    userEmail: '',
+    userRole: '',
+    userTel: '',
+    userBio: '',
+  })
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -47,14 +54,14 @@ export const useUserStore = defineStore('users', () => {
       loading.value = false
     }
   }
-  
+
   // 获取当前用户
   async function fetchCurrentUser() {
     loading.value = true
     error.value = null
     try {
       const response = await userService.getCurrentUser()
-      return response
+      currentUser.value = response.data
     } catch (e) {
       error.value = 'Failed to fetch data'
       console.error('Failed to fetch user:', e)
@@ -64,15 +71,29 @@ export const useUserStore = defineStore('users', () => {
     }
   }
 
+  // 更新用户
+  async function updateUser(userData: UpdateUserForm) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await userService.updateUser(userData)
+    } catch (e) {
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     // 状态
     users,
-    userSelf,
+    currentUser,
     loading,
     error,
     // 操作方法
     fetchUsers,
     fetchUserById,
     fetchCurrentUser,
+    updateUser,
   }
 }) 

@@ -17,8 +17,8 @@ const userName = ref('')
 // 获取当前用户信息
 const fetchCurrentUser = async () => {
   try {
-    const response = await userStore.fetchCurrentUser()
-    userName.value = response.data.userName
+    await userStore.fetchCurrentUser()
+    userName.value = userStore.currentUser.userName
   } catch (error) {
     console.error('Failed to fetch user:', error)
   }
@@ -26,7 +26,7 @@ const fetchCurrentUser = async () => {
 
 // 组件挂载时获取用户信息
 onMounted(() => {
-  if (authStore.isAuthenticated) {
+  if (authStore.isAuthenticated && !authStore.isAdmin) {
     fetchCurrentUser()
   }
 })
@@ -45,7 +45,7 @@ const handleLogout = () => {
 const handleCommand = (command: string) => {
   switch (command) {
     case 'profile':
-      router.push('/profile')
+      router.push('/users/me/profile')
       break
     case 'logout':
       handleLogout()
@@ -96,11 +96,11 @@ const storeMenuLabel = computed(() => {
         <template #trigger>
           <div class="user-info-content">
             <el-avatar :src="'/avatar.png'" class="custom-avatar" />
-            <span class="username">{{ userName }}</span>
+            <span class="username">{{ userName || 'admin' }}</span>
           </div>
         </template>
         <template #menu>
-          <div @click="handleCommand('profile')">
+          <div v-if="!authStore.isAdmin" @click="handleCommand('profile')">
             <el-icon><User /></el-icon>
             个人信息
           </div>

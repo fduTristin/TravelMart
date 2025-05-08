@@ -66,7 +66,7 @@ const routes: RouteRecordRaw[] = [
     }),
   },
   {
-    path: '/profile',
+    path: '/users/me/profile',
     name: 'profile',
     component: () => import('@/views/UserProfile.vue'),
     meta: {
@@ -148,6 +148,9 @@ router.beforeEach((to, from, next) => {
     })
   } else if (to.path === '/users' && !authStore.isAdmin) {
     // 限制非管理员访问 /users
+    next({ path: '/' })
+  } else if (to.path === '/users/me/profile' && authStore.isAdmin) {
+    // 限制管理员访问 /users/me/profile
     next({ path: '/' })
   } else {
     const title = typeof to.meta.title === 'function' ? to.meta.title() : to.meta.title

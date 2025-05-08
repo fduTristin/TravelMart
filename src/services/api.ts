@@ -31,8 +31,11 @@ api.interceptors.response.use(
   },
   (error) => {
     console.error('Response Error:', error.response?.data || error)
-    // 统一错误处理
-    const message = error.response?.data?.detail || 'Request failed'
-    throw new Error(message)
+    const errors = error.response?.data?.errors
+    if (errors && Array.isArray(errors)) {
+      const errorMessages = errors.map((err: { reason: string }) => err.reason).join('; ')
+      throw new Error(errorMessages)
+    }
+    throw error
   }
 )

@@ -77,14 +77,11 @@ const handleSubmit = async () => {
     ElMessage.success(messages.success)
     // 注册成功后跳转到登录页面
     router.push('/login')
-  } catch (error) {
-    // 错误信息已经在store中处理，这里只需显示错误消息即可
-    if (authStore.error) {
-      ElMessage.error(authStore.error)
-    } else {
-      ElMessage.error(messages.error)
-    }
-  } finally {
+  } catch (error: any) {
+    console.error('注册失败:', error)
+    ElMessage.error(error.message || '注册失败')
+  }
+  finally {
     loading.value = false
   }
 }

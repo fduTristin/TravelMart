@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { User } from '@/types/user'
+import type { User, UpdateUserForm } from '@/types/user'
 import { useAuthStore } from '@/stores/auth'
 
 export const userService = {
@@ -29,10 +29,24 @@ export const userService = {
   // 获取当前用户
   getCurrentUser: async () => {
     const token = useAuthStore().token;
-    return await api.get<User>('/profile', {
+    return await api.get<User>('/users/me/profile', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
-  }
+  },
+
+  // 更新用户
+  updateUser: async (userData: UpdateUserForm) => {
+    const token = useAuthStore().token;
+    try {
+      return await api.patch(`/users/me/profile`, userData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+    } catch (error: any) {
+      throw error
+    }
+  },
 }
