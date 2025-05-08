@@ -31,7 +31,7 @@ defineProps<{
         <h3>{{ store.storeName }}</h3>
       </div>
       <div class="categories">
-        <span v-for="category in store.categories.split(',')" :key="category" class="category-tag"
+        <span v-for="category in store.categories" :key="category" class="category-tag"
           :style="getServiceTypeStyle(getServiceTypeKey(category) || ServiceType.HOTEL)">
           {{ category }}
         </span>
