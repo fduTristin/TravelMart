@@ -5,7 +5,7 @@ export interface Account {
     accountStatus: string
 }
 
-export interface AccountBalanceUpdateForm {
+export interface AccountBalanceUpdateDTO {
     amountIncrement: number
 }
 

@@ -3,8 +3,8 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useUserStore } from '@/stores/users'
 import { useAccountStore } from '@/stores/accounts'
-import type { User, UpdateUserForm } from '@/types/user'
-import type { Account, AccountBalanceUpdateForm } from '@/types/account'
+import type { User, UpdateUserDTO } from '@/types/user'
+import type { Account, AccountBalanceUpdateDTO } from '@/types/account'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/BaseButton.vue'
@@ -30,7 +30,7 @@ const account = ref<Account>({
     accountBalance: 0
 })
 
-const userFormData = ref<UpdateUserForm>({
+const userFormData = ref<UpdateUserDTO>({
     userName: '',
     userEmail: '',
     userTel: '',
@@ -41,7 +41,7 @@ const accountFormData = ref({
     accountBalance: 0
 })
 
-const accountBalanceFormData = ref<AccountBalanceUpdateForm>({
+const accountBalanceFormData = ref<AccountBalanceUpdateDTO>({
     amountIncrement: 0
 })
 
@@ -224,7 +224,8 @@ onMounted(() => {
 
 .header {
     width: 56vw;
-    height: 28vh;
+    height: 24vh;
+    margin-bottom: 2vh;
     /* background: linear-gradient(135deg, #205684, #92bae4); */
     background-color: #275f94;
     color: white;
