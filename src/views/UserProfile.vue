@@ -14,6 +14,8 @@ const authStore = useAuthStore()
 const accountStore = useAccountStore()
 const loading = ref(true)
 const editing = ref(false) // 是否处于编辑模式
+const recharging = ref(false) // 是否处于充值模式
+
 const user = ref<User>({
     userId: 0,
     userName: '',
@@ -28,10 +30,15 @@ const account = ref<Account>({
     accountBalance: 0
 })
 
-const formData = ref<UpdateUserForm>({
+const userFormData = ref<UpdateUserForm>({
     userName: '',
     userEmail: '',
     userTel: '',
+})
+
+const accountFormData = ref({
+    accountStatus: '',
+    accountBalance: 0
 })
 
 // 获取用户信息
@@ -42,7 +49,7 @@ const fetchUserProfile = async () => {
         await accountStore.fetchCurrentAccount()
         user.value = userStore.currentUser
         account.value = accountStore.currentAccount
-        formData.value = {
+        userFormData.value = {
             userName: user.value.userName,
             userEmail: user.value.userEmail,
             userTel: user.value.userTel,
@@ -61,9 +68,9 @@ const saveUserProfile = async () => {
         loading.value = true
         // 检查哪些字段未修改，未修改的字段设置为 null
         const payload = {
-            userName: formData.value.userName !== user.value.userName ? formData.value.userName : null,
-            userEmail: formData.value.userEmail !== user.value.userEmail ? formData.value.userEmail : null,
-            userTel: formData.value.userTel !== user.value.userTel ? formData.value.userTel : null,
+            userName: userFormData.value.userName !== user.value.userName ? userFormData.value.userName : null,
+            userEmail: userFormData.value.userEmail !== user.value.userEmail ? userFormData.value.userEmail : null,
+            userTel: userFormData.value.userTel !== user.value.userTel ? userFormData.value.userTel : null,
         }
         await userStore.updateUser(payload)
         ElMessage.success('用户信息更新成功')
@@ -101,20 +108,18 @@ onMounted(() => {
             </div>
             <div class="bio">
                 <h2>{{ user.userName }}</h2>
-                <p>{{ user.userBio || '暂无个人简介' }}</p>
+                <p>ID: {{ user.userId }} | {{ user.userRole === 'MERCHANT' ? '商户' :
+                    user.userRole === 'ADMIN' ? '管理员' : '普通用户' }}</p>
+                <!-- <p>{{ user.userBio || '暂无个人简介' }}</p> -->
             </div>
         </div>
 
         <!-- 下方个人信息 -->
-        <div class="info-grid" :class="{ 'single-column': user.userRole === 'ADMIN' }">
+        <div class="info-grid">
             <div class="info-section">
-                <el-form v-if="!editing" label-width="10vh" class="form">
-                    <el-form-item label="ID">
-                        <span>{{ user.userId }}</span>
-                    </el-form-item>
-                    <el-form-item label="用户类型">
-                        <span>{{ user.userRole === 'MERCHANT' ? '商户' :
-                            user.userRole === 'ADMIN' ? '管理员' : '普通用户' }}</span>
+                <el-form v-if="!editing" class="form">
+                    <el-form-item label="用户名">
+                        <span>{{ user.userName }}</span>
                     </el-form-item>
                     <el-form-item label="手机号">
                         <span>{{ user.userTel || '未提供' }}</span>
@@ -122,24 +127,24 @@ onMounted(() => {
                     <el-form-item label="邮箱">
                         <span>{{ user?.userEmail || '未提供' }}</span>
                     </el-form-item>
-                    <el-form-item v-if="user.userRole === 'MERCHANT' || user.userRole === 'CUSTOMER'">
+                    <el-form-item class="center-content">
                         <BaseButton type="primary" @click="editing = true">
                             编辑用户信息
                         </BaseButton>
                     </el-form-item>
                 </el-form>
 
-                <el-form v-else :model="formData" label-width="10vh" class="form">
+                <el-form v-else :model="userFormData" class="form">
                     <el-form-item label="用户名">
-                        <el-input v-model="formData.userName" />
+                        <el-input v-model="userFormData.userName" />
                     </el-form-item>
                     <el-form-item label="手机号">
-                        <el-input v-model="formData.userTel" />
+                        <el-input v-model="userFormData.userTel" />
                     </el-form-item>
                     <el-form-item label="邮箱">
-                        <el-input v-model="formData.userEmail" />
+                        <el-input v-model="userFormData.userEmail" />
                     </el-form-item>
-                    <el-form-item>
+                    <el-form-item class="center-content">
                         <BaseButton type="primary" @click="saveUserProfile">
                             保存
                         </BaseButton>
@@ -151,16 +156,25 @@ onMounted(() => {
             </div>
 
             <!-- 新增账户信息，仅非ADMIN用户显示 -->
-            <div v-if="user.userRole !== 'ADMIN'" class="account-section">
-                <el-form label-width="10vh" class="form">
+            <div class="account-section">
+                <el-form class="form">
                     <el-form-item label="账户余额">
                         <span>{{ account?.accountBalance || 0 }}</span>
                     </el-form-item>
                     <el-form-item label="账户状态">
-                        <span>{{ account?.accountStatus }}</span>
+                        <span :style="{ color: account?.accountStatus === 'active' ? 'green' : 'red' }">
+                            {{ account?.accountStatus }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item v-if="account?.accountStatus === 'active' && user.userRole === 'CUSTOMER'" class="center-content1">
+                        <BaseButton type="primary" @click="recharging = true">
+                            充值账户余额
+                        </BaseButton>
                     </el-form-item>
                 </el-form>
             </div>
+
+            <!-- TODO: 充值账户余额功能 -->
         </div>
     </div>
 </template>
@@ -175,7 +189,7 @@ onMounted(() => {
 }
 
 .header {
-    width: 66vw;
+    width: 56vw;
     height: 28vh;
     /* background: linear-gradient(135deg, #205684, #92bae4); */
     background-color: #275f94;
@@ -218,14 +232,10 @@ onMounted(() => {
 
 .info-grid {
     display: grid;
-    grid-template-columns: 48% 48%;
-    gap: 4%;
-    width: 66vw;
+    grid-template-columns: 45% 45%;
+    gap: 10%;
+    width: 56vw;
     margin-top: 2vh;
-}
-
-.info-grid.single-column {
-    grid-template-columns: 100%;
 }
 
 .info-section,
@@ -242,7 +252,7 @@ onMounted(() => {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1.5vh;
+    gap: 1.8vh;
 }
 
 .el-form-item {
@@ -255,9 +265,14 @@ span {
 }
 
 :deep(.el-form-item__label) {
+    width: 35%;
     font-size: 2vh;
-    font-weight: 600;
+    font-weight: 550;
     color: #275f94;
+}
+
+:deep(.el-form-item__content) {
+    justify-content: flex-start;
 }
 
 :deep(.el-radio__label),
@@ -265,11 +280,22 @@ span {
 :deep(.el-textarea__inner) {
     font-family: "Noto Sans SC", sans-serif;
     font-size: 2vh;
-    height: 3.5vh;
+    height: 3vh;
 }
 
 :deep(.el-input__wrapper:hover),
 :deep(.el-textarea__wrapper:hover) {
     border-color: #275f94;
+}
+
+::v-deep(.center-content .el-form-item__content) {
+    justify-content: center;
+    display: flex;
+}
+
+::v-deep(.center-content1 .el-form-item__content) {
+    margin-top: 5vh;
+    justify-content: center;
+    display: flex;
 }
 </style>
