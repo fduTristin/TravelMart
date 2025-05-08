@@ -112,6 +112,31 @@ const routes: RouteRecordRaw[] = [
     })
   },
   {
+    // 假设你的店铺详情页路径是 /stores/:storeId
+    // 那么添加商品可以在其子路径下
+    path: '/stores/:storeId/products/apply', // :storeId 是关键
+    name: 'product-apply-for-store', // 给一个清晰的路由名称
+    component: () => import('@/views/product/ProductApplicationForm.vue'),
+    meta: {
+      title: '申请上架商品',
+      requiresAuth: true,
+      // 你可能还需要一个自定义的 meta 字段来校验用户是否有权访问此 storeId
+      // 例如: requiresMerchantOwner: true (然后在路由守卫中处理)
+    },
+    props: true // 这会将路由参数作为 props 传递给组件，但我们这里用 useRoute() 更灵活
+  },
+  {
+    path: '/stores/:storeId/product-applications', // 或者你选择的其他路径
+    name: 'ProductApplicationList', // 路由名
+    component: () => import('@/views/product/ProductApplicationList.vue'),
+    meta: {
+      title: '商品申请记录',
+      requiresAuth: true,
+      // 可能需要权限控制，例如仅商户或Admin可访问
+    },
+    // props: true, // 如果组件直接通过props接收storeId
+  },
+  {
     // 404 页面
     path: '/:pathMatch(.*)*',
     name: 'not-found',
