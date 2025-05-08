@@ -4,7 +4,7 @@ import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useUserStore } from '@/stores/users'
 import { useAccountStore } from '@/stores/accounts'
 import type { User, UpdateUserForm } from '@/types/user'
-import type { Account } from '@/types/account'
+import type { Account, AccountBalanceUpdateForm } from '@/types/account'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/BaseButton.vue'
@@ -39,6 +39,10 @@ const userFormData = ref<UpdateUserForm>({
 const accountFormData = ref({
     accountStatus: '',
     accountBalance: 0
+})
+
+const accountBalanceFormData = ref<AccountBalanceUpdateForm>({
+    amountIncrement: 0
 })
 
 // 获取用户信息
@@ -79,6 +83,22 @@ const saveUserProfile = async () => {
     } catch (error: any) {
         console.error('用户信息更新失败:', error)
         ElMessage.error(error.message || '用户信息更新失败')
+    } finally {
+        loading.value = false
+    }
+}
+
+// 保存账户余额
+const saveAccountBalance = async () => {
+    try {
+        loading.value = true
+        await accountStore.updateAccountBalance(accountBalanceFormData.value)
+        ElMessage.success('充值成功')
+        recharging.value = false
+        account.value = accountStore.currentAccount
+    } catch (error: any) {
+        console.error('充值失败:', error)
+        ElMessage.error(error.message || '充值失败')
     } finally {
         loading.value = false
     }
@@ -166,11 +186,25 @@ onMounted(() => {
                             {{ account?.accountStatus }}
                         </span>
                     </el-form-item>
-                    <el-form-item v-if="account?.accountStatus === 'active' && user.userRole === 'CUSTOMER'" class="center-content1">
+                    <el-form-item v-if="!recharging && account?.accountStatus === 'active' && user.userRole === 'CUSTOMER'" class="center-content1">
                         <BaseButton type="primary" @click="recharging = true">
                             充值账户余额
                         </BaseButton>
                     </el-form-item>
+
+                    <el-form v-else-if="recharging" :model="accountFormData" class="form">
+                        <el-form-item label="充值金额">
+                            <el-input-number v-model="accountBalanceFormData.amountIncrement" :min="0" :step="1000" />
+                        </el-form-item>
+                        <el-form-item class="center-content">
+                            <BaseButton type="primary" @click="saveAccountBalance">
+                                保存
+                            </BaseButton>
+                            <BaseButton type="default" @click="recharging = false">
+                                取消
+                            </BaseButton>
+                        </el-form-item>
+                    </el-form>
                 </el-form>
             </div>
 
