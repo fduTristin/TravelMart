@@ -158,8 +158,8 @@ const handleSubmit = async () => {
         await productStore.applyForNewProduct(submissionData);
         ElMessage.success('商品上架申请已成功提交！');
         formRef.value?.resetFields();
-        // 导航到申请列表页面，也带上 storeId (如果申请列表是按店铺区分的)
-        // router.push({ name: 'ProductApplicationList', params: { storeId: merchantStoreId.value } });
+        // 上架申请提交成功后，导航到申请列表页面
+        router.push({ name: 'ProductApplicationList' });
       } catch (submitError: any) {
         ElMessage.error(submitError?.message || productStore.error || '提交申请失败，请稍后再试。');
       }
