@@ -107,7 +107,7 @@ const saveAccountBalance = async () => {
 // 监听用户变化，切换用户重新加载数据
 
 watch(() => authStore.user, () => {
-    if (authStore.token) {
+    if (authStore.token && !authStore.isAdmin) {
         fetchUserProfile()
     }
 }, { deep: true })
@@ -130,7 +130,6 @@ onMounted(() => {
                 <h2>{{ user.userName }}</h2>
                 <p>ID: {{ user.userId }} | {{ user.userRole === 'MERCHANT' ? '商户' :
                     user.userRole === 'ADMIN' ? '管理员' : '普通用户' }}</p>
-                <!-- <p>{{ user.userBio || '暂无个人简介' }}</p> -->
             </div>
         </div>
 
@@ -186,7 +185,9 @@ onMounted(() => {
                             {{ account?.accountStatus }}
                         </span>
                     </el-form-item>
-                    <el-form-item v-if="!recharging && account?.accountStatus === 'active' && user.userRole === 'CUSTOMER'" class="center-content1">
+                    <el-form-item
+                        v-if="!recharging && account?.accountStatus === 'active' && user.userRole === 'CUSTOMER'"
+                        class="center-content1">
                         <BaseButton type="primary" @click="recharging = true">
                             充值账户余额
                         </BaseButton>
