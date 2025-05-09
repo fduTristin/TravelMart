@@ -75,7 +75,15 @@ export interface ReviewApplicationDTO {
  */
 export interface ProductApplication {
   id: number;
-  storeId: number;
+  storeId?: number; // 可选，如果主要通过下面的 store 对象获取
+  store?: { // 根据你的 PUT 响应示例
+    id: number;
+    name?: string; // 店铺名称可选
+  };
+  product?: { // 关联的原始商品信息
+    id: number;
+    name?: string;
+  };
   applicationType: ProductApplicationType | string;
   requestedData: string; // JSON string of product details
   status: ProductApplicationStatus | string;
@@ -84,5 +92,6 @@ export interface ProductApplication {
   createdAt?: string;
   updatedAt?: string; // 申请记录本身更新的时间
   reviewedAt?: string | null;
-  productId?: number | null; // 新增商品批准后，关联的商品ID
+  productId?: number | null; // 这个 productId 是指如果 NEW 类型申请通过后创建的 product 实体的 ID
+                           // 对于 MODIFY 类型的申请，它可能指向被修改的那个 product.id
 }

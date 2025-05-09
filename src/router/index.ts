@@ -112,6 +112,17 @@ const routes: RouteRecordRaw[] = [
     })
   },
   {
+    path: '/products/:productId', // 使用 :productId 作为参数
+    name: 'ProductDetail',
+    component: () => import('@/views/product/ProductDetail.vue'),
+    meta: {
+      title: '商品详情', // 页面标题
+      requiresAuth: false, // 通常商品详情页不需要登录即可查看，除非有特殊业务需求
+      // keepAlive: false, // 通常详情页不需要keep-alive
+    },
+    props: true // 这会将路由参数 :productId 作为 prop 传递给组件，但我们这里用 useRoute() 更灵活
+  },
+  {
     // 假设你的店铺详情页路径是 /stores/:storeId
     // 那么添加商品可以在其子路径下
     path: '/stores/:storeId/products/apply', // :storeId 是关键
@@ -139,6 +150,17 @@ const routes: RouteRecordRaw[] = [
       // 可能需要权限控制，例如仅商户或Admin可访问
     },
     // props: true, // 如果组件直接通过props接收storeId
+  },
+  {
+    path: '/products/:productId/edit', // 和我们规划的一致
+    name: 'ProductEdit', // 确保这个名称与 ProductDetail.vue 中跳转时使用的名称一致
+    component: () => import('@/views/product/ProductEditForm.vue'),
+    meta: {
+      title: '修改商品信息',
+      requiresAuth: true, // 通常需要商户登录
+      // 可能还需要权限校验，确保是该商品的拥有者才能编辑
+    },
+    props: true // 这使得 :productId 可以作为 prop 注入，但我们用 useRoute() 获取
   },
   {
     // 404 页面
