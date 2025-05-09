@@ -4,8 +4,9 @@ import type {
   Product,
   CreateProductDTO,
   UpdateProductDTO,
-  ProductApplication
-} from '@/types/product' // 引入我们之前定义的类型
+  ProductApplication,
+  ReviewApplicationDTO
+} from '@/types/product'
 
 export const productService = {
   /**
@@ -16,9 +17,6 @@ export const productService = {
    */
   async createProductApplication(data: CreateProductDTO): Promise<ProductApplication> {
     const authStore = useAuthStore()
-    // API 文档中 POST /product-applications 的响应是 {} (201 Created)
-    // 通常创建成功后会返回创建的资源，这里假设返回 ProductApplication 对象
-    // 如果后端确实只返回空对象或状态码，这里的 Promise 返回类型可能需要调整为 void 或 any
     const response = await api.post<ProductApplication>('/product-applications', data, {
       headers: {
         Authorization: `Bearer ${authStore.token}`
@@ -110,5 +108,25 @@ export const productService = {
       }
     })
     return response.data
+  },
+
+  async reviewProductApplication(applicationId: number, data: ReviewApplicationDTO): Promise<ProductApplication> {
+    const authStore = useAuthStore();
+    const response = await api.patch<ProductApplication>(`/product-applications/${applicationId}`, data, {
+      headers: {
+        Authorization: `Bearer ${authStore.token}`
+      }
+    });
+    return response.data;
+  },
+
+  async getProductApplicationDetails(applicationId: number): Promise<ProductApplication> {
+    const authStore = useAuthStore();
+    const response = await api.get<ProductApplication>(`/product-applications/${applicationId}`, {
+        headers: {
+            Authorization: `Bearer ${authStore.token}`
+        }
+    });
+    return response.data;
   }
 }
