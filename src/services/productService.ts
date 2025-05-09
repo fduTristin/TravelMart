@@ -7,6 +7,7 @@ import type {
   ProductApplication,
   ReviewApplicationDTO
 } from '@/types/product'
+import type { AxiosResponse } from 'axios';
 
 export const productService = {
   /**
@@ -84,14 +85,25 @@ export const productService = {
    * @param storeId - 店铺ID
    * @returns 该店铺的商品列表
    */
-  async getStoreProducts(storeId: number): Promise<Product[]> {
-    const authStore = useAuthStore() // 假设此接口也需要认证
-    const response = await api.get<Product[]>(`/stores/${storeId}/products`, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`
+  async getStoreProducts(storeId: number): Promise<Product[]> { // <--- 明确返回 Product[]
+    const authStore = useAuthStore();
+    try {
+      const response: AxiosResponse<Product[]> = await api.get(`/stores/${storeId}/products`, {
+        headers: {
+          Authorization: `Bearer ${authStore.token}`
+        }
+      });
+      // 检查响应数据是否是数组，如果是，则返回它，否则返回空数组或抛出错误
+      if (response && Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        console.error(`Invalid product data structure for store ${storeId}:`, response);
+        return []; // 或者 throw new Error('Invalid product data');
       }
-    })
-    return response.data
+    } catch (error) {
+      console.error(`Error fetching products for store ${storeId} in service:`, error);
+      throw error; // 将错误向上抛出，让 store action 处理
+    }
   },
 
   /**

@@ -25,17 +25,30 @@ export const useProductStore = defineStore('product', () => {
    * 获取指定店铺的商品列表
    * @param storeId - 店铺ID
    */
-  async function fetchStoreProducts(storeId: number) {
-    loading.value = true
-    error.value = null
+  async function fetchStoreProducts(storeId: number): Promise<Product[]> {
+    loading.value = true;
+    error.value = null;
     try {
-      products.value = await productService.getStoreProducts(storeId)
+      // productService.getStoreProducts 现在直接返回 Product[] 或在出错时抛出
+      const productsArray = await productService.getStoreProducts(storeId);
+
+      console.log(`[StoreAction] Fetched products for store ${storeId} from service:`, JSON.parse(JSON.stringify(productsArray)));
+
+      // productsArray 已经是 Product[] 了 (或者在 service 中处理错误后返回的空数组)
+      return productsArray;
     } catch (err: any) {
-      error.value = err.message || '获取店铺商品列表失败'
-      console.error('Error fetching store products:', err)
-      products.value = [] // 出错时清空或保持旧数据
+      error.value = err.message || `获取店铺 ${storeId} 商品列表失败`;
+      console.error(`[StoreAction] Error fetching products for store ${storeId}:`, err);
+      // 确保如果上游 service 抛错了，这里也要处理或再次抛出
+      // 如果 service 在其 catch 中返回了 [], 这里的 catch 可能不会执行，除非 service re-throw
+      // 如果 service re-throw，这里可以选择返回 [] 或再次 re-throw
+      // 为了让组件知道出错了，最好是让错误能传播到组件的 catch，或者在这里返回一个明确的错误指示
+      // 但如果 service 保证出错时返回 []，这里可以直接返回 []，但 error.value 应该被设置
+      // 当前假设 service 会 throw error
+      throw err; // 如果 service re-throws, this re-throws to the component
+      // 或者 return []; 如果你希望 action 层面消化错误并返回空列表
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
