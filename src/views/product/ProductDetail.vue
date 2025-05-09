@@ -61,7 +61,7 @@
             </div>
 
             <div class="action-buttons">
-                <div v-if="authStore.isMerchant && productStoreData && authStore.userId === productStoreData.ownerId" class="merchant-actions">
+              <div v-if="authStore.isMerchant && productStoreData && authStore.userId === productStoreData.ownerId" class="merchant-actions">
                 <el-button type="primary" @click="navigateToEditProduct(product!.id)">修改商品</el-button>
                 <el-button type="danger" @click="confirmRemoveProduct(product!.id)">下架商品</el-button>
               </div>
@@ -224,22 +224,55 @@ const navigateToEditProduct = (currentProductId: number | undefined) => {
 };
 
 const confirmRemoveProduct = async (currentProductId: number | undefined) => {
-  if (!currentProductId) { ElMessage.error('无效商品ID'); return; }
+  if (!currentProductId || !product.value) {
+    ElMessage.error('无效商品ID或商品数据未加载。');
+    return;
+  }
+
   try {
+    // 1. 弹出确认框，让用户二次确认
     await ElMessageBox.confirm(
-        `确定要下架该商品 (ID: ${currentProductId}) 吗？此操作会将商品状态变为“已下架”。`,
-        '下架确认',
-        { confirmButtonText: '确定下架', cancelButtonText: '取消', type: 'warning' }
+      `确定要下架商品 “${product.value.name}” (ID: ${currentProductId}) 吗？商品将不再对顾客可见。`,
+      '下架确认',
+      {
+        confirmButtonText: '确定下架',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
     );
-    ElMessage.info(`功能待开发：下架商品 ID ${currentProductId}`);
-    // TODO: 调用 productStore.takeProductOffShelf(currentProductId);
-    // 并处理成功后的逻辑，例如刷新当前商品状态或导航离开
-    // await loadProductDetails(currentProductId); // 例如，重新加载详情以更新状态显示
-  } catch (action) {
-    if (action !== 'cancel' && action !== 'close') { // ElMessageBox 的 confirm/cancel 会 reject 'confirm'/'cancel'/'close'
-      ElMessage.error('下架操作时发生错误。');
+
+    // 2. 用户点击了“确定下架”，显示处理中消息
+    ElMessage({ type: 'info', message: '正在下架商品...', duration: 1500 });
+
+    // 3. 调用 store action 执行下架操作
+    await productStore.takeProductOffShelf(currentProductId);
+
+    // 4. API 调用成功后，显示成功消息
+    ElMessage.success(`商品 “${product.value.name}” 已成功下架！`);
+
+    // 5. 更新当前页面的商品状态显示
+    //    (productStore.takeProductOffShelf action 内部也应该更新了 currentProduct.status)
+    //    这里再次确保 product ref 的状态也同步，如果它们不是同一个对象引用的话
+    if (product.value && product.value.id === currentProductId) {
+      product.value.status = ProductStatusEnum.OFF_SHELF; // 使用导入的枚举
+    }
+
+    // 6. (可选) 可以在此处添加其他UI反馈，例如禁用“下架”按钮，
+    //    或者几秒后自动导航离开此页面等。
+    //    例如:
+    //    const offShelfButton = document.getElementById(`offshelf-btn-${currentProductId}`); // 假设按钮有这样的ID
+    //    if (offShelfButton) offShelfButton.disabled = true;
+
+  } catch (actionOrError) {
+    // 这个 catch 会捕获 ElMessageBox.confirm 的 reject (当用户点击取消或关闭时)
+    // 以及 productStore.takeProductOffShelf action 抛出的错误
+
+    if (actionOrError === 'cancel' || String(actionOrError).toLowerCase() === 'close' || (actionOrError instanceof Error && String(actionOrError.message).toLowerCase().includes('cancel'))) {
+      ElMessage.info('已取消下架操作。');
     } else {
-        ElMessage.info('已取消下架操作。');
+      // 如果是 store action 抛出的错误，productStore.error 应该已经被设置了
+      console.error(`下架商品 (ID: ${currentProductId}) 操作失败:`, actionOrError);
+      ElMessage.error(productStore.error || `下架失败: ${ (actionOrError as Error)?.message || '未知错误' }`);
     }
   }
 };

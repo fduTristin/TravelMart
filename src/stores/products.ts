@@ -8,6 +8,7 @@ import type {
   ProductApplication,
   ReviewApplicationDTO
 } from '@/types/product'
+import { ProductStatus } from '@/types/product'
 
 export const useProductStore = defineStore('product', () => {
   // --- 状态 (State) ---
@@ -166,29 +167,49 @@ export const useProductStore = defineStore('product', () => {
    * 商户下架商品
    * @param productId - 要下架的商品ID
    */
-  async function takeProductOffShelf(productId: number) {
-    loading.value = true
-    error.value = null
+  async function takeProductOffShelf(productId: number): Promise<void> { // 返回 Promise<void> 或更新后的Product对象(如果API返回)
+    loading.value = true;
+    error.value = null;
     try {
-      await productService.offShelfProduct(productId)
-      // 下架成功后，更新本地 products 列表中的商品状态或直接移除
-      // 方案1: 修改状态 (如果商品仍在列表中，只是状态改变)
-      const productIndex = products.value.findIndex(p => p.id === productId)
-      if (productIndex !== -1) {
-        products.value[productIndex].status = 'OFF_SHELF' // 使用 ProductStatus.OFF_SHELF 更佳
-        // 或者直接从列表中移除该商品，如果UI上不再显示已下架商品
-        // products.value.splice(productIndex, 1);
+      await productService.offShelfProduct(productId); // 调用 service，该 service 应该处理 DELETE 请求
+
+      // API (DELETE /product-applications/{productId}) 成功时返回 204 No Content，不返回更新后的商品对象。
+      // 所以我们需要在前端手动更新状态。
+
+      // 1. 更新 ProductDetail 页正在查看的商品 (currentProduct) 的状态
+      if (currentProduct.value && currentProduct.value.id === productId) {
+        currentProduct.value.status = ProductStatus.OFF_SHELF; // 假设 ProductStatus.OFF_SHELF = 'OFF_SHELF'
+        console.log(`[StoreAction] Product ID ${productId} status updated to OFF_SHELF in currentProduct.`);
       }
-      // 方案2: 重新获取当前店铺的商品列表 (保证数据最新)
-      // if (currentStoreId) await fetchStoreProducts(currentStoreId);
-      // 这个 currentStoreId 需要有地方存储和获取
-      // 具体策略取决于你的需求，是立即更新UI还是等待下次刷新
+
+      // 2. 更新可能存在的店铺商品列表缓存 (products ref)
+      // 如果 this.products 是一个通用的、可能包含多个店铺商品的列表，或者是一个特定店铺的商品列表缓存，
+      // 我们需要找到并更新它。
+      // 但更常见的做法是，让列表组件 (StoreDetail.vue) 在下架操作后重新获取其数据。
+      // 为了简化，这里我们暂时不直接修改一个全局的 products 列表，
+      // 而是依赖组件在操作完成后自行刷新数据或处理UI。
+      // 如果你的 `products` ref 就是 StoreDetail.vue 当前显示的商品列表，可以考虑更新：
+      const productInListIndex = products.value.findIndex(p => p.id === productId);
+      if (productInListIndex !== -1) {
+          // 方案A: 直接修改状态 (如果列表还想显示已下架的，只是样式不同)
+          // products.value[productInListIndex].status = ProductStatus.OFF_SHELF;
+          // 方案B: 如果列表只显示 ON_SHELF 商品，可以直接移除 (但 StoreDetail.vue 的 filter 会处理)
+          // products.value.splice(productInListIndex, 1); // 这会直接修改，可能导致问题如果 StoreDetail.vue 的 filter 不重算
+          // 更安全的做法是让 StoreDetail.vue 重新 fetch。
+          // 这里我们先仅更新状态，StoreDetail.vue 的 filter 逻辑会处理显示。
+           products.value[productInListIndex].status = ProductStatus.OFF_SHELF;
+      }
+
+      // 通常，下架操作后，依赖此商品ID的视图（如商品详情页、店铺商品列表页）
+      // 应该重新获取数据或基于新的状态来更新其显示。
+      // 这个action主要负责调用API和更新核心状态（如currentProduct）。
+
     } catch (err: any) {
-      error.value = err.message || '商品下架失败'
-      console.error('Error taking product off shelf:', err)
-      throw err
+      error.value = err.message || `下架商品 (ID: ${productId}) 失败`;
+      console.error(`[StoreAction] Error taking product off shelf (ID: ${productId}):`, err);
+      throw err; // 重新抛出错误，让组件可以感知
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
