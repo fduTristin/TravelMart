@@ -8,7 +8,7 @@ export const userService = {
     console.log('Fetching all users...')
     const token = useAuthStore().token;
     console.log(`Token: ${token}`)
-    return await api.get<User[]>('/admin/users', {
+    return await api.get<User[]>('/users', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
