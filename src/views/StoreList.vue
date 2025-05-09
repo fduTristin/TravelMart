@@ -169,4 +169,8 @@ onMounted(() => {
   height: 5vh;
   border-radius: 1vh;
 }
+
+:deep(.el-select__selection){
+  font-size: 1.9vh;
+}
 </style>
