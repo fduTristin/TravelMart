@@ -238,19 +238,33 @@ const statusOptions = ref([
 ]);
 
 const filteredApplications = computed(() => {
-  let apps = applications.value;
-  if (!apps) return [];
+  // 打印初始状态
+  const appsToFilter = applications.value;
+  if (!appsToFilter || !Array.isArray(appsToFilter)) return [];
 
-  if (filters.storeId !== null) {
-    apps = apps.filter(app => Number(app.storeId) === Number(filters.storeId));
+  // 创建副本以进行操作
+  let filtered = [...appsToFilter];
+
+  // 1. Store ID Filter
+  if (filters.storeId !== null && filters.storeId !== undefined) { // 明确检查 null 和 undefined
+    filtered = filtered.filter(app => Number(app.storeId) === Number(filters.storeId));
   }
-  if (filters.applicationType !== null) { // 直接比较枚举成员
-    apps = apps.filter(app => app.applicationType === filters.applicationType);
+
+  // 2. Application Type Filter
+  // 只有当 filters.applicationType 是一个有效的、非空字符串时才应用
+  if (typeof filters.applicationType === 'string' && filters.applicationType.trim() !== '') {
+    const typeToFilter = filters.applicationType.toUpperCase();
+    filtered = filtered.filter(app => app.applicationType?.toUpperCase() === typeToFilter);
   }
-  if (filters.status !== null) { // 直接比较枚举成员
-    apps = apps.filter(app => app.status === filters.status);
+
+  // 3. Status Filter
+  // 只有当 filters.status 是一个有效的、非空字符串时才应用
+  if (typeof filters.status === 'string' && filters.status.trim() !== '') {
+    const statusToFilter = filters.status.toUpperCase();
+    filtered = filtered.filter(app => app.status?.toUpperCase() === statusToFilter);
   }
-  return apps;
+
+  return filtered;
 });
 
 const applyFilters = () => {
