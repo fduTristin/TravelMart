@@ -1,0 +1,216 @@
+<template>
+  <div class="product-application-form-container">
+    <el-card shadow="never">
+      <template #header>
+        <div class="card-header">
+          <span>为店铺申请上架新商品</span>
+        </div>
+      </template>
+      <el-form
+        ref="formRef"
+        :model="productFormData"
+        :rules="rules"
+        label-width="120px"
+        v-loading="isLoading"
+      >
+        <el-form-item label="商品名称" prop="name">
+          <el-input v-model="productFormData.name" placeholder="请输入商品名称" />
+        </el-form-item>
+
+        <el-form-item label="商品描述" prop="description">
+          <el-input
+            type="textarea"
+            v-model="productFormData.description"
+            :rows="4"
+            placeholder="请输入商品描述 (500字以内)"
+            maxlength="500"
+            show-word-limit
+          />
+        </el-form-item>
+
+        <el-form-item label="商品价格 (元)" prop="price">
+          <el-input-number
+            v-model="productFormData.price"
+            :precision="2"
+            :step="0.01"
+            :min="0.01"
+            placeholder="请输入价格"
+            style="width: 100%;"
+          />
+        </el-form-item>
+
+        <el-form-item label="商品图片URL" prop="imageUrl">
+          <el-input v-model="productFormData.imageUrl" placeholder="请输入商品图片的URL" />
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="handleSubmit" :disabled="!merchantStoreId || isLoading">
+            提交申请
+          </el-button>
+          <el-button @click="handleReset">重置表单</el-button>
+        </el-form-item>
+
+        <el-alert v-if="productStore.error" :title="productStore.error" type="error" show-icon closable @close="clearError" />
+
+      </el-form>
+    </el-card>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue';
+import { ElMessage, ElForm, ElInput, ElButton, ElInputNumber, ElCard, ElAlert } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
+import { useProductStore } from '@/stores/products';
+import { useAuthStore } from '@/stores/auth'; // 仍可用于用户角色等检查
+import type { CreateProductDTO } from '@/types/product';
+import { useRouter, useRoute } from 'vue-router'; // 导入 useRoute 和 useRouter
+
+// Pinia Stores
+const productStore = useProductStore();
+const authStore = useAuthStore(); // 保留，可能用于权限校验等
+
+// Vue Router
+const router = useRouter();
+const route = useRoute();
+
+// Form Ref
+const formRef = ref<FormInstance>();
+
+// Form Data
+const productFormData = ref<{
+  name: string;
+  description: string;
+  price: number | undefined;
+  imageUrl: string;
+}>({
+  name: '',
+  description: '',
+  price: undefined,
+  imageUrl: '',
+});
+
+const merchantStoreId = ref<number | null>(null); // 从路由参数获取的店铺ID
+
+// Validation Rules (与之前版本相同)
+const rules = ref<FormRules>({
+  name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
+  description: [
+    { required: true, message: '请输入商品描述', trigger: 'blur' },
+    { max: 500, message: '商品描述不能超过500个字符', trigger: 'input' },
+  ],
+  price: [
+    { required: true, message: '请输入商品价格', trigger: 'blur' }, // 初始校验
+    { type: 'number', message: '价格必须是数字', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (value === undefined || value === null) {
+          // el-input-number可能在清空时为undefined/null, 但因:min="0.01", 不会小于等于0
+          // :required 已经处理了空值，这里主要校验 > 0
+          callback(); // 如果允许为空，则需要修改此逻辑
+        } else if (value <= 0) { // 价格 > 0 的校验由 :min="0.01" 处理了大部分
+                                 // 但用户可能通过非标准方式输入，所以保留校验是好的
+          callback(new Error('价格必须大于0'));
+        }
+        else {
+          callback();
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+  imageUrl: [
+    { required: true, message: '请输入商品图片URL', trigger: 'blur' },
+    { type: 'url', message: '请输入有效的URL地址', trigger: ['blur', 'change'] },
+  ],
+});
+
+// Loading state
+const isLoading = computed(() => productStore.loading);
+
+// Clear error from store
+const clearError = () => {
+  productStore.error = null;
+};
+
+// Get merchant's store ID from route parameter
+onMounted(() => {
+  const storeIdFromRoute = route.params.storeId; // storeId 是你在路由中定义的参数名
+  if (storeIdFromRoute) {
+    const parsedStoreId = Array.isArray(storeIdFromRoute) ? Number(storeIdFromRoute[0]) : Number(storeIdFromRoute);
+    if (!isNaN(parsedStoreId) && parsedStoreId > 0) {
+      merchantStoreId.value = parsedStoreId;
+      console.log(`当前操作的店铺ID: ${merchantStoreId.value}`);
+      // 可选: 验证当前登录的商户是否有权管理此 storeId
+      // 这需要额外的逻辑，例如调用一个服务检查 store.ownerId === authStore.userId
+      // const currentStore = storeStore.stores.find(s => s.id === merchantStoreId.value);
+      // if (!currentStore || currentStore.ownerId !== authStore.userId) {
+      //   ElMessage.error('您无权操作此店铺。');
+      //   router.push({ name: 'UserStoresList' }); // 跳转到商户的店铺列表或其他安全页面
+      // }
+    } else {
+      ElMessage.error('路由中的店铺ID无效。');
+      // router.push({ name: 'Home' }); // 或其他适当的错误处理/跳转
+    }
+  } else {
+    ElMessage.error('无法确定目标店铺，路径中缺少店铺ID。');
+    // router.push({ name: 'Home' }); // 或其他适当的错误处理/跳转
+  }
+});
+
+// Handle Form Submission
+const handleSubmit = async () => {
+  if (!formRef.value) return;
+  if (!merchantStoreId.value) {
+    ElMessage.error('店铺ID未知，无法提交商品申请。请确保路径正确。');
+    return;
+  }
+
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      const submissionData: CreateProductDTO = {
+        name: productFormData.value.name,
+        description: productFormData.value.description,
+        price: productFormData.value.price!,
+        imageUrl: productFormData.value.imageUrl,
+        storeId: merchantStoreId.value!,
+      };
+
+      try {
+        await productStore.applyForNewProduct(submissionData);
+        ElMessage.success('商品上架申请已成功提交！');
+        formRef.value?.resetFields();
+        // 导航到申请列表页面，也带上 storeId (如果申请列表是按店铺区分的)
+        // router.push({ name: 'ProductApplicationList', params: { storeId: merchantStoreId.value } });
+      } catch (submitError: any) {
+        ElMessage.error(submitError?.message || productStore.error || '提交申请失败，请稍后再试。');
+      }
+    } else {
+      ElMessage.info('请检查表单中的必填项和格式是否正确。');
+      return false;
+    }
+  });
+};
+
+// Handle Form Reset
+const handleReset = () => {
+  formRef.value?.resetFields();
+  clearError();
+};
+
+</script>
+
+<style scoped>
+.product-application-form-container {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+</style>

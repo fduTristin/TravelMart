@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router'
 import { ElAside, ElMenu, ElMenuItem, ElIcon, ElDivider, ElAvatar } from 'element-plus'
-import { House, User, Setting, SwitchButton } from '@element-plus/icons-vue'
+import { House, User, Setting, SwitchButton, Ticket } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/users'
@@ -56,6 +56,9 @@ const handleCommand = (command: string) => {
 const storeMenuLabel = computed(() => {
   return authStore.isMerchant ? '我的店铺' : authStore.isAdmin?'店铺管理':'店铺列表'
 })
+const productMenuLabel = computed(() => {
+  return authStore.isMerchant ? '商品申请历史' : '商品申请管理'
+})
 </script>
 
 <template>
@@ -87,6 +90,12 @@ const storeMenuLabel = computed(() => {
           <Setting />
         </el-icon>
         <span>{{ storeMenuLabel }}</span>
+      </el-menu-item>
+      <el-menu-item v-if="authStore.isAdmin || authStore.isMerchant" index="/product-applications" class="menu-item">
+        <el-icon>
+          <Ticket />
+        </el-icon>
+        <span>{{ productMenuLabel }}</span>
       </el-menu-item>
     </el-menu>
 
