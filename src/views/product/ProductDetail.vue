@@ -106,7 +106,7 @@ const loadProductDetails = async (id: number) => {
   isLoading.value = true;
   fetchError.value = null;
   try {
-    await productStore.fetchProductDetails(id); // 调用 store action
+    await productStore.fetchProductById(id); // 调用 store action
     product.value = productStore.currentProduct; // 从 store 获取更新后的当前商品
 
     if (product.value) {
@@ -169,10 +169,22 @@ const getProductStatusTag = (statusKey?: ProductStatus | string | null): ('succe
 };
 
 // --- 商户和管理员操作占位 ---
-const navigateToEditProduct = (id: number) => {
-  // TODO: 跳转到商品编辑页面，例如
-  // router.push({ name: 'ProductEdit', params: { productId: id } });
-  ElMessage.info(`功能待开发：编辑商品 ID ${id}`);
+const navigateToEditProduct = (productId: number | undefined) => {
+  if (!productId) {
+    ElMessage.error('无法编辑：商品ID无效。');
+    return;
+  }
+  // 确保 productId 是数字 (虽然类型已经是 number，但以防万一)
+  const id = Number(productId);
+  if (isNaN(id) || id <= 0) {
+    ElMessage.error('无法编辑：商品ID格式不正确。');
+    return;
+  }
+
+  console.log(`Navigating to edit page for product ID: ${id}`);
+  router.push({ name: 'ProductEdit', params: { productId: id } });
+  // 假设商品修改页面的路由名称是 'ProductEdit'
+  // 并且它期望一个名为 productId 的路由参数
 };
 
 const confirmRemoveProduct = async (id: number) => {

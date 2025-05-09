@@ -152,6 +152,17 @@ const routes: RouteRecordRaw[] = [
     // props: true, // 如果组件直接通过props接收storeId
   },
   {
+    path: '/products/:productId/edit', // 和我们规划的一致
+    name: 'ProductEdit', // 确保这个名称与 ProductDetail.vue 中跳转时使用的名称一致
+    component: () => import('@/views/product/ProductEditForm.vue'),
+    meta: {
+      title: '修改商品信息',
+      requiresAuth: true, // 通常需要商户登录
+      // 可能还需要权限校验，确保是该商品的拥有者才能编辑
+    },
+    props: true // 这使得 :productId 可以作为 prop 注入，但我们用 useRoute() 获取
+  },
+  {
     // 404 页面
     path: '/:pathMatch(.*)*',
     name: 'not-found',

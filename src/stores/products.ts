@@ -56,21 +56,31 @@ export const useProductStore = defineStore('product', () => {
    * 获取单个商品详情
    * @param productId - 商品ID
    */
-  async function fetchProductDetails(productId: number) { // 我会给它加上返回类型 Promise<Product | null>
+  async function fetchProductById(productId: number): Promise<Product | null> { // <--- 1. 明确返回类型
     loading.value = true;
     error.value = null;
-    currentProduct.value = null; // 清除旧值
+    // currentProduct.value = null; // 可以选择在开始时清除，或只在出错时清除
+
     try {
-      // productService.getProductById(productId) 现在直接返回 Product 或抛出错误
-      const productData = await productService.getProductById(productId);
-      currentProduct.value = productData; // 直接赋值
-      console.log(`[StoreAction] Fetched product by ID ${productId}:`, JSON.parse(JSON.stringify(currentProduct.value)));
-      // return productData; // 如果希望 action 也返回值给组件
+      const productData = await productService.getProductById(productId); // service 层应返回 Product 或抛错
+      if (productData) { // 确保 productData 不是 undefined/null (虽然 service 层应该保证)
+        currentProduct.value = productData; // 可选：更新 store 内的 currentProduct
+        console.log(`[StoreAction] Fetched product by ID ${productId}:`, JSON.parse(JSON.stringify(productData)));
+        return productData; // <--- 2. 成功时返回 Product 对象
+      } else {
+        // 如果 productService.getProductById 可能返回 null/undefined 而不抛错
+        console.warn(`[StoreAction] productService.getProductById returned no data for ID ${productId}`);
+        currentProduct.value = null;
+        return null; // <--- 明确返回 null
+      }
     } catch (err: any) {
       error.value = err.message || `获取商品详情 (ID: ${productId}) 失败`;
       console.error(`[StoreAction] Error fetching product by ID ${productId}:`, err);
       currentProduct.value = null;
-      // throw err; // 如果希望组件也能捕获到这个错误
+      // 选择A：向上抛出错误，让组件的 catch 处理
+      // throw err;
+      // 选择B：不向上抛出，但返回 null，组件需要检查返回值是否为 null
+      return null; // <--- 2. 失败时返回 null (或者你可以选择 throw err;)
     } finally {
       loading.value = false;
     }
@@ -100,32 +110,38 @@ export const useProductStore = defineStore('product', () => {
   }
 
   /**
-   * 申请修改商品信息
-   * @param productId - 要修改的商品的ID (或申请ID，需根据API确认)
-   * @param data - 商品修改数据
+   * 商户提交商品信息修改申请
+   * @param productId - 被修改的商品的ID
+   * @param data - 包含新商品信息的 UpdateProductDTO
+   * @returns 创建的商品修改申请记录
    */
-  async function applyForProductModification(productId: number, data: UpdateProductDTO) {
-    loading.value = true
-    error.value = null
+  async function applyForProductModification(productId: number, data: UpdateProductDTO): Promise<ProductApplication | null> {
+    loading.value = true;
+    error.value = null;
     try {
-      const updatedApplication = await productService.updateProductApplication(productId, data)
-      // 更新 productApplications 列表中的对应申请
-      const index = productApplications.value.findIndex(app => app.id === updatedApplication.id);
-      if (index !== -1) {
-        productApplications.value[index] = updatedApplication;
+      // productService.updateProductApplication 应该调用 PUT /product-applications/{productId}
+      // 并返回后端创建的新的 ProductApplication 对象
+      const newModificationApplication = await productService.updateProductApplication(productId, data);
+
+      if (newModificationApplication) {
+        // 将新创建的修改申请记录添加到 productApplications 列表的开头
+        // 这样用户在跳转到申请列表后可以立即看到它
+        productApplications.value.unshift(newModificationApplication);
+        console.log('[StoreAction] New product modification application added to list:', newModificationApplication);
+        return newModificationApplication;
       } else {
-        // 如果列表中没有，可能是直接修改，或者列表未包含此项，可以考虑添加到列表或重新获取
-        productApplications.value.unshift(updatedApplication);
+        // 如果 service 层因为某些原因返回了 null/undefined (例如API返回了非预期结构)
+        console.error('[StoreAction] productService.updateProductApplication did not return a valid application object.');
+        error.value = '提交修改申请后未能获取到有效的申请记录。';
+        return null;
       }
-      // 或者重新获取列表
-      // await fetchProductApplications();
-      return updatedApplication
+
     } catch (err: any) {
-      error.value = err.message || '商品信息修改申请失败'
-      console.error('Error applying for product modification:', err)
-      throw err
+      error.value = err.message || `提交商品 (ID: ${productId}) 修改申请失败`;
+      console.error(`[StoreAction] Error applying for product modification (Product ID: ${productId}):`, err);
+      throw err; // 重新抛出错误，让组件可以感知
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -241,7 +257,7 @@ export const useProductStore = defineStore('product', () => {
     error,
     // Actions
     fetchStoreProducts,
-    fetchProductDetails,
+    fetchProductById,
     applyForNewProduct,
     applyForProductModification,
     fetchProductApplications,
