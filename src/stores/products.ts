@@ -5,7 +5,8 @@ import type {
   Product,
   CreateProductDTO,
   UpdateProductDTO,
-  ProductApplication
+  ProductApplication,
+  ReviewApplicationDTO
 } from '@/types/product'
 
 export const useProductStore = defineStore('product', () => {
@@ -156,6 +157,61 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  /**
+   * 管理员审核商品申请
+   * @param payload - 包含 applicationId 和 reviewData (status, reviewComments)
+   */
+  async function processApplicationReview(payload: { applicationId: number; reviewData: ReviewApplicationDTO }) {
+    loading.value = true;
+    error.value = null;
+    try {
+      const updatedApplication = await productService.reviewProductApplication(payload.applicationId, payload.reviewData);
+
+      // 更新本地 productApplications 列表中的对应申请记录
+      const index = productApplications.value.findIndex(app => app.id === payload.applicationId);
+      if (index !== -1) {
+        productApplications.value[index] = updatedApplication;
+      } else {
+        // 如果列表中没有找到 (不太可能，除非列表在审核期间被外部清空或未加载)
+        // 可以考虑将更新后的申请添加到列表顶部或重新获取整个列表
+        // productApplications.value.unshift(updatedApplication);
+        // 或者更稳妥地重新获取，但会增加一次API调用：
+        // await fetchProductApplications();
+        console.warn(`Application with ID ${payload.applicationId} not found in local list after review. It was updated on server.`);
+      }
+      // 如果审核通过并且是NEW类型，商家的商品列表 (products ref) 也应该最终得到更新。
+      // 这个更新可能通过用户下次访问商家商品页时调用 fetchStoreProducts() 来实现，
+      // 或者如果审核API返回了足够的信息，我们可以在这里做更智能的更新。
+      // Admin.md 描述了后端会在批准NEW申请时创建products记录。
+
+      return updatedApplication; // 返回更新后的申请，方便组件处理
+    } catch (err: any) {
+      error.value = err.message || '审核申请失败';
+      console.error('Error processing application review:', err);
+      throw err; // 抛出错误，让组件可以捕获并处理
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  /**
+   * 获取单个申请的详细信息 (如果管理员审核前需要查看比列表更详细的信息)
+   * @param applicationId - 申请ID
+   */
+  async function fetchApplicationDetails(applicationId: number) {
+    loading.value = true;
+    error.value = null;
+    try {
+      currentApplication.value = await productService.getProductApplicationDetails(applicationId);
+    } catch (err: any) {
+      error.value = err.message || '获取申请详情失败';
+      console.error('Error fetching application details:', err);
+      currentApplication.value = null;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     // State
     products,
@@ -171,5 +227,7 @@ export const useProductStore = defineStore('product', () => {
     applyForProductModification,
     fetchProductApplications,
     takeProductOffShelf,
+    processApplicationReview,
+    fetchApplicationDetails,
   }
 })
