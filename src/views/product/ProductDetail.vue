@@ -37,11 +37,12 @@
                 <router-link v-if="storeName" :to="`/stores/${product.storeId}`" class="store-link">
                   {{ storeName }} (ID: {{ product.storeId }})
                 </router-link>
-                <span v-else>店铺ID: {{ product.storeId }}</span>
+                <span v-else-if="product.storeId">店铺ID: {{ product.storeId }}</span>
+                <span v-else>未知店铺</span>
               </el-descriptions-item>
 
               <el-descriptions-item label="商品状态">
-                <el-tag :type="getProductStatusTag(product.status)">
+                <el-tag :type="getProductStatusTag(product.status)" disable-transitions>
                   {{ formatProductStatus(product.status) }}
                 </el-tag>
               </el-descriptions-item>
@@ -60,14 +61,14 @@
             </div>
 
             <div class="action-buttons">
-              <div v-if="authStore.isMerchant && authStore.userId === product.storeOwnerId">
-                 <el-button type="primary" @click="navigateToEditProduct(product.id)">修改商品</el-button>
-                <el-button type="danger" @click="confirmRemoveProduct(product.id)">下架商品</el-button>
+              <div v-if="authStore.isMerchant && productStoreData && authStore.userId === productStoreData.ownerId" class="merchant-actions">
+                <el-button type="primary" @click="navigateToEditProduct(product!.id)">修改商品</el-button>
+                <el-button type="danger" @click="confirmRemoveProduct(product!.id)">下架商品</el-button>
               </div>
                <div v-if="authStore.isAdmin" style="margin-top:10px;">
-                <el-button type="warning" plain @click="adminManageProduct(product.id)">管理商品 (Admin)</el-button>
+                <el-button type="warning" plain @click="adminManageProduct(product!.id)">管理商品 (Admin)</el-button>
               </div>
-            </div>
+              </div>
 
           </el-card>
         </el-col>
@@ -79,13 +80,17 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import PageContainer from '@/components/PageContainer.vue'; // 假设有这个页面容器组件
+import PageContainer from '@/components/PageContainer.vue';
 import { useProductStore } from '@/stores/products';
-import { useStoreStore } from '@/stores/stores'; // 用于获取店铺名称
+import { useStoreStore } from '@/stores/stores';
 import { useAuthStore } from '@/stores/auth';
 import type { Product } from '@/types/product';
-import { ProductStatus } from '@/types/product'; // 引入 ProductStatus 枚举
-import { ElRow, ElCol, ElCard, ElImage, ElDescriptions, ElDescriptionsItem, ElTag, ElButton, ElEmpty, ElSkeleton, ElMessage, ElMessageBox } from 'element-plus';
+import { ProductStatus as ProductStatusEnum } from '@/types/product'; // 确保 ProductStatusEnum 导入
+import type { Store } from '@/types/store'; // 引入 Store 类型
+import {
+    ElRow, ElCol, ElCard, ElImage, ElDescriptions, ElDescriptionsItem, ElTag, ElButton,
+    ElEmpty, ElSkeleton, ElMessage, ElMessageBox
+} from 'element-plus';
 
 const route = useRoute();
 const router = useRouter();
@@ -94,37 +99,67 @@ const storeStore = useStoreStore();
 const authStore = useAuthStore();
 
 const product = ref<Product | null>(null);
+const productStoreData = ref<Store | null>(null); // <--- 新增: 用于存储当前商品所属的店铺对象
+const storeName = ref<string | null>(null); // 保留，用于显示店铺名称
+
 const isLoading = ref(true);
 const fetchError = ref<string | null>(null);
-const storeName = ref<string | null>(null);
 
 const pageTitle = computed(() => product.value ? `商品详情: ${product.value.name}` : '加载商品详情...');
 const productId = computed(() => Number(route.params.productId));
 
 const loadProductDetails = async (id: number) => {
-  if (isNaN(id) || id <= 0) { /* ... */ }
+  if (isNaN(id) || id <= 0) {
+    fetchError.value = '无效的商品ID';
+    isLoading.value = false;
+    product.value = null;
+    productStoreData.value = null;
+    storeName.value = null;
+    return;
+  }
   isLoading.value = true;
   fetchError.value = null;
-  try {
-    await productStore.fetchProductById(id); // 调用 store action
-    product.value = productStore.currentProduct; // 从 store 获取更新后的当前商品
+  product.value = null;
+  productStoreData.value = null;
+  storeName.value = null;
 
-    if (product.value) {
-      // 获取店铺名称等后续操作...
-      if (product.value.storeId) {
-        if (storeStore.stores.length === 0 && !storeStore.loading) { // 避免重复加载
-          await storeStore.fetchStores();
+  try {
+    const fetchedProduct = await productStore.fetchProductById(id); // 或 fetchProductDetails
+
+    if (fetchedProduct) {
+      product.value = fetchedProduct;
+
+      if (fetchedProduct.storeId) { // 确保后端返回的 product 对象里有 storeId
+        // 获取店铺信息 (用于显示店铺名称和判断ownerId)
+        if (storeStore.stores.length === 0 && !storeStore.loading) {
+          await storeStore.fetchStores(); // 加载所有店铺列表（如果尚未加载）
         }
-        const store = storeStore.stores.find(s => s.id === product.value!.storeId);
-        storeName.value = store ? store.storeName : null;
+        // 从店铺列表中查找当前商品所属的店铺
+        const foundStore = storeStore.stores.find(s => s.id === fetchedProduct.storeId);
+        if (foundStore) {
+          productStoreData.value = foundStore; // <--- 关键: 将店铺对象存起来
+          storeName.value = foundStore.storeName;
+          console.log('[ProductDetail] productStoreData set:', JSON.parse(JSON.stringify(productStoreData.value))); // <--- 添加日志
+        } else {
+          console.warn(`[ProductDetail] Store with ID ${fetchedProduct.storeId} not found in storeStore.stores.`);
+          productStoreData.value = null; // 未找到店铺，则设为null
+          storeName.value = `店铺ID: ${fetchedProduct.storeId} (名称未找到)`;
+        }
+      } else {
+        console.warn(`[ProductDetail] Product ID ${fetchedProduct.id} loaded, but does not have a storeId.`);
+        productStoreData.value = null; // 商品没有 storeId，则店铺信息为null
+        storeName.value = '未知店铺';
       }
     } else {
-      fetchError.value = '商品未找到。';
+      fetchError.value = '商品未找到或加载失败。';
+      product.value = null;
+      productStoreData.value = null; // 获取商品失败，店铺信息也为null
     }
   } catch (error: any) {
     console.error('Failed to load product details in component:', error);
     fetchError.value = error.message || '加载商品详情失败。';
     product.value = null;
+    productStoreData.value = null; // 出错时，店铺信息也为null
   } finally {
     isLoading.value = false;
   }
@@ -139,88 +174,133 @@ const formatPrice = (price: number | undefined) => {
 const formatGenericDateTime = (dateTimeString?: string | null) => {
   if (!dateTimeString) return 'N/A';
   try {
-    return new Date(dateTimeString).toLocaleString('zh-CN', { hour12: false });
+    return new Date(dateTimeString).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   } catch (e) { return dateTimeString; }
 };
 
-const formatProductStatus = (statusKey?: ProductStatus | string | null): string => {
+// 修改：直接使用导入的 ProductStatusEnum
+const formatProductStatus = (statusKey?: ProductStatusEnum | string | null): string => {
   if (!statusKey) return '状态未知';
-  // 假设 ProductStatus 枚举的值就是后端返回的字符串
-  // 例如: ProductStatus.ON_SHELF = 'ON_SHELF'
-  // 你可能需要一个映射表，如果枚举名和后端值不同
   switch (String(statusKey).toUpperCase()) {
-    case ProductStatus.ON_SHELF: return '销售中';
-    case ProductStatus.OFF_SHELF: return '已下架';
-    case ProductStatus.PENDING_APPROVAL: return '待审核';
-    case ProductStatus.APPROVAL_FAILED: return '审核失败';
+    case ProductStatusEnum.ON_SHELF: return '销售中';
+    case ProductStatusEnum.OFF_SHELF: return '已下架';
+    case ProductStatusEnum.PENDING_APPROVAL: return '待审核';
+    case ProductStatusEnum.APPROVAL_FAILED: return '审核失败';
     default: return String(statusKey);
   }
 };
 
-const getProductStatusTag = (statusKey?: ProductStatus | string | null): ('success' | 'warning' | 'danger' | 'info') => {
+const getProductStatusTag = (statusKey?: ProductStatusEnum | string | null): ('success' | 'warning' | 'danger' | 'info') => {
   if (!statusKey) return 'info';
   switch (String(statusKey).toUpperCase()) {
-    case ProductStatus.ON_SHELF: return 'success';
-    case ProductStatus.OFF_SHELF: return 'info';
-    case ProductStatus.PENDING_APPROVAL: return 'warning';
-    case ProductStatus.APPROVAL_FAILED: return 'danger';
+    case ProductStatusEnum.ON_SHELF: return 'success';
+    case ProductStatusEnum.OFF_SHELF: return 'info';
+    case ProductStatusEnum.PENDING_APPROVAL: return 'warning';
+    case ProductStatusEnum.APPROVAL_FAILED: return 'danger';
     default: return 'info';
   }
 };
 
-// --- 商户和管理员操作占位 ---
-const navigateToEditProduct = (productId: number | undefined) => {
-  if (!productId) {
+// --- 操作按钮的函数 ---
+const navigateToEditProduct = (currentProductId: number | undefined) => {
+  if (!currentProductId) {
     ElMessage.error('无法编辑：商品ID无效。');
     return;
   }
-  // 确保 productId 是数字 (虽然类型已经是 number，但以防万一)
-  const id = Number(productId);
-  if (isNaN(id) || id <= 0) {
-    ElMessage.error('无法编辑：商品ID格式不正确。');
+  // 确保 productStoreData.value (即店铺信息) 也已加载，因为编辑表单可能需要 storeId
+  if (!productStoreData.value || !productStoreData.value.id) {
+      ElMessage.error('无法编辑：商品所属店铺信息不完整。');
+      return;
+  }
+  console.log(`Navigating to edit page for product ID: ${currentProductId}, from store ID: ${productStoreData.value.id}`);
+  router.push({
+    name: 'ProductEdit', // 确保路由名称正确
+    params: {
+      // 如果 ProductEditForm 也需要 storeId 作为路由参数 (例如 /stores/:storeId/products/:productId/edit)
+      // storeId: productStoreData.value.id,
+      productId: currentProductId
+    }
+  });
+};
+
+const confirmRemoveProduct = async (currentProductId: number | undefined) => {
+  if (!currentProductId || !product.value) {
+    ElMessage.error('无效商品ID或商品数据未加载。');
     return;
   }
 
-  console.log(`Navigating to edit page for product ID: ${id}`);
-  router.push({ name: 'ProductEdit', params: { productId: id } });
-  // 假设商品修改页面的路由名称是 'ProductEdit'
-  // 并且它期望一个名为 productId 的路由参数
-};
-
-const confirmRemoveProduct = async (id: number) => {
-  // TODO: 实现下架逻辑
   try {
+    // 1. 弹出确认框，让用户二次确认
     await ElMessageBox.confirm(
-        `确定要下架该商品 (ID: ${id}) 吗？此操作会将商品状态变为“已下架”。`,
-        '下架确认',
-        { confirmButtonText: '确定下架', cancelButtonText: '取消', type: 'warning' }
+      `确定要下架商品 “${product.value.name}” (ID: ${currentProductId}) 吗？商品将不再对顾客可见。`,
+      '下架确认',
+      {
+        confirmButtonText: '确定下架',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
     );
-    // 用户点击了确定
-    // await productStore.takeProductOffShelf(id); // 假设有这个action
-    ElMessage.success(`商品 (ID: ${id}) 已成功下架！(模拟)`);
-    // 可能需要刷新当前商品信息或导航离开
-    // loadProductDetails(id);
-  } catch (action) {
-    if (action === 'cancel') {
-        ElMessage.info('已取消下架操作。');
+
+    // 2. 用户点击了“确定下架”，显示处理中消息
+    ElMessage({ type: 'info', message: '正在下架商品...', duration: 1500 });
+
+    // 3. 调用 store action 执行下架操作
+    await productStore.takeProductOffShelf(currentProductId);
+
+    // 4. API 调用成功后，显示成功消息
+    ElMessage.success(`商品 “${product.value.name}” 已成功下架！`);
+
+    // 5. 更新当前页面的商品状态显示
+    //    (productStore.takeProductOffShelf action 内部也应该更新了 currentProduct.status)
+    //    这里再次确保 product ref 的状态也同步，如果它们不是同一个对象引用的话
+    if (product.value && product.value.id === currentProductId) {
+      product.value.status = ProductStatusEnum.OFF_SHELF; // 使用导入的枚举
+    }
+
+    // 6. (可选) 可以在此处添加其他UI反馈，例如禁用“下架”按钮，
+    //    或者几秒后自动导航离开此页面等。
+    //    例如:
+    //    const offShelfButton = document.getElementById(`offshelf-btn-${currentProductId}`); // 假设按钮有这样的ID
+    //    if (offShelfButton) offShelfButton.disabled = true;
+
+  } catch (actionOrError) {
+    // 这个 catch 会捕获 ElMessageBox.confirm 的 reject (当用户点击取消或关闭时)
+    // 以及 productStore.takeProductOffShelf action 抛出的错误
+
+    if (actionOrError === 'cancel' || String(actionOrError).toLowerCase() === 'close' || (actionOrError instanceof Error && String(actionOrError.message).toLowerCase().includes('cancel'))) {
+      ElMessage.info('已取消下架操作。');
+    } else {
+      // 如果是 store action 抛出的错误，productStore.error 应该已经被设置了
+      console.error(`下架商品 (ID: ${currentProductId}) 操作失败:`, actionOrError);
+      ElMessage.error(productStore.error || `下架失败: ${ (actionOrError as Error)?.message || '未知错误' }`);
     }
   }
 };
 
-const adminManageProduct = (id: number) => {
-  ElMessage.info(`功能待开发：管理员管理商品 ID ${id}`);
+const adminManageProduct = (currentProductId: number | undefined) => {
+  if (!currentProductId) { ElMessage.error('无效商品ID'); return; }
+  ElMessage.info(`功能待开发：管理员管理商品 ID ${currentProductId}`);
 };
 
 
 onMounted(() => {
-  loadProductDetails(productId.value);
+  console.log('[ProductDetail] Current authStore.userId:', authStore.userId);
+  console.log('[ProductDetail] Current authStore.isMerchant:', authStore.isMerchant);
+  if (productId.value) {
+    loadProductDetails(productId.value);
+  } else {
+    fetchError.value = "商品ID缺失，无法加载详情。";
+    isLoading.value = false;
+  }
 });
 
 watch(
   () => route.params.productId,
-  (newId) => {
-    if (newId && Number(newId) !== product.value?.id) { // 仅当ID实际改变时才重新加载
-      loadProductDetails(Number(newId));
+  (newIdParam) => {
+    const newId = Number(newIdParam);
+    // 只有当 newId 有效，并且与当前已加载的 product.id 不同时才重新加载
+    if (newId && newId > 0 && newId !== product.value?.id) {
+      loadProductDetails(newId);
     }
   }
 );
@@ -243,6 +323,7 @@ watch(
   height: 400px; /* 或者根据需要调整 */
   display: block;
   border-radius: 4px; /* 图片本身也加圆角 */
+  background-color: #f5f7fa; /* 图片加载时的背景色 */
 }
 .product-title {
   font-size: 28px;
@@ -254,11 +335,14 @@ watch(
   font-size: 24px;
   font-weight: bold;
   color: #F56C6C; /* 醒目的价格颜色 */
-  margin-bottom: 15px;
+}
+.el-descriptions {
+    margin-bottom: 20px;
 }
 .store-link {
   color: var(--el-color-primary);
   text-decoration: none;
+  font-weight: 500;
 }
 .store-link:hover {
   text-decoration: underline;
@@ -266,7 +350,7 @@ watch(
 .product-description-full {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #EBEEF5;
+  border-top: 1px solid var(--el-border-color-lighter);
 }
 .product-description-full h3 {
   font-size: 18px;
@@ -280,15 +364,15 @@ watch(
   white-space: pre-wrap; /* 保留换行和空格 */
 }
 .action-buttons {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #EBEEF5;
+  margin-top: 24px; /* 调整与上方描述的间距 */
+  padding-top: 24px;
+  border-top: 1px solid var(--el-border-color-lighter);
+  display: flex; /* 让按钮横向排列或根据需要调整 */
+  gap: 10px; /* 按钮之间的间距 */
+  flex-wrap: wrap; /* 如果按钮过多则换行 */
 }
-.action-buttons .el-button {
-  margin-right: 10px;
+.merchant-actions, .admin-actions { /* 可以为不同角色的按钮组添加样式 */
+    display: flex;
+    gap: 10px;
 }
-.el-descriptions { /* 给描述列表一些外边距 */
-    margin-bottom: 20px;
-}
-
 </style>
