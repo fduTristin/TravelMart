@@ -186,7 +186,7 @@ const handleReset = () => {
 
 .form-container {
   background: rgb(252, 252, 252);
-  border-radius: 1vw;
+  border-radius: 1vh;
   width: 60vw;
   height: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -224,7 +224,7 @@ const handleReset = () => {
 
 :deep(.el-input__wrapper),
 :deep(.el-textarea__wrapper) {
-  height: 4vh;
+  height: 3vh;
   box-shadow: none;
   border: 1px solid var(--el-border-color);
   transition: all 0.2s;

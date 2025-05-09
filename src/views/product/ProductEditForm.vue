@@ -1,11 +1,5 @@
 <template>
   <PageContainer :title="pageTitle">
-    <el-card v-if="!initialLoadingError" shadow="never">
-      <template #header>
-        <div class="card-header">
-          <span>{{ isEditMode ? '申请修改商品信息' : '加载商品信息中...' }}</span>
-        </div>
-      </template>
 
       <el-skeleton :rows="5" animated v-if="isLoading" />
 
@@ -14,7 +8,7 @@
         ref="formRef"
         :model="productFormData"
         :rules="rules"
-        label-width="120px"
+        class="product-edit-form"
       >
         <el-form-item label="商品名称" prop="name">
           <el-input v-model="productFormData.name" placeholder="请输入商品名称" />
@@ -48,17 +42,15 @@
             v-if="productFormData.imageUrl"
             :src="productFormData.imageUrl"
             fit="contain"
-            style="max-height: 100px; margin-top: 10px; border:1px solid #eee;"
+            style="max-height: 50vh; margin-top: 10px; border:1px solid #eee;"
             :preview-src-list="[productFormData.imageUrl]"
             hide-on-click-modal
             />
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleSubmit" :loading="isSubmitting">
-            提交修改申请
-          </el-button>
-          <el-button @click="goBack">取消</el-button>
+          <BaseButton type="primary" @click="submitForm">提交</BaseButton>
+          <BaseButton type="default" @click="resetForm">重置</BaseButton>
         </el-form-item>
 
         <el-alert v-if="submitError" :title="submitError" type="error" show-icon closable @close="submitError = null" />
@@ -66,7 +58,6 @@
       </el-form>
       <el-empty v-else description="未能加载到要编辑的商品信息。" />
 
-    </el-card>
     <el-alert v-else :title="initialLoadingError || '发生错误'" type="error" show-icon />
   </PageContainer>
 </template>
@@ -79,6 +70,7 @@ import { useProductStore } from '@/stores/products';
 import type { Product, UpdateProductDTO } from '@/types/product'; // Product 和 UpdateProductDTO
 import { ElMessage, ElForm, ElInput, ElButton, ElInputNumber, ElCard, ElAlert, ElEmpty, ElSkeleton, ElImage } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
+import BaseButton from '@/components/BaseButton.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -124,6 +116,12 @@ const rules = ref<FormRules>({
   ],
 });
 const formRef = ref<FormInstance>();
+const fileList = ref([]);
+
+const handleUploadSuccess = (response: any, file: any) => {
+  productFormData.imageUrl = response.url;
+  ElMessage.success('图片上传成功');
+};
 
 // 加载要编辑的商品数据
 const loadProductForEdit = async (id: number) => {
@@ -218,6 +216,14 @@ const handleSubmit = async () => {
   isSubmitting.value = false; // Ensure this is reset in all paths if API call fails
 };
 
+const submitForm = async () => {
+  await handleSubmit();
+};
+
+const resetForm = () => {
+  formRef.value.resetFields();
+};
+
 const goBack = () => {
   router.back(); // 或者 router.push({ name: 'ProductDetail', params: { productId: productId.value }})
 };
@@ -232,4 +238,41 @@ const goBack = () => {
 .el-alert {
   margin-top: 15px;
 }
+
+.product-edit-form {
+  width: 60vw;
+  background: white;
+  padding: 4vh 2vw;
+  border-radius: 1vh;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.el-form-item__label) {
+  width: 15vh;
+  font-size: 1.9vh;
+  font-weight: 600;
+  color: #15324d;
+  margin-right: 1vh;  
+}
+
+:deep(.el-input__wrapper),
+:deep(.el-textarea__wrapper) {
+  height: 3vh;
+  box-shadow: none;
+  border: 1px solid var(--el-border-color);
+  transition: all 0.2s;
+}
+
+:deep(.el-input__inner),
+:deep(.el-textarea__inner) {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 1.9vh;
+}
+
+:deep(.el-form-item:last-child) {
+  margin-top: 4vh;
+  margin-bottom: 4vh;
+  margin-left: 18vw;
+}
+
 </style>
