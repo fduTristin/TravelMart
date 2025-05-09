@@ -22,17 +22,18 @@
     </el-form-item>
 
     <el-form-item>
-      <BaseButton type="primary" :icon="Search" @click="applyFilters">查询</BaseButton>
+      <BaseButton type="primary" :icon="Search" @click="applyFilters" :loadng="isLoading">查询</BaseButton>
       <BaseButton type="default" :icon="RefreshLeft" @click="resetFilters">重置</BaseButton>
       <BaseButton type="default" :icon="Refresh" @click="loadApplications" :loading="isLoading">刷新</BaseButton>
     </el-form-item>
   </el-form>
   <div class="product-application-list-container">
-    <el-table v-if="filteredApplications.length > 0" :data="filteredApplications" v-loading="isLoading" stripe style="width: 100%"
-      class="application-table" :row-class-name="tableRowClassName" @row-click="handleRowClick" :default-sort="{prop: 'createdAt', order: 'descending'}">
-      <el-table-column prop="id" label="申请ID" min-width=110 sortable />
+    <el-table v-if="filteredApplications.length > 0" :data="filteredApplications" v-loading="isLoading" stripe
+      style="width: 100%" class="application-table" :row-class-name="tableRowClassName"
+      :default-sort="{ prop: 'createdAt', order: 'descending' }">
+      <el-table-column prop="id" label="申请ID" min-width=120 sortable />
 
-      <el-table-column label="所属店铺" min-width=130 sortable
+      <el-table-column label="所属店铺" min-width=145 sortable
         :sort-by="(row: ProductApplication) => getStoreName(row.storeId)">
         <template #default="scope">
           {{ getStoreName(scope.row.storeId) }}
@@ -45,7 +46,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="applicationType" label="申请类型" min-width=120>
+      <el-table-column prop="applicationType" label="申请类型" min-width=140>
         <template #default="scope">
           <el-tag :type="getApplicationTypeTag(scope.row.applicationType)">
             {{ formatApplicationType(scope.row.applicationType) }}
@@ -53,7 +54,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="status" label="审核状态" min-width=120>
+      <el-table-column prop="status" label="审核状态" min-width=140>
         <template #default="scope">
           <el-tag :type="getStatusTagType(scope.row.status)">
             {{ formatStatus(scope.row.status) }}
@@ -61,19 +62,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="申请价格" min-width=120 align="right">
+      <el-table-column label="申请价格" min-width=150>
         <template #default="scope">
           {{ getProductPrice(scope.row.requestedData) }} 元
         </template>
       </el-table-column>
 
-      <el-table-column prop="createdAt" label="申请时间" min-width=210 sortable>
+      <el-table-column prop="createdAt" label="申请时间" min-width=260 sortable>
         <template #default="scope">
           {{ formatDateTime(scope.row.createdAt) }}
         </template>
       </el-table-column>
 
-      <el-table-column prop="reviewedAt" label="审核时间" min-width=210 sortable>
+      <el-table-column prop="reviewedAt" label="审核时间" min-width=260 sortable>
         <template #default="scope">
           {{ formatDateTime(scope.row.reviewedAt) }}
         </template>
@@ -81,21 +82,32 @@
 
       <el-table-column prop="reviewComments" label="审核意见" min-width=200 show-overflow-tooltip />
 
-      <el-table-column label="操作" width=120 fixed="right" align="center">
-        <el-button link type="primary" @click="viewApplicationDetails(scope.row)">
-          查看详情
-        </el-button>
+      <el-table-column label="操作" width="330" fixed="right" align="center">
+        <template #default="scope">
+          <el-button link type="primary" @click="viewApplicationDetails(scope.row)">
+            详情
+          </el-button>
+
+          <el-button v-if="authStore.isAdmin && scope.row.status?.toUpperCase() === ProductApplicationStatus.PENDING"
+            link type="success" @click="handleReview(scope.row, ProductApplicationStatus.APPROVED)">
+            通过
+          </el-button>
+          <el-button v-if="authStore.isAdmin && scope.row.status?.toUpperCase() === ProductApplicationStatus.PENDING"
+            link type="danger" @click="handleReview(scope.row, ProductApplicationStatus.REJECTED)">
+            拒绝
+          </el-button>
+        </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialogVisible"top="5vh">
+    <el-dialog v-model="dialogVisible" top="5vh">
       <div v-if="selectedApplication" class="dialog-content">
         <el-descriptions :column="1" border>
           <el-descriptions-item label="申请ID" label-class-name="desc-label">{{ selectedApplication.id
-          }}</el-descriptions-item>
+            }}</el-descriptions-item>
           <el-descriptions-item label="所属店铺" label-class-name="desc-label">{{
             getStoreName(selectedApplication.storeId)
-          }}</el-descriptions-item>
+            }}</el-descriptions-item>
           <el-descriptions-item label="申请类型" label-class-name="desc-label">
             <el-tag :type="getApplicationTypeTag(selectedApplication.applicationType)">
               {{ formatApplicationType(selectedApplication.applicationType) }}
@@ -108,10 +120,10 @@
           </el-descriptions-item>
           <el-descriptions-item label="申请时间" label-class-name="desc-label">{{
             formatDateTime(selectedApplication.createdAt)
-          }}</el-descriptions-item>
+            }}</el-descriptions-item>
           <el-descriptions-item label="审核时间" label-class-name="desc-label">{{
             formatDateTime(selectedApplication.reviewedAt)
-          }}</el-descriptions-item>
+            }}</el-descriptions-item>
           <el-descriptions-item label="审核意见" :span="2" label-class-name="desc-label">{{
             selectedApplication.reviewComments
             || '无' }}</el-descriptions-item>
@@ -129,8 +141,8 @@
             <el-image v-if="getProductImageUrl(selectedApplication.requestedData)"
               style="width: 20vh; height: 20vh; border-radius: 4px;"
               :src="getProductImageUrl(selectedApplication.requestedData)"
-              :preview-src-list="[getProductImageUrl(selectedApplication.requestedData) || '']" :initial-index="0" fit="cover"
-              loading="lazy" hide-on-click-modal />
+              :preview-src-list="[getProductImageUrl(selectedApplication.requestedData) || '']" :initial-index="0"
+              fit="cover" loading="lazy" hide-on-click-modal />
             <span v-else>无图片</span>
           </el-descriptions-item>
         </el-descriptions>
@@ -153,13 +165,13 @@ import { useAuthStore } from '@/stores/auth';
 import { useStoreStore } from '@/stores/stores';
 // 区分类型导入和值导入
 import type {
-    ProductApplication,
-    CreateProductDTO,
-    ReviewApplicationDTO,
+  ProductApplication,
+  CreateProductDTO,
+  ReviewApplicationDTO,
 } from '@/types/product';
 import {
-    ProductApplicationType, // 值导入 (枚举)
-    ProductApplicationStatus // 值导入 (枚举)
+  ProductApplicationType, // 值导入 (枚举)
+  ProductApplicationStatus // 值导入 (枚举)
 } from '@/types/product';
 import {
   ElTable, ElTableColumn, ElTag, ElButton, ElCard, ElDialog, ElForm, ElFormItem, ElSelect, ElOption,
@@ -294,8 +306,8 @@ const getProductPrice = (jsonData: string) => {
 
 // --- 修改：确保 getProductImageUrl 返回 string | undefined ---
 const getProductImageUrl = (jsonData: string | undefined | null): string | undefined => {
-    const data = parseRequestedData(jsonData); // jsonData type changed to allow undefined/null
-    return data.imageUrl; // imageUrl from CreateProductDTO is string, so this is string | undefined
+  const data = parseRequestedData(jsonData); // jsonData type changed to allow undefined/null
+  return data.imageUrl; // imageUrl from CreateProductDTO is string, so this is string | undefined
 };
 // --- 修改结束 ---
 
@@ -399,7 +411,7 @@ const handleReview = async (application: ProductApplication, newReviewStatus: Pr
     } else {
       console.error(`审核申请 (ID: ${application.id}) 失败:`, error);
       // productStore.error 应该由 action 设置，这里可以直接显示
-      ElMessage.error(productStore.error || `操作失败: ${ (error as Error)?.message || '未知错误' }`);
+      ElMessage.error(productStore.error || `操作失败: ${(error as Error)?.message || '未知错误'}`);
     }
   }
 };
@@ -419,10 +431,6 @@ const loadApplications = async () => {
 
 const tableRowClassName = ({ row }: { row: ProductApplication }) => {
   return 'application-row'; // 可根据需求动态设置行样式
-};
-
-const handleRowClick = (row: ProductApplication) => {
-  viewApplicationDetails(row);
 };
 
 onMounted(() => {
@@ -516,7 +524,8 @@ onMounted(() => {
 }
 
 .dialog-content :deep(.el-descriptions__label) {
-  width: 15%; /* 调小宽度 */
+  width: 15%;
+  /* 调小宽度 */
   font-size: 1.8vh;
   font-weight: 600;
 }
@@ -534,7 +543,9 @@ onMounted(() => {
 }
 
 .el-button {
+  width: 6vh;
   font-size: 2vh;
+  font-weight: 600;
   font-family: inherit;
 }
 
