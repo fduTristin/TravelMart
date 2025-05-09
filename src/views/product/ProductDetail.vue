@@ -261,6 +261,21 @@ const confirmRemoveProduct = async (currentProductId: number | undefined) => {
     //    const offShelfButton = document.getElementById(`offshelf-btn-${currentProductId}`); // 假设按钮有这样的ID
     //    if (offShelfButton) offShelfButton.disabled = true;
 
+    // 7. 导航到对应的店铺页面
+    if (product.value && product.value.storeId) {
+      try {
+        // 假设店铺详情页的路由名称是 'store-detail'
+        // 并且它接受一个名为 'id' 的参数
+        await router.push({ name: 'store-detail', params: { id: product.value.storeId } });
+      } catch (navigationError) {
+        console.error("导航到店铺页面失败:", navigationError);
+        ElMessage.info('商品已下架，但导航到店铺页面失败。您可以手动返回。');
+        // 如果导航失败，用户仍停留在当前页，但商品已下架，按钮已隐藏
+      }
+    } else {
+      ElMessage.info('商品已下架。未找到店铺ID，无法自动导航。');
+      // 如果没有 storeId，则不导航，仅隐藏按钮和更新状态
+    }
   } catch (actionOrError) {
     // 这个 catch 会捕获 ElMessageBox.confirm 的 reject (当用户点击取消或关闭时)
     // 以及 productStore.takeProductOffShelf action 抛出的错误
