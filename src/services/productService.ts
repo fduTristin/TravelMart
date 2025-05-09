@@ -113,12 +113,11 @@ export const productService = {
    * @returns 商品详情
    */
   async getProductById(productId: number): Promise<Product> { // <--- 明确返回 Product
-    // const authStore = useAuthStore(); // 如果此接口需要token
+    const authStore = useAuthStore();
     try {
-      // 假设 GET /products/{productId} 不需要 token，或者你的 api 实例已处理
-      const response: AxiosResponse<Product> = await api.get(`/products/${productId}`/*, {
-        headers: { Authorization: `Bearer ${authStore.token}` } // 如果需要
-      }*/);
+      const response: AxiosResponse<Product> = await api.get(`/products/${productId}`, {
+        headers: { Authorization: `Bearer ${authStore.token}` }
+      });
 
       if (response && response.data) { // 检查响应和 data 属性
         return response.data; // 返回实际的 Product 对象

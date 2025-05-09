@@ -24,11 +24,8 @@
 
         <el-col :xs="24" :sm="24" :md="14" :lg="14" class="product-info-section">
           <el-card shadow="hover">
-            <template #header>
-              <h1 class="product-title">{{ product.name }}</h1>
-            </template>
 
-            <el-descriptions :column="1" border size="large">
+            <el-descriptions :column="1" border >
               <el-descriptions-item label="价格">
                 <span class="product-price">{{ formatPrice(product.price) }}</span>
               </el-descriptions-item>
@@ -62,11 +59,11 @@
 
             <div class="action-buttons">
               <div v-if="authStore.isMerchant && productStoreData && authStore.userId === productStoreData.ownerId" class="merchant-actions">
-                <el-button type="primary" @click="navigateToEditProduct(product!.id)">修改商品</el-button>
-                <el-button type="danger" @click="confirmRemoveProduct(product!.id)">下架商品</el-button>
+                <BaseButton type="primary" @click="navigateToEditProduct(product!.id)">修改商品</BaseButton>
+                <BaseButton type="danger" @click="confirmRemoveProduct(product!.id)">下架商品</BaseButton>
               </div>
                <div v-if="authStore.isAdmin" style="margin-top:10px;">
-                <el-button type="warning" plain @click="adminManageProduct(product!.id)">管理商品 (Admin)</el-button>
+                <BaseButton type="warning" plain @click="adminManageProduct(product!.id)">管理商品 (Admin)</BaseButton>
               </div>
               </div>
 
@@ -91,6 +88,7 @@ import {
     ElRow, ElCol, ElCard, ElImage, ElDescriptions, ElDescriptionsItem, ElTag, ElButton,
     ElEmpty, ElSkeleton, ElMessage, ElMessageBox
 } from 'element-plus';
+import BaseButton from '@/components/BaseButton.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -316,13 +314,13 @@ watch(
   text-align: center;
 }
 .image-card, .product-info-section .el-card {
-  border-radius: 8px;
+  border-radius: 1vh;
 }
 .main-product-image {
   width: 100%;
-  height: 400px; /* 或者根据需要调整 */
+  height: 100%; /* 或者根据需要调整 */
   display: block;
-  border-radius: 4px; /* 图片本身也加圆角 */
+  border-radius: 1vh; /* 图片本身也加圆角 */
   background-color: #f5f7fa; /* 图片加载时的背景色 */
 }
 .product-title {
@@ -353,12 +351,12 @@ watch(
   border-top: 1px solid var(--el-border-color-lighter);
 }
 .product-description-full h3 {
-  font-size: 18px;
+  font-size: 2vh;
   margin-bottom: 10px;
   color: #303133;
 }
 .product-description-full p {
-  font-size: 14px;
+  font-size: 1.8vh;
   line-height: 1.8;
   color: #606266;
   white-space: pre-wrap; /* 保留换行和空格 */
@@ -374,5 +372,19 @@ watch(
 .merchant-actions, .admin-actions { /* 可以为不同角色的按钮组添加样式 */
     display: flex;
     gap: 10px;
+}
+.el-tag {
+  width: 8.5vh;
+  height: 3.2vh;
+  font-size: 1.8vh;
+}
+.el-card :deep(.el-descriptions__label) {
+  width: 12%;
+  font-size: 1.8vh;
+  font-weight: 600;
+}
+.el-card :deep(.el-descriptions__content) {
+  font-size: 1.8vh;
+  line-height: 3vh;
 }
 </style>

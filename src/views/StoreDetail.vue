@@ -9,6 +9,7 @@ import type { Store } from '@/types/store';
 import type { Product } from '@/types/product'; // <--- 引入 Product 类型
 import { ElRow, ElCol, ElCard, ElImage, ElTag, ElButton, ElEmpty, ElSkeleton, ElSkeletonItem, ElMessage } from 'element-plus'; // <--- 引入Element Plus组件
 import { Plus } from '@element-plus/icons-vue'
+import BaseButton from '@/components/BaseButton.vue';
 
 const route = useRoute();
 const router = useRouter(); // <--- 实例化 useRouter
@@ -136,16 +137,17 @@ const formatPrice = (price: number | undefined) => {
 <template>
   <PageContainer>
     <div v-if="storeLoading" class="loading-placeholder">
-        <el-skeleton :rows="5" animated />
+      <el-skeleton :rows="5" animated />
     </div>
     <div v-else-if="storeError || !store" class="error-placeholder">
-        <el-empty description="加载店铺数据失败或店铺不存在" />
+      <el-empty description="加载店铺数据失败或店铺不存在" />
     </div>
 
     <div v-else class="store-detail-content">
       <div class="store-header">
         <div class="store-cover">
-          <el-image :src="store.imageUrl || '/placeholder-image.jpg'" :alt="store.storeName" fit="cover" class="store-cover-image" />
+          <el-image :src="store.imageUrl || '/placeholder-image.jpg'" :alt="store.storeName" fit="cover"
+            class="store-cover-image" />
         </div>
         <div class="store-info">
           <h1>{{ store.storeName }}</h1>
@@ -153,7 +155,8 @@ const formatPrice = (price: number | undefined) => {
           <p class="description">备案地址: {{ store.registrationAddress }}</p>
           <p class="description">注册资金: {{ store.registeredCapital }}元</p>
           <p class="description">注册时间: {{ store.registrationDate }}</p>
-          <p v-if="authStore.isAdmin || (authStore.isMerchant && authStore.userId === store.ownerId)" class="description">
+          <p v-if="authStore.isAdmin || (authStore.isMerchant && authStore.userId === store.ownerId)"
+            class="description">
             注册人身份证号: {{ store.ownerIdNumber }}
           </p>
           <div class="info-item description">
@@ -165,35 +168,30 @@ const formatPrice = (price: number | undefined) => {
               {{ category }}
             </el-tag>
           </div>
-
-          <div class="store-actions-bar" v-if="authStore.isMerchant && authStore.userId === store.ownerId">
-            <el-button type="success" :icon="Plus" @click="navigateToApplyNewProduct">
-              新增商品到本店
-            </el-button>
-          </div>
         </div>
       </div>
 
-      <el-divider content-position="left"><h3>店铺商品</h3></el-divider>
+
+      <h1>店铺商品</h1>
 
       <div v-if="productsLoading" class="products-loading">
         <el-row :gutter="20">
-            <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="n in 4" :key="n">
-                <el-card shadow="hover" style="margin-bottom: 20px;">
-                    <el-skeleton animated>
-                        <template #template>
-                        <el-skeleton-item variant="image" style="width: 100%; height: 180px;" />
-                        <div style="padding: 14px;">
-                            <el-skeleton-item variant="p" style="width: 50%" />
-                            <div style="display: flex; align-items: center; justify-items: space-between; margin-top: 10px;">
-                            <el-skeleton-item variant="text" style="margin-right: 16px; width: 30%;" />
-                            <el-skeleton-item variant="text" style="width: 30%;" />
-                            </div>
-                        </div>
-                        </template>
-                    </el-skeleton>
-                </el-card>
-            </el-col>
+          <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="n in 4" :key="n">
+            <el-card shadow="hover" style="margin-bottom: 20px;">
+              <el-skeleton animated>
+                <template #template>
+                  <el-skeleton-item variant="image" style="width: 100%; height: 180px;" />
+                  <div style="padding: 14px;">
+                    <el-skeleton-item variant="p" style="width: 50%" />
+                    <div style="display: flex; align-items: center; justify-items: space-between; margin-top: 10px;">
+                      <el-skeleton-item variant="text" style="margin-right: 16px; width: 30%;" />
+                      <el-skeleton-item variant="text" style="width: 30%;" />
+                    </div>
+                  </div>
+                </template>
+              </el-skeleton>
+            </el-card>
+          </el-col>
         </el-row>
       </div>
       <div v-else-if="productsError" class="error-placeholder">
@@ -201,26 +199,18 @@ const formatPrice = (price: number | undefined) => {
       </div>
       <div v-else-if="products.length > 0" class="product-list">
         <el-row :gutter="20">
-          <el-col
-            v-for="product in products"
-            :key="product.id"
-            :xs="24" :sm="12" :md="8" :lg="6" >
+          <el-col v-for="product in products" :key="product.id" :xs="24" :sm="12" :md="8" :lg="6">
             <el-card shadow="hover" class="product-card" @click="navigateToProductDetail(product.id)">
-              <el-image
-                :src="product.imageUrl || '/placeholder-product.jpg'"
-                :alt="product.name"
-                fit="cover"
-                class="product-image"
-                lazy
-              />
+              <el-image :src="product.imageUrl || '/placeholder-product.jpg'" :alt="product.name" fit="cover"
+                class="product-image" lazy />
               <div class="product-info">
                 <h4 class="product-name" :title="product.name">{{ product.name }}</h4>
                 <p class="product-description" :title="product.description">
                   {{ product.description }}
                 </p>
                 <div class="product-price-actions">
-                    <span class="product-price">{{ formatPrice(product.price) }}</span>
-                    <!-- <div v-if="authStore.isMerchant && authStore.userId === store?.ownerId" class="merchant-actions">
+                  <span class="product-price">{{ formatPrice(product.price) }}</span>
+                  <!-- <div v-if="authStore.isMerchant && authStore.userId === store?.ownerId" class="merchant-actions">
                         <el-button type="primary" size="small" link @click="editProduct(product.id)">修改</el-button>
                         <el-button type="danger" size="small" link @click="removeProduct(product.id)">下架</el-button>
                     </div> -->
@@ -233,6 +223,13 @@ const formatPrice = (price: number | undefined) => {
       <div v-else>
         <el-empty description="该店铺暂无已上架的商品" />
       </div>
+      <BaseButton type="primary" @click="navigateToApplyNewProduct"
+        v-if="authStore.isMerchant && authStore.userId === store.ownerId">
+        <el-icon>
+          <Plus />
+        </el-icon>
+        新增商品
+      </BaseButton>
     </div>
   </PageContainer>
 </template>
@@ -247,48 +244,62 @@ const formatPrice = (price: number | undefined) => {
   padding: 40px 0;
 }
 
-.store-detail-content { /* Renamed from .store-detail to avoid conflict with a possible class name */
-  max-width: 80vw; /* 稍微调大宽度以容纳商品列表 */
-  /* height: auto; */ /* 高度由内容决定 */
+.store-detail-content {
+  /* Renamed from .store-detail to avoid conflict with a possible class name */
+  max-width: 80vw;
+  /* 稍微调大宽度以容纳商品列表 */
+  /* height: auto; */
+  /* 高度由内容决定 */
   margin: 0 auto;
   padding-bottom: 40px;
 }
 
 .store-header {
   background: white;
-  border-radius: 8px; /* 调整圆角 */
+  border-radius: 8px;
+  /* 调整圆角 */
   overflow: hidden;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1); /* Element Plus 卡片阴影风格 */
-  margin-bottom: 24px; /* 调整间距 */
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  /* Element Plus 卡片阴影风格 */
+  margin-bottom: 24px;
+  /* 调整间距 */
   display: flex;
   flex-direction: column;
 }
 
 .store-cover-image {
   width: 100%;
-  height: 300px; /* 调整封面高度 */
-  display: block; /* 避免图片下方小间隙 */
+  height: 300px;
+  /* 调整封面高度 */
+  display: block;
+  /* 避免图片下方小间隙 */
 }
 
 .store-info {
-  padding: 24px; /* 调整内边距 */
+  padding: 24px;
+  /* 调整内边距 */
 }
 
 .store-info h1 {
-  margin: 0 0 12px; /* 调整间距 */
-  font-size: 28px; /* 调整字号 */
+  margin: 0 0 12px;
+  /* 调整间距 */
+  font-size: 28px;
+  /* 调整字号 */
   color: #303133;
   font-weight: 600;
 }
 
 .description {
-  font-size: 14px; /* 调整字号 */
+  font-size: 14px;
+  /* 调整字号 */
   color: #606266;
   line-height: 1.7;
-  margin-bottom: 8px; /* 调整间距 */
+  margin-bottom: 8px;
+  /* 调整间距 */
 }
 
-.info-item { /* 如果还使用 info-item */
+.info-item {
+  /* 如果还使用 info-item */
   display: flex;
   align-items: center;
   gap: 8px;
@@ -296,22 +307,27 @@ const formatPrice = (price: number | undefined) => {
   font-size: 14px;
   margin-bottom: 8px;
 }
+
 .info-item span:first-child {
-    font-weight: 500;
-    color: #303133;
+  font-weight: 500;
+  color: #303133;
 }
 
 
 .categories {
   display: flex;
-  gap: 8px; /* 调整间距 */
+  gap: 8px;
+  /* 调整间距 */
   flex-wrap: wrap;
-  margin-top: 16px; /* 调整间距 */
+  margin-top: 16px;
+  /* 调整间距 */
 }
 
 .category-tag {
-  font-size: 12px; /* 调整字号 */
-  /* padding: 4px 8px; */ /* el-tag 默认有padding，可微调 */
+  font-size: 12px;
+  /* 调整字号 */
+  /* padding: 4px 8px; */
+  /* el-tag 默认有padding，可微调 */
   /* border-radius: 4px; */
 }
 
@@ -319,10 +335,11 @@ const formatPrice = (price: number | undefined) => {
 .el-divider {
   margin: 30px 0;
 }
+
 .el-divider h3 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #303133;
+  font-size: 20px;
+  font-weight: 600;
+  color: #303133;
 }
 
 .product-list {
@@ -333,12 +350,14 @@ const formatPrice = (price: number | undefined) => {
   margin-bottom: 20px;
   border-radius: 8px;
   cursor: pointer;
-  transition: box-shadow 0.3s ease-in-out; /* 可选：添加一个轻微的阴影过渡效果 */
+  transition: box-shadow 0.3s ease-in-out;
+  /* 可选：添加一个轻微的阴影过渡效果 */
 }
 
 .product-image {
   width: 100%;
-  height: 180px; /* 固定图片高度 */
+  height: 180px;
+  /* 固定图片高度 */
   display: block;
   border-bottom: 1px solid #ebeef5;
 }
@@ -362,31 +381,42 @@ const formatPrice = (price: number | undefined) => {
   color: #909399;
   line-height: 1.5;
   margin-bottom: 10px;
-  height: 40px; /* 限制描述显示两行左右 */
+  height: 40px;
+  /* 限制描述显示两行左右 */
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* 限制两行 */
+  -webkit-line-clamp: 2;
+  /* 限制两行 */
   -webkit-box-orient: vertical;
 }
 
 .product-price-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
 }
 
 .product-price {
   font-size: 18px;
   font-weight: bold;
-  color: #f56c6c; /* 价格用醒目颜色 */
-}
-.merchant-actions .el-button {
-    padding: 0; /* Element Plus link button tends to have padding */
-}
-.merchant-actions .el-button + .el-button {
-    margin-left: 10px;
+  color: #f56c6c;
+  /* 价格用醒目颜色 */
 }
 
+.merchant-actions .el-button {
+  padding: 0;
+  /* Element Plus link button tends to have padding */
+}
+
+.merchant-actions .el-button+.el-button {
+  margin-left: 10px;
+}
+
+:deep(h1) {
+  font-size: 2.5vh;
+  font-weight: 600;
+  color: ;
+}
 </style>
