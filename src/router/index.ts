@@ -126,11 +126,15 @@ const routes: RouteRecordRaw[] = [
     props: true // 这会将路由参数作为 props 传递给组件，但我们这里用 useRoute() 更灵活
   },
   {
-    path: '/stores/:storeId/product-applications', // 或者你选择的其他路径
+    //   path: '/stores/:storeId/product-applications', // 带 storeId 的路径，查看对应店铺下的申请（这个不需要就删了？）
+    path: '/product-applications',
     name: 'ProductApplicationList', // 路由名
     component: () => import('@/views/product/ProductApplicationList.vue'),
     meta: {
-      title: '商品申请记录',
+      title: () => {
+        const authStore = useAuthStore()
+        return authStore.isMerchant ? '商品申请历史' : '商品申请管理'
+      },
       requiresAuth: true,
       // 可能需要权限控制，例如仅商户或Admin可访问
     },

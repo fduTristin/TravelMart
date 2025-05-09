@@ -67,22 +67,35 @@ export enum ProductApplicationStatus {
 /**
  * 商品上架/修改申请记录的类型
  */
+// export interface ProductApplication {
+//   id: number; // 申请记录的ID
+//   store?: { // 关联的店铺信息 (可选, 例如在修改申请中可能包含)
+//     id: number;
+//     name: string;
+//   };
+//   product?: { // 关联的商品信息 (可选, 例如在修改申请中可能指原商品)
+//     id: number;
+//     name: string;
+//   };
+//   applicationType: ProductApplicationType | string; // 申请类型 (例如 "NEW", "MODIFY")
+//   requestedData: string; // 请求的数据 (JSON字符串形式的商品信息)
+//   status: ProductApplicationStatus | string; // 申请状态 (例如 "PENDING", "APPROVED", "REJECTED")
+//   reviewer?: any; // 审核人信息 (可选)
+//   reviewComments?: string | null; // 审核意见 (可选)
+//   createdAt?: string; // 申请创建时间 (ISO 格式字符串)
+//   updatedAt?: string; // 申请更新时间 (ISO 格式字符串, 可能在审核后更新)
+//   reviewedAt?: string | null; // 审核时间 (ISO 格式字符串, 可能为 null)
+// }
 export interface ProductApplication {
-  id: number; // 申请记录的ID
-  store?: { // 关联的店铺信息 (可选, 例如在修改申请中可能包含)
-    id: number;
-    name: string;
-  };
-  product?: { // 关联的商品信息 (可选, 例如在修改申请中可能指原商品)
-    id: number;
-    name: string;
-  };
-  applicationType: ProductApplicationType | string; // 申请类型 (例如 "NEW", "MODIFY")
-  requestedData: string; // 请求的数据 (JSON字符串形式的商品信息)
-  status: ProductApplicationStatus | string; // 申请状态 (例如 "PENDING", "APPROVED", "REJECTED")
-  reviewer?: any; // 审核人信息 (可选)
-  reviewComments?: string | null; // 审核意见 (可选)
-  createdAt?: string; // 申请创建时间 (ISO 格式字符串)
-  updatedAt?: string; // 申请更新时间 (ISO 格式字符串, 可能在审核后更新)
-  reviewedAt?: string | null; // 审核时间 (ISO 格式字符串, 可能为 null)
+  id: number;
+  storeId: number; // 关键：确保 storeId 是顶层属性
+  applicationType: ProductApplicationType | string;
+  requestedData: string; // JSON string of product details
+  status: ProductApplicationStatus | string;
+  reviewer?: any;
+  reviewComments?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  reviewedAt?: string | null;
+  // product?: { id: number; name: string }; // 可选，如果API在某些场景下会关联已存在的商品实体
 }
