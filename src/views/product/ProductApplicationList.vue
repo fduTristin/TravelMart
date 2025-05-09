@@ -69,7 +69,7 @@
          </el-form-item>
       </el-form>
 
-      <el-table :data="filteredApplications" v-loading="isLoading" stripe style="width: 100%" class="application-table">
+      <el-table :data="filteredApplications" v-loading="isLoading" stripe style="width: 100%" class="application-table" :default-sort="{prop: 'createdAt', order: 'descending'}">
         <el-table-column prop="id" label="申请ID" width="100" sortable />
 
         <el-table-column label="所属店铺" width="180" sortable :sort-by="(row: ProductApplication) => getStoreName(row.storeId)">
