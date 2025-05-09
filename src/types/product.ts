@@ -64,38 +64,25 @@ export enum ProductApplicationStatus {
   REJECTED = 'REJECTED',
 }
 
+// DTO for Admin reviewing an application
+export interface ReviewApplicationDTO {
+  status: ProductApplicationStatus.APPROVED | ProductApplicationStatus.REJECTED; // 只能是这两个值
+  reviewComments?: string;
+}
+
 /**
  * 商品上架/修改申请记录的类型
  */
-// export interface ProductApplication {
-//   id: number; // 申请记录的ID
-//   store?: { // 关联的店铺信息 (可选, 例如在修改申请中可能包含)
-//     id: number;
-//     name: string;
-//   };
-//   product?: { // 关联的商品信息 (可选, 例如在修改申请中可能指原商品)
-//     id: number;
-//     name: string;
-//   };
-//   applicationType: ProductApplicationType | string; // 申请类型 (例如 "NEW", "MODIFY")
-//   requestedData: string; // 请求的数据 (JSON字符串形式的商品信息)
-//   status: ProductApplicationStatus | string; // 申请状态 (例如 "PENDING", "APPROVED", "REJECTED")
-//   reviewer?: any; // 审核人信息 (可选)
-//   reviewComments?: string | null; // 审核意见 (可选)
-//   createdAt?: string; // 申请创建时间 (ISO 格式字符串)
-//   updatedAt?: string; // 申请更新时间 (ISO 格式字符串, 可能在审核后更新)
-//   reviewedAt?: string | null; // 审核时间 (ISO 格式字符串, 可能为 null)
-// }
 export interface ProductApplication {
   id: number;
-  storeId: number; // 关键：确保 storeId 是顶层属性
+  storeId: number;
   applicationType: ProductApplicationType | string;
   requestedData: string; // JSON string of product details
   status: ProductApplicationStatus | string;
-  reviewer?: any;
-  reviewComments?: string | null;
+  reviewer?: { id: number; name?: string; }; // 假设 reviewer 是一个对象，包含 admin_id
+  reviewComments?: string | null; // 对应 review_comments
   createdAt?: string;
-  updatedAt?: string;
+  updatedAt?: string; // 申请记录本身更新的时间
   reviewedAt?: string | null;
-  // product?: { id: number; name: string }; // 可选，如果API在某些场景下会关联已存在的商品实体
+  productId?: number | null; // 新增商品批准后，关联的商品ID
 }
