@@ -82,15 +82,15 @@
       <el-table-column prop="reviewComments" label="审核意见" min-width=200 show-overflow-tooltip />
 
       <el-table-column label="操作" width=120 fixed="right" align="center">
-        <el-button link type="primary" size="huge" @click="viewApplicationDetails(scope.row)">
+        <el-button link type="primary" @click="viewApplicationDetails(scope.row)">
           查看详情
         </el-button>
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialogVisible" title="申请详情" width="60%" top="5vh">
+    <el-dialog v-model="dialogVisible"top="5vh">
       <div v-if="selectedApplication" class="dialog-content">
-        <el-descriptions :column="2" border>
+        <el-descriptions :column="1" border>
           <el-descriptions-item label="申请ID" label-class-name="desc-label">{{ selectedApplication.id
           }}</el-descriptions-item>
           <el-descriptions-item label="所属店铺" label-class-name="desc-label">{{
@@ -101,7 +101,7 @@
               {{ formatApplicationType(selectedApplication.applicationType) }}
             </el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="状态" label-class-name="desc-label">
+          <el-descriptions-item label="申请状态" label-class-name="desc-label">
             <el-tag :type="getStatusTagType(selectedApplication.status)">
               {{ formatStatus(selectedApplication.status) }}
             </el-tag>
@@ -117,7 +117,7 @@
             || '无' }}</el-descriptions-item>
         </el-descriptions>
 
-        <el-divider content-position="left">申请的商品信息</el-divider>
+        <el-divider content-position="center">申请的商品信息</el-divider>
         <el-descriptions :column="1" border>
           <el-descriptions-item label="商品名称" label-class-name="desc-label">{{
             getProductName(selectedApplication.requestedData) }}</el-descriptions-item>
@@ -127,16 +127,16 @@
             getProductPrice(selectedApplication.requestedData) }} 元</el-descriptions-item>
           <el-descriptions-item label="图片URL" label-class-name="desc-label">
             <el-image v-if="getProductImageUrl(selectedApplication.requestedData)"
-              style="width: 100px; height: 100px; border-radius: 4px;"
+              style="width: 20vh; height: 20vh; border-radius: 4px;"
               :src="getProductImageUrl(selectedApplication.requestedData)"
-              :preview-src-list="[getProductImageUrl(selectedApplication.requestedData)]" :initial-index="0" fit="cover"
+              :preview-src-list="[getProductImageUrl(selectedApplication.requestedData) || '']" :initial-index="0" fit="cover"
               loading="lazy" hide-on-click-modal />
             <span v-else>无图片</span>
           </el-descriptions-item>
         </el-descriptions>
       </div>
       <template #footer>
-        <el-button @click="dialogVisible = false">关闭</el-button>
+        <BaseButton @click="dialogVisible = false">关闭</BaseButton>
       </template>
     </el-dialog>
 
@@ -163,7 +163,7 @@ import {
 } from '@/types/product';
 import {
   ElTable, ElTableColumn, ElTag, ElButton, ElCard, ElDialog, ElForm, ElFormItem, ElSelect, ElOption,
-  ElDescriptions, ElDescriptionsItem, ElImage, ElEmpty, ElDivider, ElMessage // 确保 ElMessage 已导入
+  ElDescriptions, ElDescriptionsItem, ElImage, ElEmpty, ElDivider, ElMessage, ElMessageBox // 确保 ElMessage 已导入
 } from 'element-plus';
 import { Refresh, Search, RefreshLeft } from '@element-plus/icons-vue';
 import BaseButton from '@/components/BaseButton.vue';
@@ -455,7 +455,7 @@ onMounted(() => {
 
     .cell {
       font-weight: 600;
-      font-size: 2vh;
+      font-size: 1.8vh;
     }
   }
 
@@ -465,7 +465,7 @@ onMounted(() => {
 
     .cell {
       font-weight: 500;
-      font-size: 2vh;
+      font-size: 1.8vh;
     }
   }
 
@@ -504,26 +504,33 @@ onMounted(() => {
   margin-right: 10px;
 }
 
-.application-table {
-  margin-top: 10px;
+
+.dialog-content {
+  width: 40vw;
+  padding: 2vh 3vw;
 }
 
 .dialog-content .el-descriptions {
-  margin-top: 10px;
+  width: 40vw;
+  font-size: 1.8vh;
 }
 
-.dialog-content :deep(.desc-label) {
-  font-weight: bold;
-  min-width: 100px;
-  text-align: right;
-  background-color: #f9fafc;
-  /* Light background for labels */
+.dialog-content :deep(.el-descriptions__label) {
+  width: 15%; /* 调小宽度 */
+  font-size: 1.8vh;
+  font-weight: 600;
 }
+
+.dialog-content :deep(.el-descriptions__content) {
+  font-size: 1.8vh;
+  line-height: 3vh;
+}
+
 
 .el-tag {
-  width: 9vh;
-  height: 3.8vh;
-  font-size: 2vh;
+  width: 8.5vh;
+  height: 3.2vh;
+  font-size: 1.8vh;
 }
 
 .el-button {
@@ -538,10 +545,15 @@ onMounted(() => {
 }
 
 :deep(.el-select__selection) {
-  font-size: 1.9vh;
+  font-size: 1.8vh;
 }
 
 .el-select {
   margin-right: 9vw;
+}
+
+:deep(.el-divider__text) {
+  font-size: 1.8vh;
+  font-weight: 600;
 }
 </style>
