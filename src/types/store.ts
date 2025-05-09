@@ -9,7 +9,7 @@ export enum ServiceType {
 export interface Store {
     id: number
     storeName: string
-    categories: string
+    categories: string[]
     ownerIdNumber: string
     description: string
     registrationAddress: string
@@ -17,14 +17,14 @@ export interface Store {
     registrationDate: string
     ownerId: number
     imageUrl?: string
-    isOpen?: boolean
-    rating?: number
+    // isOpen?: boolean
+    // rating?: number
 }
 
 // 创建店铺的DTO接口
 export interface CreateStoreDTO {
     storeName: string
-    categories: string
+    categories: string[]
     ownerIdNumber: string
     description: string
     registrationAddress: string

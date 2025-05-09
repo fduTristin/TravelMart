@@ -1,5 +1,5 @@
 import { api } from './api'
-import type { User } from '@/types/user'
+import type { User, UpdateUserDTO } from '@/types/user'
 import { useAuthStore } from '@/stores/auth'
 
 export const userService = {
@@ -8,7 +8,7 @@ export const userService = {
     console.log('Fetching all users...')
     const token = useAuthStore().token;
     console.log(`Token: ${token}`)
-    return await api.get<User[]>('/admin/users', {
+    return await api.get<User[]>('/users', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -34,5 +34,19 @@ export const userService = {
         'Authorization': `Bearer ${token}`,
       },
     })
-  }
+  },
+
+  // 更新用户
+  updateUser: async (userData: UpdateUserDTO) => {
+    const token = useAuthStore().token;
+    try {
+      return await api.patch(`/profile`, userData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+    } catch (error: any) {
+      throw error
+    }
+  },
 }

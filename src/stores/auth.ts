@@ -6,6 +6,7 @@ import type { AxiosError } from 'axios'
 
 interface JwtPayload {
   sub: string
+  userId: number
   userRole: 'ADMIN' | 'MERCHANT' | 'CUSTOMER'
   iat: number
   exp: number
@@ -45,6 +46,9 @@ export const useAuthStore = defineStore('auth', () => {
       return null
     }
   })
+
+  // 获取用户ID
+  const userId = computed(() => user.value?.userId || null)
 
   // 用户角色
   const role = computed(() => user.value?.userRole || null)
@@ -108,13 +112,6 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.post('/auth/register', userData)
       return response.data
     } catch (err: unknown) {
-      // 处理错误响应
-      const axiosError = err as AxiosError<ErrorResponse>
-      if (axiosError.response?.data?.message) {
-        error.value = axiosError.response.data.message
-      } else {
-        error.value = '用户名已存在！'
-      }
       throw err
     } finally {
       loading.value = false
@@ -129,6 +126,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     token,
     user,
+    userId,
     role,
     isMerchant,
     isAdmin,

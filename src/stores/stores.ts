@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { api } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
-import type{Store, CreateStoreDTO} from '@/types/store'
+import type { Store, CreateStoreDTO } from '@/types/store'
 import { storeService } from '@/services/storeService'
 
 // 服务类型枚举
@@ -81,33 +81,20 @@ export const useStoreStore = defineStore('store', () => {
   // 创建新店铺
   const createStore = async (data: CreateStoreDTO) => {
     try {
-      const authStore = useAuthStore()
-
-      // 确保用户已登录
-      if (!authStore.token) {
-        throw new Error('用户未登录')
-      }
-
-      // 设置请求头中的 token
-      const response = await api.post('/stores/create', data, {
-        headers: {
-          Authorization: `Bearer ${authStore.token}`
-        }
-      })
-
-      // 如果后端返回创建的店铺信息,使用后端返回的数据
-      if (response.data) {
-        const newStore = response.data
-
-        // 添加到本地状态中
-        stores.value.push(newStore)
-        return newStore
-      } else {
-        throw new Error('创建店铺失败,服务器未返回数据')
-      }
-    } catch (error) {
-      console.error('创建店铺失败:', error)
-      throw error
+      loading.value = true
+      error.value = null
+      const newStore = await storeService.createStore(data)
+      newStore.imageUrl = newStore.imageUrl || '/restaurant.jpg' // 设置默认图片
+      stores.value.push(newStore)
+      console.log('新建店铺成功:', stores.value)
+      return newStore
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : '获取店铺列表失败'
+      error.value = errorMsg
+      console.error('新建店铺失败:', err)
+      throw err
+    } finally {
+      loading.value = false
     }
   }
 

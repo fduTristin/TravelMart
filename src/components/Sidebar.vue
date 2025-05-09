@@ -1,21 +1,41 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router'
 import { ElAside, ElMenu, ElMenuItem, ElIcon, ElDivider, ElAvatar } from 'element-plus'
-import { House, User, Setting, SwitchButton } from '@element-plus/icons-vue'
+import { House, User, Setting, SwitchButton, Ticket } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/users'
 import CustomDropdown from '@/components/CustomDropdown.vue'
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const userStore = useUserStore()
+const userName = ref('')
+
+// 获取当前用户信息
+const fetchCurrentUser = async () => {
+  try {
+    await userStore.fetchCurrentUser()
+    userName.value = userStore.currentUser.userName
+  } catch (error) {
+    console.error('Failed to fetch user:', error)
+  }
+}
+
+// 组件挂载时获取用户信息
+onMounted(() => {
+  if (authStore.isAuthenticated && !authStore.isAdmin) {
+    fetchCurrentUser()
+  }
+})
 
 // 处理登出
 const handleLogout = () => {
   // 保存用户名到 localStorage
-  if (authStore.user?.sub) {
-    localStorage.setItem('lastUsername', authStore.user.sub)
+  if (userName.value) {
+    localStorage.setItem('lastUsername', userName.value)
   }
   authStore.logout()
   router.push('/login')
@@ -35,6 +55,9 @@ const handleCommand = (command: string) => {
 
 const storeMenuLabel = computed(() => {
   return authStore.isMerchant ? '我的店铺' : authStore.isAdmin?'店铺管理':'店铺列表'
+})
+const productMenuLabel = computed(() => {
+  return authStore.isMerchant ? '商品申请历史' : '商品申请管理'
 })
 </script>
 
@@ -68,6 +91,12 @@ const storeMenuLabel = computed(() => {
         </el-icon>
         <span>{{ storeMenuLabel }}</span>
       </el-menu-item>
+      <el-menu-item v-if="authStore.isAdmin || authStore.isMerchant" index="/product-applications" class="menu-item">
+        <el-icon>
+          <Ticket />
+        </el-icon>
+        <span>{{ productMenuLabel }}</span>
+      </el-menu-item>
     </el-menu>
 
     <!-- 用户信息区域 -->
@@ -76,11 +105,11 @@ const storeMenuLabel = computed(() => {
         <template #trigger>
           <div class="user-info-content">
             <el-avatar :src="'/avatar.png'" class="custom-avatar" />
-            <span class="username">{{ authStore.user?.sub }}</span>
+            <span class="username">{{ userName || 'admin' }}</span>
           </div>
         </template>
         <template #menu>
-          <div @click="handleCommand('profile')">
+          <div v-if="!authStore.isAdmin" @click="handleCommand('profile')">
             <el-icon><User /></el-icon>
             个人信息
           </div>

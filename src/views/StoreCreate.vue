@@ -154,12 +154,8 @@ const handleSubmit = async () => {
       try {
         loading.value = true
         // 将categories数组转换为逗号分隔的字符串
-        const submitData = {
-          ...formData.value,
-          categories: formData.value.categories.join(',')
-        }
         // 调用创建店铺的API
-        const newStore = await storeStore.createStore(submitData)
+        const newStore = await storeStore.createStore(formData.value)
         ElMessage.success('店铺创建成功')
         router.push(`/stores/${newStore.id}`)
       } catch (error: unknown) {
