@@ -112,16 +112,33 @@ export const productService = {
    * @param productId - 商品ID
    * @returns 商品详情
    */
-  async getProductById(productId: number): Promise<Product> {
-    const authStore = useAuthStore() // 假设此接口也需要认证
-    const response = await api.get<Product>(`/products/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`
+  async getProductById(productId: number): Promise<Product> { // <--- 明确返回 Product
+    // const authStore = useAuthStore(); // 如果此接口需要token
+    try {
+      // 假设 GET /products/{productId} 不需要 token，或者你的 api 实例已处理
+      const response: AxiosResponse<Product> = await api.get(`/products/${productId}`/*, {
+        headers: { Authorization: `Bearer ${authStore.token}` } // 如果需要
+      }*/);
+
+      if (response && response.data) { // 检查响应和 data 属性
+        return response.data; // 返回实际的 Product 对象
+      } else {
+        console.error(`Invalid product data structure for product ID ${productId}:`, response);
+        throw new Error(`商品数据无效 (ID: ${productId})`);
       }
-    })
-    return response.data
+    } catch (error) {
+      console.error(`Error fetching product by ID ${productId} in service:`, error);
+      throw error; // 将错误向上抛出
+    }
   },
 
+  /**
+   * 管理员审核商品上架/修改申请
+   * PATCH /product-applications/{applicationId}
+   * @param applicationId - 商品申请ID
+   * @param data - 审核决定数据
+   * @returns 更新后的商品申请记录
+   */
   async reviewProductApplication(applicationId: number, data: ReviewApplicationDTO): Promise<ProductApplication> {
     const authStore = useAuthStore();
     const response = await api.patch<ProductApplication>(`/product-applications/${applicationId}`, data, {
@@ -132,6 +149,12 @@ export const productService = {
     return response.data;
   },
 
+  /**
+   * 获取单个商品申请的详细信息
+   * GET /product-applications/{applicationId}
+   * @param applicationId - 商品申请ID
+   * @returns 商品申请详情记录
+   */
   async getProductApplicationDetails(applicationId: number): Promise<ProductApplication> {
     const authStore = useAuthStore();
     const response = await api.get<ProductApplication>(`/product-applications/${applicationId}`, {

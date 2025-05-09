@@ -56,17 +56,23 @@ export const useProductStore = defineStore('product', () => {
    * 获取单个商品详情
    * @param productId - 商品ID
    */
-  async function fetchProductDetails(productId: number) {
-    loading.value = true
-    error.value = null
+  async function fetchProductDetails(productId: number) { // 我会给它加上返回类型 Promise<Product | null>
+    loading.value = true;
+    error.value = null;
+    currentProduct.value = null; // 清除旧值
     try {
-      currentProduct.value = await productService.getProductById(productId)
+      // productService.getProductById(productId) 现在直接返回 Product 或抛出错误
+      const productData = await productService.getProductById(productId);
+      currentProduct.value = productData; // 直接赋值
+      console.log(`[StoreAction] Fetched product by ID ${productId}:`, JSON.parse(JSON.stringify(currentProduct.value)));
+      // return productData; // 如果希望 action 也返回值给组件
     } catch (err: any) {
-      error.value = err.message || '获取商品详情失败'
-      console.error('Error fetching product details:', err)
-      currentProduct.value = null
+      error.value = err.message || `获取商品详情 (ID: ${productId}) 失败`;
+      console.error(`[StoreAction] Error fetching product by ID ${productId}:`, err);
+      currentProduct.value = null;
+      // throw err; // 如果希望组件也能捕获到这个错误
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 

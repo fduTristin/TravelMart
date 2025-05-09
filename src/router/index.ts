@@ -112,6 +112,17 @@ const routes: RouteRecordRaw[] = [
     })
   },
   {
+    path: '/products/:productId', // 使用 :productId 作为参数
+    name: 'ProductDetail',
+    component: () => import('@/views/product/ProductDetail.vue'),
+    meta: {
+      title: '商品详情', // 页面标题
+      requiresAuth: false, // 通常商品详情页不需要登录即可查看，除非有特殊业务需求
+      // keepAlive: false, // 通常详情页不需要keep-alive
+    },
+    props: true // 这会将路由参数 :productId 作为 prop 传递给组件，但我们这里用 useRoute() 更灵活
+  },
+  {
     // 假设你的店铺详情页路径是 /stores/:storeId
     // 那么添加商品可以在其子路径下
     path: '/stores/:storeId/products/apply', // :storeId 是关键
